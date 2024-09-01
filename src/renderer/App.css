@@ -12,16 +12,21 @@ a:-webkit-any-link {
 }
 
 html, body, #root {
-  height:100%;
-  margin:0;
+  height: 100%;
+  margin: 0;
   font-family: "Source Code Pro", "Courier New", "Courier", monospace;
 }
 
-#root {
+body {
+  min-height: 100%;
+}
+
+html {
   background-image: url('../../assets/images/title/skyline-night.gif');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center bottom;
+  background-attachment: fixed;
 }
 
 header {
@@ -49,12 +54,15 @@ header #titlebar {
 
 #right {
   display: flex;
-  width: 150px;
   justify-content: space-between;
   font-size: 18px;
   font-weight: bold;
   color: darkorchid;
   text-shadow: darkorchid 0px 0px 10px;
+}
+
+#right #separator {
+  margin: 0px 15px;
 }
 
 #exit:hover, #options:hover {

@@ -48,8 +48,8 @@ function FrenzyNETHeader(props:FrenzyNETHeaderProps) {
           FrenzyNET
         </div>
         <div id="right">
-          <div id="options"><Link to="/options">OPTIONS</Link></div>
-          /
+          {props.page === "options" ? <div id="options"><Link to="/">MAIN MENU</Link></div> : <div id="options"><Link to="/options">OPTIONS</Link></div>}
+          <div id="separator">/</div>
           <div id="exit" onClick={closeApp}>
             EXIT
           </div>
