@@ -139,7 +139,3 @@ app
     });
   })
   .catch(console.log);
-
-function closeApp(e){
-  app.exit();
-}
