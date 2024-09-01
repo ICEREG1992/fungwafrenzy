@@ -56,7 +56,7 @@ function FrenzyNETHeader(props:FrenzyNETHeaderProps) {
         </div>
       </div>
       <Marquee speed={25}>
-        <span>Officials warn of fraud with local utility companies: Water, Electric, etc. /</span>
+        <span>Officials warn of corruption within local utility companies: Water, Electric, etc. /</span>
         <span>Art collective Synydyne's "Bear Stearns Bravo" taken offline in unlisting scandal /</span>
         <span>Battle Club found! Was inside us all along? /</span>
       </Marquee>
