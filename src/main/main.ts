@@ -31,6 +31,10 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
+ipcMain.on('close-app', () => {
+  app.quit();
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -135,3 +139,7 @@ app
     });
   })
   .catch(console.log);
+
+function closeApp(e){
+  app.exit();
+}

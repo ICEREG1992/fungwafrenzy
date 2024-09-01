@@ -6,6 +6,11 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+a:-webkit-any-link {
+  color: unset;
+  text-decoration: unset;
+}
+
 html, body, #root {
   height:100%;
   margin:0;
@@ -16,65 +21,96 @@ html, body, #root {
   background-image: url('../../assets/images/title/skyline-night.gif');
   background-repeat: no-repeat;
   background-size: cover;
+  background-position: center bottom;
 }
 
 header {
   display: flex;
   justify-content: space-between;
   flex-direction: column;
-  height: 100px;
 }
 
 header #titlebar {
   height: 30px;
   padding: 10px 20px;
-  background-color: grey;
+  background-color: #414141;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-direction: row;
 }
 
-#title {
-  font-size: 24px;
+#left {
+  color: white;
+  font-size: 20px;
   font-weight: bold;
   font-style: italic;
 }
 
-#exit {
+#right {
+  display: flex;
+  width: 150px;
+  justify-content: space-between;
   font-size: 18px;
   font-weight: bold;
   color: darkorchid;
   text-shadow: darkorchid 0px 0px 10px;
+}
+
+#exit:hover, #options:hover {
   cursor: pointer;
+  color: rgb(120, 39, 161);
+  text-shadow: rgb(120, 39, 161) 0px 0px 10px;
 }
 
 .rfm-marquee-container {
-  height: 60px;
+  height: 50px;
   width: 100%;
-  background-color: darkgrey;
+  background-color: #111111bc;
   display: flex;
   justify-content: space-between;
   align-items: center;
   white-space: nowrap;
-  text-shadow: black 0px 0px 10px;
   overflow: hidden;
-}
-
-#ticker div {
-  display: block;
-  width: min-content;
-  position: absolute;
-  overflow: hidden;
-  text-wrap: nowrap;
-  animation: marquee 20s linear infinite;
+  color: goldenrod;
+  text-shadow: goldenrod 0px 0px 10px;
 }
 
 .rfm-child {
   padding-right: 9px;
 }
 
-@keyframes marquee {
-  0% { left: 0; }
-  100% { left: -100%; }
+#body {
+  width: 100%;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  padding-top:50px;
+}
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(3, 2fr);
+  gap: 20px;
+}
+
+#grid button {
+  font-family: "Source Code Pro", "Courier New", "Courier", monospace;
+  font-size: 30px;
+  height: 130px;
+  width: 230px;
+}
+
+#navigation {
+  display:flex;
+  justify-content: space-around;
+  align-items: center;
+  color: white;
+  height:80px;
+  background-color: #222222ac
+}
+
+#mainbutton {
+  width: 96px;
+  height: 50px;
 }
