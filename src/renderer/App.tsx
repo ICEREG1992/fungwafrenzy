@@ -80,9 +80,11 @@ function FrenzyNETHeader(props:FrenzyNETHeaderProps) {
         </div>
       </div>
       <Marquee speed={25}>
-        <span>Officials warn of corruption within local utility companies: Water, Electric, etc. /</span>
+        <span>Authorities warn of corruption within local utility companies: Water, Electric, etc. /</span>
         <span>Art collective Synydyne's "Bear Stearns Bravo" taken offline in unlisting scandal /</span>
         <span>Battle Club found! Was inside us all along? /</span>
+        <span>JET sequel announced for 2027 /</span>
+        <span>Bear Stearns unveils new line of consolation and greeting cards. "I CARE" SEZ JUDO JACKIE. /</span>
       </Marquee>
       {props.nav ? <HeaderNavigation page={props.page}/> : null}
     </header>
