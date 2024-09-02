@@ -78,8 +78,8 @@ function FrenzyNETHeader(props:FrenzyNETHeaderProps) {
             <Link to="./">EXIT</Link>
           </div>
         </div>
-      </div>
-      <Marquee speed={25}>
+      </div> 
+      <Marquee speed={25}> {/* TODO: get this to start at random location on render */}
         <span>Authorities warn of corruption within local utility companies: Water, Electric, etc. /</span>
         <span>Art collective Synydyne's "Bear Stearns Bravo" taken offline in unlisting scandal /</span>
         <span>Battle Club found! Was inside us all along? /</span>
