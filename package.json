@@ -1,23 +1,19 @@
 {
-  "description": "A foundation for scalable desktop apps",
+  "description": "Modern client for FMV game \"Fung-Wa Frenzy\"",
   "keywords": [
-    "electron",
-    "boilerplate",
-    "react",
-    "typescript",
-    "ts",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
+    "Fung-Wa",
+    "Frenzy",
+    "FMV",
+    "Client",
+    "Game"
   ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/ICEREG1992/fungwafrenzy",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://github.com/ICEREG1992/fungwafrenzy/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/ICEREG1992/fungwafrenzy.git"
   },
   "license": "MIT",
   "author": {
@@ -27,9 +23,9 @@
   },
   "contributors": [
     {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
+      "name": "William Sullivan",
+      "email": "willwill.sullivan@gmail.com",
+      "url": "https://github.com/ICEREG1992"
     }
   ],
   "main": "./src/main/main.ts",
@@ -172,8 +168,8 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "Fung-Wa Frenzy",
+    "appId": "com.icereg1992.fungwafrenzy",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -232,12 +228,9 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "ICEREG1992",
+      "repo": "fungwafrenzy"
     }
-  },
-  "collective": {
-    "url": "https://opencollective.com/electron-react-boilerplate-594"
   },
   "devEngines": {
     "node": ">=14.x",

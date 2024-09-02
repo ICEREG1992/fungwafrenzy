@@ -112,6 +112,9 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
 
+  // Kill menu with weird workaround
+  mainWindow.removeMenu();
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();

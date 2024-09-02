@@ -130,7 +130,7 @@ function Options() {
           </div>
           <div className="NETbody">
             <div className = "NETline">
-              <b>resolution:</b> 720x480 <a>&lt;CHANGE&gt;</a>
+              <b>resolution:</b> 1024x728 <a>&lt;CHANGE&gt;</a>
             </div>
             <div className = "NETline">
               <b>fullscreen:</b> disabled <a>&lt;CHANGE&gt;</a>
