@@ -134,8 +134,9 @@ header #titlebar {
   height: 50px;
 }
 
-button {
+button, a {
   user-select: none;
+  -webkit-user-drag: none;
 }
 
 .NETcontainer {
