@@ -3,11 +3,11 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels =
-  | 'ipc-example' 
-  | 'close-app' 
-  | 'get-appdatapaths' 
-  | 'load-userconfig' 
-  | 'load-saves' 
+  | 'ipc-example'
+  | 'close-app'
+  | 'get-appdatapaths'
+  | 'load-userconfig'
+  | 'load-saves'
   | 'load-impacts';
 
 const electronHandler = {
