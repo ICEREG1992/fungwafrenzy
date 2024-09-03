@@ -39,7 +39,7 @@ ipcMain.on('close-app', () => {
 ipcMain.handle('get-appdatapaths', () => {
   return [
     path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts'),
-    path.join(app.getPath('appData'), 'fungwafrenzy', 'saves')
+    path.join(app.getPath('appData'), 'fungwafrenzy', 'saves'),
   ];
 });
 
