@@ -37,11 +37,14 @@ ipcMain.on('close-app', () => {
 });
 
 ipcMain.handle('get-appdatapaths', () => {
-  return [path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts'), path.join(app.getPath('appData'), 'fungwafrenzy', 'saves')];
+  return [
+    path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts'),
+    path.join(app.getPath('appData'), 'fungwafrenzy', 'saves')
+  ];
 });
 
-ipcMain.handle('load-impacts', (e, path) => {
-  const impactFolders = fs.readdirSync(path);
+ipcMain.handle('load-impacts', (e, p) => {
+  const impactFolders = fs.readdirSync(p);
   console.log(impactFolders);
   return impactFolders;
 });
