@@ -72,7 +72,7 @@ header #titlebar {
   margin: 0px 15px;
 }
 
-#exit:hover, #options:hover {
+#exit:hover, #settings:hover {
   cursor: pointer;
   color: rgb(120, 39, 161);
   text-shadow: rgb(120, 39, 161) 0px 0px 10px;

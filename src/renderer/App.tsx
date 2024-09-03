@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import path from 'path-browserify';
 import FrenzyNETHeader from './FrenzyNETHeader';
 import { userSettings } from './interfaces';
-import Options from './Options';
+import Settings from './Settings';
 import Browse from './Browse';
 import './App.css';
 
@@ -117,7 +117,7 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Title />} />
-        <Route path="/options" element={<Options settings={userSettings}/>} />
+        <Route path="/settings" element={<Settings settings={userSettings}/>} />
         <Route path="/browse" element={<Browse path={userSettings.impact_folder_path}/>} />
         <Route path="/loadimpact" element={<LoadImpact />} />
         <Route path="/loadgame" element={<LoadGame />} />

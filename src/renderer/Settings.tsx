@@ -1,14 +1,14 @@
 import FrenzyNETHeader from './FrenzyNETHeader';
 import { userSettings } from './interfaces';
 
-interface OptionsProps {
+interface SettingsProps {
     settings: userSettings;
 }
 
-export default function Options(props:OptionsProps) {
+export default function Settings(props:SettingsProps) {
     return (
       <div>
-        <FrenzyNETHeader nav page="options"/>
+        <FrenzyNETHeader nav page="settings"/>
         <div id="body">
           <div className="NETcontainer">
             <div className="NETheader">

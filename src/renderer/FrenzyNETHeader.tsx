@@ -18,7 +18,7 @@ export default function FrenzyNETHeader(props:FrenzyNETHeaderProps) {
           <Link to="/">FrenzyNET</Link>
         </div>
         <div id="right">
-          {props.page === "options" ? <div id="options"><Link to="/">MAIN MENU</Link></div> : <div id="options"><Link to="/options">OPTIONS</Link></div>}
+          {props.page === "settings" ? <div id="settings"><Link to="/">MAIN MENU</Link></div> : <div id="settings"><Link to="/settings">SETTINGS</Link></div>}
           <div id="separator">/</div>
           <div id="exit" onClick={closeApp}>
             <Link to="./">EXIT</Link>
