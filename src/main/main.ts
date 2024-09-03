@@ -36,6 +36,16 @@ ipcMain.on('close-app', () => {
   app.quit();
 });
 
+ipcMain.handle('get-appdatapaths', () => {
+  return [path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts'), path.join(app.getPath('appData'), 'fungwafrenzy', 'saves')];
+});
+
+ipcMain.handle('load-impacts', (e, path) => {
+  const impactFolders = fs.readdirSync(path);
+  console.log(impactFolders);
+  return impactFolders;
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();

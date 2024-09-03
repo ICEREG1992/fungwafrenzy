@@ -17,6 +17,12 @@ html, body, #root {
   font-family: "Source Code Pro", "Courier New", "Courier", monospace;
 }
 
+#root>div {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 body {
   min-height: 100%;
 }
@@ -92,9 +98,29 @@ header #titlebar {
 #body {
   width: 100%;
   display:flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding-top:50px;
+  overflow-y: scroll;
+}
+
+#body::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  position: fixed;
+}
+
+/* Custom scrollbar track */
+#body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Custom scrollbar handle */
+#body::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  border: 3px solid transparent; /* Add space around the thumb */
+  background-clip: padding-box;
 }
 
 #grid {
@@ -125,6 +151,7 @@ header #titlebar {
   justify-content: space-between;
   align-items: center;
   height: 80px;
+  margin: 0px 20px;
 }
 
 #mainbutton {
@@ -143,6 +170,7 @@ button, a {
   display: flex;
   flex-direction: column;
   width: 760px;
+  margin: 0px 15px;
 }
 
 .NETheader {
@@ -164,6 +192,20 @@ button, a {
 
 .NETline {
   margin: 8px 0px;
+}
+
+.NETimpact {
+  display: flex;
+  align-items: center;
+  padding: 0px 40px;
+  margin-bottom: 30px;
+  font-size: 24px;
+  background-color: #222222ac;
+  border: 1px solid #aaaaaa88;
+  color: cyan;
+  height: 128px;
+  user-select: none;
+  cursor: pointer;
 }
 
 input[type="range"] {
