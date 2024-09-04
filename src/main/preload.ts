@@ -8,7 +8,7 @@ export type Channels =
   | 'get-appdatapaths'
   | 'load-userconfig'
   | 'load-saves'
-  | 'load-impacts';
+  | 'get-impacts';
 
 const electronHandler = {
   ipcRenderer: {

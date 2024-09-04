@@ -197,15 +197,19 @@ button, a {
 .NETimpact {
   display: flex;
   align-items: center;
-  padding: 0px 40px;
   margin-bottom: 30px;
   font-size: 24px;
   background-color: #222222ac;
   border: 1px solid #aaaaaa88;
   color: cyan;
   height: 128px;
+  width: 728px;
   user-select: none;
   cursor: pointer;
+}
+
+.NETimpact div {
+  padding: 0px 40px;
 }
 
 input[type="range"] {

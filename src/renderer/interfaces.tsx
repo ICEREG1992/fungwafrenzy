@@ -1,4 +1,5 @@
 export interface userSettings {
+    selected_impact: string;
     player_theme: string;
     impact_folder_path: string;
     save_folder_path: string;

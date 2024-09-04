@@ -73,6 +73,7 @@ function Title() {
 export default function App() {
   
   const [userSettings, setUserSettings] = useState<userSettings>({
+    "selected_impact": "",
     "player_theme": "classic",
     "impact_folder_path": "x",
     "save_folder_path": "y",
@@ -94,8 +95,9 @@ export default function App() {
         }
       }
       // data not successfully returned, fill with defaults
-      window.electron.ipcRenderer.invoke('get-appdatapaths').then((res) => {
+      window.electron.ipcRenderer.invoke('get-appdatapaths').then((res: Array<string>) => {
         setUserSettings({
+          "selected_impact": "",
           "player_theme": "classic",
           "impact_folder_path": res[0],
           "save_folder_path": res[1],
@@ -112,13 +114,19 @@ export default function App() {
     loadSettings();
   }, [])
   
+  const selectImpact = (name: string) => {
+    setUserSettings((prev) => ({
+        ...prev,
+        selected_impact: name,
+    }));
+  }
 
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Title />} />
         <Route path="/settings" element={<Settings settings={userSettings}/>} />
-        <Route path="/browse" element={<Browse path={userSettings.impact_folder_path}/>} />
+        <Route path="/browse" element={<Browse path={userSettings.impact_folder_path} selectImpact={selectImpact}/>} />
         <Route path="/loadimpact" element={<LoadImpact />} />
         <Route path="/loadgame" element={<LoadGame />} />
         <Route path="/credits" element={<Credits />} />

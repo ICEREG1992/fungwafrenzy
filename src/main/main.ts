@@ -8,9 +8,9 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import path from 'path';
+import path, { resolve } from 'path';
 import fs from 'fs';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, protocol, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -43,10 +43,22 @@ ipcMain.handle('get-appdatapaths', () => {
   ];
 });
 
-ipcMain.handle('load-impacts', (e, p) => {
+ipcMain.handle('get-impacts', (e, p:string) => {
   const impactFolders = fs.readdirSync(p);
-  console.log(impactFolders);
-  return impactFolders;
+  const out: Array<Array<string>> = [];
+  impactFolders.forEach(i => {
+    const icons = fs.readdirSync(path.join(p,i)).filter(file => /^icon\.(png|jpg|jpeg|gif|webp})/.test(file));
+    var image = "";
+    if (icons.length) {
+      const firstIcon = path.join(p,i,icons[0]);
+      const imageBuffer = fs.readFileSync(firstIcon);
+      image = `data:image/png;base64,` + imageBuffer.toString('base64');
+    } else {
+      image = "";
+    }
+    out.push([i, image]);
+  });
+  return out;
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -148,6 +160,7 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
+    // create custom file protocol to serve im
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
