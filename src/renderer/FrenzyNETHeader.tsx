@@ -31,6 +31,11 @@ export default function FrenzyNETHeader(props:FrenzyNETHeaderProps) {
         <span>Battle Club found! Was inside us all along? /</span>
         <span>JET sequel announced for 2027 /</span>
         <span>Bear Stearns unveils new line of consolation and greeting cards. "I CARE" SEZ JUDO JACKIE. /</span>
+        <span>Cowboy Cafe celebrates 10 years of service, despite seeming lack of patronage /</span>
+        <span>Thanks, * 400TACOS /</span>
+        <span>Also try Bear Stearns Bravo! /</span>
+        <span>Dark Netrider trashes entire city block playing Grand Theft Auto 3, still at large /</span>
+        <span>Weeeeeeeeeeeeeeeeeee! /</span>
       </Marquee>
       {props.nav ? <HeaderNavigation page={props.page}/> : null}
     </header>
