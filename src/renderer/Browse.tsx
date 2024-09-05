@@ -15,7 +15,7 @@ export default function Browse(props:BrowseProps) {
         })
     }, []);
     return (
-      <div>
+      <div className="menuroot">
         <FrenzyNETHeader nav page="browse impacts"/>
         <div id="body">
             <div className="NETcontainer">

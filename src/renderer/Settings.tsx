@@ -8,7 +8,7 @@ interface SettingsProps {
 export default function Settings(props:SettingsProps) {
   console.log(props.settings)
   return (
-    <div>
+    <div className="menuroot">
       <FrenzyNETHeader nav page="settings"/>
       <div id="body">
         <div className="NETcontainer">
@@ -27,6 +27,20 @@ export default function Settings(props:SettingsProps) {
             </div>
             <div className = "NETline">
               <b>save_folder_path:</b> {props.settings.save_folder_path} <a>&lt;CHANGE&gt;</a>
+            </div>
+          </div>
+          <div className="NETheader">
+            USER SETTINGS
+          </div>
+          <div className="NETbody">
+            <div className = "NETline">
+              <b>username:</b> {props.settings.username ? props.settings.username : "NONE"} <a>&lt;CHANGE&gt;</a>
+            </div>
+            <div className = "NETline">
+              <b>class:</b> {props.settings.class ? props.settings.class : "NONE"} <a>&lt;CHANGE&gt;</a>
+            </div>
+            <div className = "NETline">
+              <b>location:</b> {props.settings.location ? props.settings.location : "NONE"} <a>&lt;CHANGE&gt;</a>
             </div>
           </div>
           <div className="NETheader">
