@@ -21,14 +21,14 @@ export default function Game(props:GameProps) {
                                     LA Nights, Love of the City
                                 </div>
                             </div>
-                            <div className = "gameUser">
+                            <Link to="/"><div className = "gameUser">
                                 <div className = "gameUsername">
                                     ICEREG1992
                                 </div>
                                 <div className = "gameUserclass">
                                     Regulator
                                 </div>
-                            </div>
+                            </div></Link>
                         </div>
                         <div className = "gameBody">
                             <div className = "gamePlayer">
