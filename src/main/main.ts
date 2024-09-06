@@ -10,8 +10,9 @@
  */
 import path, { resolve } from 'path';
 import fs from 'fs';
-import { app, BrowserWindow, protocol, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, protocol, shell, ipcMain, net } from 'electron';
 import { autoUpdater } from 'electron-updater';
+import { pathToFileURL } from 'url';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -108,6 +109,7 @@ const createWindow = async () => {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
+      webSecurity: false,
     },
   });
 
@@ -145,6 +147,15 @@ const createWindow = async () => {
   new AppUpdater();
 };
 
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'impact',
+    privileges: {
+        bypassCSP: true,
+        stream: true,
+    }
+  }
+]);
 /**
  * Add event listeners...
  */
@@ -160,7 +171,13 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
-    // create custom file protocol to serve im
+    // create custom file protocol to serve videos
+    protocol.handle("impact", (request) => {
+      const requestPath = request.url.slice('data://'.length);
+      const basePath = path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts');
+      const filePath = path.join(basePath, requestPath);
+      return net.fetch(pathToFileURL(filePath).toString());
+    });
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the

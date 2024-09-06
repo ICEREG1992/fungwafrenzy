@@ -1,4 +1,5 @@
 import { userSettings, userSave } from './interfaces';
+import ReactPlayer from 'react-player'
 import { Link } from 'react-router-dom';
 
 interface GameProps {
@@ -32,7 +33,7 @@ export default function Game(props:GameProps) {
                         </div>
                         <div className = "gameBody">
                             <div className = "gamePlayer">
-                                
+                                <ReactPlayer controls={true} playing={true} url={"impact://" + props.settings.selected_impact + "/" + "video" + "/" + "0101.mp4"}></ReactPlayer>
                             </div>
                         </div>
                         <div className = "gameControls">

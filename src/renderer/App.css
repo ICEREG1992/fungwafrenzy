@@ -303,6 +303,11 @@ input[type="range"] {
   z-index: 1;
 }
 
+.gamePlayer {
+  display: flex;
+  justify-content: center;
+}
+
 .gameControls {
   color: #738e99;
   margin-top: 28px;
