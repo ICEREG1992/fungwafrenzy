@@ -9,7 +9,7 @@
 @font-face {
   font-family: 'Rokkitt';
   font-style: normal;
-  font-weight: normal;
+  font-weight: 100 300;
   src: url('../../assets/fonts/Rokkitt-VariableFont_wght.ttf') format('truetype');
 }
 
@@ -258,9 +258,9 @@ input[type="range"] {
 }
 
 .gameTitle {
-  font-size: 23px;
+  font-size: 25px;
   color: #738E99;
-  font-weight: lighter;
+  font-weight: 200;
 }
 
 .gameSubtitle {
@@ -271,7 +271,6 @@ input[type="range"] {
 
 .gameUser {
   float: right;
-  width: min-content;
   height: 28px;
   margin: 28px 160px 0px 0px;
   overflow: hidden;

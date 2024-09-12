@@ -62,6 +62,12 @@ ipcMain.handle('get-impacts', (e, p:string) => {
   return out;
 });
 
+ipcMain.handle('get-impact', (e, i:string, p:string) => {
+  const data = fs.readFileSync(path.join(p,i,"impact.json"), 'utf-8');
+  const json = JSON.parse(data)
+  return json;
+})
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -109,7 +115,6 @@ const createWindow = async () => {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
-      webSecurity: false,
     },
   });
 
@@ -173,9 +178,14 @@ app
   .then(() => {
     // create custom file protocol to serve videos
     protocol.handle("impact", (request) => {
-      const requestPath = request.url.slice('data://'.length);
-      const basePath = path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts');
-      const filePath = path.join(basePath, requestPath);
+      const url = new URL(request.url);
+      const searchParams = new URLSearchParams(url.search);
+      const videoName = url.hostname;
+      const rootPath = searchParams.get('path');
+      const impactName = searchParams.get('impact');
+      const basePath = path.join(rootPath, impactName, 'video');
+      const filePath = path.join(basePath, videoName);
+      console.log(filePath);
       return net.fetch(pathToFileURL(filePath).toString());
     });
     createWindow();

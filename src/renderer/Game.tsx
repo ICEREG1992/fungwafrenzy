@@ -1,6 +1,8 @@
-import { userSettings, userSave } from './interfaces';
+import React, { useState, useEffect } from 'react';
+import { userSettings, userSave, impact } from './interfaces';
 import ReactPlayer from 'react-player'
 import { Link } from 'react-router-dom';
+import { getRandomValues } from 'crypto';
 
 interface GameProps {
     settings:userSettings;
@@ -8,6 +10,19 @@ interface GameProps {
 }
 
 export default function Game(props:GameProps) {
+    const [impact, setImpact] = useState<impact>();
+    useEffect(() => {
+        window.electron.ipcRenderer.invoke('get-impact', props.settings.selected_impact, props.settings.impact_folder_path).then((res) => {
+            setImpact(res);
+        })
+    }, []);
+
+    if (!impact) {
+        return (
+            <div>Impact was unable to be loaded from file.</div>
+        )
+    }
+
     switch (props.settings.player_theme) {
         case "classic":
             return(
@@ -16,24 +31,24 @@ export default function Game(props:GameProps) {
                         <div className = "gameTitlebar">
                             <div className = "gameTitling">
                                 <div className = "gameTitle">
-                                    BEAR STEARNS BRAVO / FIRST IMPACT
+                                    {impact.info.game.toUpperCase()} / {impact.info.title.toUpperCase()}
                                 </div>
                                 <div className = "gameSubtitle">
-                                    LA Nights, Love of the City
+                                    {impact.info.subtitle}
                                 </div>
                             </div>
                             <Link to="/"><div className = "gameUser">
                                 <div className = "gameUsername">
-                                    ICEREG1992
+                                    {props.settings.username ? props.settings.username : "MAIN MENU"}
                                 </div>
                                 <div className = "gameUserclass">
-                                    Regulator
+                                    {props.settings.class ? props.settings.class : ""}
                                 </div>
                             </div></Link>
                         </div>
                         <div className = "gameBody">
                             <div className = "gamePlayer">
-                                <ReactPlayer controls={true} playing={true} url={"impact://" + props.settings.selected_impact + "/" + "video" + "/" + "0101.mp4"}></ReactPlayer>
+                                <ReactPlayer controls={false} playing={true} url={"impact://" + impact.blocks[impact.meta.start].videos[0].path + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact}></ReactPlayer>
                             </div>
                         </div>
                         <div className = "gameControls">
