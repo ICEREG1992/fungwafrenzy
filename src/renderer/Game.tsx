@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { userSettings, userSave, impact } from './interfaces';
+import { userSettings, userSave, impact, gameState } from './interfaces';
+import GameControls from './GameControls';
 import ReactPlayer from 'react-player'
 import { Link } from 'react-router-dom';
 import { getRandomValues } from 'crypto';
@@ -10,12 +11,48 @@ interface GameProps {
 }
 
 export default function Game(props:GameProps) {
-    const [impact, setImpact] = useState<impact>();
+    const [impact, setImpact] = useState<impact>({
+        info:{
+            game: "",
+            title: "",
+            subtitle: "",
+            description: "",
+            length: "",
+            author: "",
+        },
+        meta:{
+            variables: [],
+            start: "",
+        },
+        blocks:{},
+        music:{},
+    });
+    const [gameState, setGameState] = useState<gameState>({
+        block: {
+            title:"",
+            videos:[],
+        },
+        currentVideo: "",
+        variables: {},
+    });
     useEffect(() => {
-        window.electron.ipcRenderer.invoke('get-impact', props.settings.selected_impact, props.settings.impact_folder_path).then((res) => {
+        window.electron.ipcRenderer.invoke('get-impact', props.settings.selected_impact, props.settings.impact_folder_path).then((res:impact) => {
             setImpact(res);
+            setGameState({
+                block: res.blocks[res.meta.start],
+                currentVideo: res.blocks[res.meta.start].videos[0].path,
+                variables: {},
+            })
         })
     }, []);
+
+    const selectVideo = (target: string) => {
+        setGameState((prev) => ({
+            ...prev,
+            block: impact.blocks[target],
+            currentVideo: impact.blocks[target].videos[0].path,
+        }));
+    }
 
     if (!impact) {
         return (
@@ -48,7 +85,8 @@ export default function Game(props:GameProps) {
                         </div>
                         <div className = "gameBody">
                             <div className = "gamePlayer">
-                                <ReactPlayer controls={false} playing={true} url={"impact://" + impact.blocks[impact.meta.start].videos[0].path + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact}></ReactPlayer>
+                                <GameControls block={gameState.block} state={gameState} setter={selectVideo}></GameControls>
+                                <ReactPlayer controls={false} playing={true} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact}></ReactPlayer>
                             </div>
                         </div>
                         <div className = "gameControls">

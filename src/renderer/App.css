@@ -305,6 +305,49 @@ input[type="range"] {
 .gamePlayer {
   display: flex;
   justify-content: center;
+  position: absolute;
+  width: 100%;
+}
+
+.gameOverlay {
+  position:absolute;
+  width: 640px;
+  bottom: 0px;
+  overflow: hidden;
+  height: 188px;
+  z-index: 5;
+  text-align: center;
+  background-color: #00000099;
+  border-top: 1px solid #ffffff1a
+}
+
+.gameButtons {
+  margin: 17px 19px;
+}
+
+.gameButton {
+  background: linear-gradient(180deg, #fcfcfccd, #dadddecd);
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 12px 15px;
+  margin-top: 9px;
+  width: 100%;
+  cursor: pointer;
+  line-height: 16px;
+  font-size: 12px;
+}
+
+.gameButton:hover {
+  background: linear-gradient(180deg, #fbfbfbf0, #dadcddf0);
+}
+
+.gameButton:active {
+  background: linear-gradient(180deg, #717171, #bababa, #b9b9b9, #b6b6b6, #b1b2b3, #aeafb0, #a8aaab, #a2a4a5);
+  
+}
+
+.gameButton:first-child {
+  margin-top: 0px;
 }
 
 .gameControls {

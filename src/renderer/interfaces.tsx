@@ -46,15 +46,16 @@ interface variable {
     type: string;
 }
 
-interface impactBlocks {
+export interface impactBlocks {
     [key: string]: impactBlock;
 }
 
-interface impactBlock {
+export interface impactBlock {
     title: string;
     videos: Array<blockVideo>;
-    targets: Array<blockTarget> | blockNext;
     flags?: Array<blockFlag>;
+    targets?: Array<blockTarget>;
+    next?: blockNext;
 }
 
 interface blockVideo {
@@ -63,7 +64,8 @@ interface blockVideo {
     condition: blockCondition;
     timing: blockTiming;
     music: string;
-    targets?: Array<blockTarget> | blockNext;
+    targets?: Array<blockTarget>;
+    next?: blockNext;
 }
 
 interface blockCondition {
@@ -76,7 +78,7 @@ interface blockTiming {
     loop: number
 }
 
-interface blockTarget {
+export interface blockTarget {
     target: string;
     text: string;
 }
@@ -97,4 +99,14 @@ interface impactMusic {
 interface impactSong {
     title: string;
     path: string;
+}
+
+export interface gameState {
+    block: impactBlock;
+    currentVideo: string;
+    variables: variables;
+}
+
+interface variables {
+    [key: string]: string;
 }
