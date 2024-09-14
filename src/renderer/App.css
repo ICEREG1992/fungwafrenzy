@@ -322,7 +322,7 @@ input[type="range"] {
 }
 
 .gameButtons {
-  margin: 17px 19px;
+  padding: 17px 19px;
 }
 
 .gameButton {

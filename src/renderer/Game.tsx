@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { userSettings, userSave, impact, gameState } from './interfaces';
+import React, { useState, useEffect, useRef } from 'react';
+import { userSettings, userSave, impact, gameState, blockTiming } from './interfaces';
 import GameControls from './GameControls';
 import ReactPlayer from 'react-player'
 import { Link } from 'react-router-dom';
@@ -11,6 +11,7 @@ interface GameProps {
 }
 
 export default function Game(props:GameProps) {
+
     const [impact, setImpact] = useState<impact>({
         info:{
             game: "",
@@ -27,6 +28,7 @@ export default function Game(props:GameProps) {
         blocks:{},
         music:{},
     });
+
     const [gameState, setGameState] = useState<gameState>({
         block: {
             title:"",
@@ -35,6 +37,9 @@ export default function Game(props:GameProps) {
         currentVideo: "",
         variables: {},
     });
+
+    const [showControls, setShowControls] = useState<boolean>(false);
+
     useEffect(() => {
         window.electron.ipcRenderer.invoke('get-impact', props.settings.selected_impact, props.settings.impact_folder_path).then((res:impact) => {
             setImpact(res);
@@ -46,18 +51,65 @@ export default function Game(props:GameProps) {
         })
     }, []);
 
-    const selectVideo = (target: string) => {
+    const selectBlock = (target: string) => {
+        console.log(target);
+        console.log(impact.blocks[target]);
         setGameState((prev) => ({
             ...prev,
             block: impact.blocks[target],
             currentVideo: impact.blocks[target].videos[0].path,
         }));
+        setShowControls(false);
     }
 
     if (!impact) {
         return (
             <div>Impact was unable to be loaded from file.</div>
         )
+    }
+
+    const gamePlayer = useRef<ReactPlayer | null>(null);
+
+    const handleOnEnded = () => {
+        if (gameState.block.next) {
+            selectBlock(gameState.block.next);
+        } else if (gamePlayer.current) {
+            var currentVideoTiming:blockTiming = {targets:-1, loop:-1,};
+            gameState.block.videos.forEach(v => {
+                if (v.path == gameState.currentVideo && v.timing) {
+                    currentVideoTiming = v.timing;
+                    return;
+                }
+            });
+            // this is inconsistent
+            console.log("video loops at " + currentVideoTiming.loop);
+            gamePlayer.current.seekTo(0);
+            gamePlayer.current.seekTo(currentVideoTiming.loop);
+        } else {
+            console.log("can't get player ref");
+        }
+    }
+
+    interface progress {
+        played: number,
+        loaded: number,
+        playedSeconds: number,
+        loadedSeconds: number,
+    }
+
+    const gameControl = useRef<typeof GameControls | null>(null);
+
+    const handleOnProgress = (e:progress) => {
+        var currentVideoTiming:blockTiming = {targets:-1, loop:-1,};
+        gameState.block.videos.forEach(v => {
+            if (v.path == gameState.currentVideo && v.timing) {
+                currentVideoTiming = v.timing;
+                return;
+            }
+        });
+        if (e.playedSeconds > currentVideoTiming.targets) {
+            setShowControls(true);
+        }
     }
 
     switch (props.settings.player_theme) {
@@ -85,8 +137,8 @@ export default function Game(props:GameProps) {
                         </div>
                         <div className = "gameBody">
                             <div className = "gamePlayer">
-                                <GameControls block={gameState.block} state={gameState} setter={selectVideo}></GameControls>
-                                <ReactPlayer controls={false} playing={true} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact}></ReactPlayer>
+                                <GameControls block={gameState.block} state={gameState} show={showControls} setter={selectBlock}></GameControls>
+                                <ReactPlayer ref={gamePlayer} onEnded={handleOnEnded} onProgress={handleOnProgress} progressInterval={250} controls={false} playing={true} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact} />
                             </div>
                         </div>
                         <div className = "gameControls">

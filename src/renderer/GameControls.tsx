@@ -1,20 +1,24 @@
+import React, { useState } from 'react';
 import { impactBlock, gameState, blockTarget } from './interfaces';
 
 interface GameControlsProps {
     block:impactBlock;
     state:gameState;
+    show:boolean;
     setter: (target: string) => void;
 }
 
 export default function GameControls(props:GameControlsProps) {
     return(
-        <div className="gameOverlay">
+        <div className="gameOverlay" style={props.show ? {height: document.getElementsByClassName('gameButtons')[0].getBoundingClientRect().height} : {height: 0}}>
             <div className="gameButtons">
                 <Buttons block={props.block} state={props.state} setter={props.setter}></Buttons>
             </div>
         </div>
     );
 }
+
+
 
 interface ButtonsProps {
     block:impactBlock;
@@ -40,7 +44,6 @@ function Buttons(props:ButtonsProps) {
         });
     } else {
         // return block targets
-        console.log("returning block targets!");
         if (props.block.targets) {
             props.block.targets.forEach(element => {
                 arr.push(
