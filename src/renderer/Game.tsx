@@ -38,7 +38,17 @@ export default function Game(props:GameProps) {
         variables: {},
     });
 
-    const [showControls, setShowControls] = useState<boolean>(false);
+    const [playing, setPlaying] = useState<boolean>(true);
+
+    interface ControlsLock {
+        show: boolean;
+        lock: boolean;
+    }
+
+    const [showControls, setShowControls] = useState<ControlsLock>({
+        show: false,
+        lock: false,
+    });
 
     useEffect(() => {
         window.electron.ipcRenderer.invoke('get-impact', props.settings.selected_impact, props.settings.impact_folder_path).then((res:impact) => {
@@ -54,12 +64,22 @@ export default function Game(props:GameProps) {
     const selectBlock = (target: string) => {
         console.log(target);
         console.log(impact.blocks[target]);
-        setGameState((prev) => ({
-            ...prev,
-            block: impact.blocks[target],
-            currentVideo: impact.blocks[target].videos[0].path,
-        }));
-        setShowControls(false);
+        setShowControls({
+            show: false,
+            lock: true, // lock the controls so they don't get put back up by handleOnProgress
+        });
+        // wait 500 ms before fading out so controls can go away
+        setTimeout(() => {
+            setGameState((prev) => ({
+                ...prev,
+                block: impact.blocks[target],
+                currentVideo: impact.blocks[target].videos[0].path,
+            }));
+            setShowControls({
+                show: false,
+                lock: false,
+            });
+        }, 500)
     }
 
     if (!impact) {
@@ -108,7 +128,12 @@ export default function Game(props:GameProps) {
             }
         });
         if (e.playedSeconds > currentVideoTiming.targets) {
-            setShowControls(true);
+            if (!showControls.lock) {
+                setShowControls({
+                    show: true,
+                    lock: false,
+                });
+            }
         }
     }
 
@@ -137,12 +162,12 @@ export default function Game(props:GameProps) {
                         </div>
                         <div className = "gameBody">
                             <div className = "gamePlayer">
-                                <GameControls block={gameState.block} state={gameState} show={showControls} setter={selectBlock}></GameControls>
-                                <ReactPlayer ref={gamePlayer} onEnded={handleOnEnded} onProgress={handleOnProgress} progressInterval={250} controls={false} playing={true} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact} />
+                                <GameControls block={gameState.block} state={gameState} show={showControls.show} setter={selectBlock}></GameControls>
+                                <ReactPlayer ref={gamePlayer} onEnded={handleOnEnded} onProgress={handleOnProgress} progressInterval={250} controls={false} playing={playing} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact} />
                             </div>
                         </div>
                         <div className = "gameControls">
-                            <a>Pause</a>  ·  <a>Restart</a>  ·  Video playback problems? Just refresh the page. You won't lose your place. 
+                            <a onClick={() => {setPlaying(!playing)}}>{playing ? "Pause" : "Play"}</a>  ·  <a>Restart</a>  ·  Video playback problems? Just refresh the page. You won't lose your place. 
                         </div>
                     </div>
                     <div className = "gameFooter">

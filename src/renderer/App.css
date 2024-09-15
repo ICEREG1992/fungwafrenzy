@@ -318,7 +318,8 @@ input[type="range"] {
   z-index: 5;
   text-align: center;
   background-color: #00000099;
-  border-top: 1px solid #ffffff1a
+  border-top: 1px solid #ffffff1a;
+  transition: height 500ms ease-in-out;
 }
 
 .gameButtons {
@@ -359,6 +360,11 @@ input[type="range"] {
 
 .gameControls a {
   font-weight: bold;
+  cursor: pointer;
+}
+
+.gameControls a:hover {
+  color: #566b73;
 }
 
 .gameFooter {
