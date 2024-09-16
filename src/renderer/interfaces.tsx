@@ -50,7 +50,7 @@ export interface impactBlocks {
 export interface impactBlock {
     title: string;
     videos: Array<blockVideo>;
-    flags?: Array<blockFlag>;
+    flags?: blockFlags;
     targets?: Array<blockTarget>;
     next?: string;
 }
@@ -61,6 +61,7 @@ interface blockVideo {
     condition: blockCondition;
     timing: blockTiming;
     music: string;
+    flags?: blockFlags;
     targets?: Array<blockTarget>;
     next?: string;
 }
@@ -78,11 +79,11 @@ export interface blockTiming {
 export interface blockTarget {
     target: string;
     text: string;
+    flags?: blockFlags;
 }
 
-interface blockFlag {
-    name: string;
-    value: string;
+export interface blockFlags {
+    [name: string]: string;
 }
 
 interface impactMusic {

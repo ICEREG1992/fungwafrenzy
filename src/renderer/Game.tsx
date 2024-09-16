@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { userSettings, impact, gameState, blockTiming, gameFlags } from './interfaces';
+import { userSettings, impact, gameState, blockTiming, gameFlags, blockFlags, blockTarget } from './interfaces';
 import GameControls from './GameControls';
 import ReactPlayer from 'react-player'
 import { Link } from 'react-router-dom';
@@ -81,56 +81,70 @@ export default function Game(props:GameProps) {
         })
     }, []);
 
-    const selectBlock = (target: string) => {
+    function handleFlags(flags:gameFlags, flag:string, target:string) {
+        // if flag is boolean, the value will either be "true", "false", or "flip"
+        switch (typeof flags[flag]) {
+            case "boolean":
+                switch ((impact.blocks[target].flags as blockFlags)[flag]) {
+                    case "true": 
+                        flags[flag] = true;
+                        break;
+                    case "false":
+                        flags[flag] = false;
+                        break;
+                    case "flip":
+                        flags[flag] = !flags[flag];
+                        break;
+                }
+                break;
+            case "number":
+                // if value ends in a "+" or "-", it is an operation, otherwise just assign the value
+                switch ((impact.blocks[target].flags as blockFlags)[flag].slice(-1)) {
+                    case "+":
+                        flags[flag] = flags[flag] as number + parseInt((impact.blocks[target].flags as blockFlags)[flag].slice(0, -1));
+                        break; 
+                    case "-":
+                        flags[flag] = flags[flag] as number - parseInt((impact.blocks[target].flags as blockFlags)[flag].slice(0, -1));
+                        break;
+                    default:
+                        flags[flag] = parseInt((impact.blocks[target].flags as blockFlags)[flag]);
+                        break;
+                }
+                break;
+        }
+    }
+
+    const selectBlock = (target: blockTarget) => {
         setShowControls({
             show: false,
             lock: true, // lock the controls so they don't get put back up by handleOnProgress
         });
-        
+        // handle button flags
+        var newFlags = gameState.flags;
+        if (target.flags) {
+            Object.keys(target.flags).forEach(flag => {
+                handleFlags(newFlags, flag, target.target);
+            });
+        }
+        // handle block flags
+        // var newFlags = gameState.flags;
+        if (impact.blocks[target.target].flags) {
+            Object.keys(impact.blocks[target.target].flags as blockFlags).forEach(flag => {
+                handleFlags(newFlags, flag, target.target);
+            });
+        }
         // wait 500 ms then change video
         setTimeout(() => {
-            // figure out what flags need to change
-            var newFlags = gameState.flags;
-            if (impact.blocks[target].flags) {
-                impact.blocks[target].flags.forEach(flag => {
-                    // if flag is boolean, the value will either be "true", "false", or "flip"
-                    switch (typeof newFlags[flag.name]) {
-                        case "boolean":
-                            switch (flag.value) {
-                                case "true": 
-                                    newFlags[flag.name] = true;
-                                    break;
-                                case "false":
-                                    newFlags[flag.name] = false;
-                                    break;
-                                case "flip":
-                                    newFlags[flag.name] = !newFlags[flag.name];
-                                    break;
-                            }
-                            break;
-                        case "number":
-                            // if value ends in a "+" or "-", it is an operation, otherwise just assign the value
-                            switch (flag.value[-1]) {
-                                case "+":
-                                    newFlags[flag.name] = newFlags[flag.name] as number + parseInt(flag.value.slice(0, -1));
-                                    break; 
-                                case "-":
-                                    newFlags[flag.name] = newFlags[flag.name] as number - parseInt(flag.value.slice(0, -1));
-                                    break;
-                                default:
-                                    newFlags[flag.name] = parseInt(flag.value);
-                                    break;
-                            }
-                            break;
-                    }
-                    
-                });
-            }
+            // figure out next video given block and flags
+
+            // now that we know video, handle video flags
+            
+            // switch to new video
             console.log(newFlags);
             setGameState(() => ({
                 flags: newFlags,
-                block: impact.blocks[target],
-                currentVideo: impact.blocks[target].videos[0].path,
+                block: impact.blocks[target.target],
+                currentVideo: impact.blocks[target.target].videos[0].path, // this will be replaced with game logic
             }));
             setShowControls({
                 show: false,
