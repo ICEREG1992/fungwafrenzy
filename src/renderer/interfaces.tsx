@@ -14,12 +14,6 @@ export interface userSettings {
     volume_music: number;
 }
 
-export interface userSave {
-    impact: string;
-    variables: object;
-    block: string;
-}
-
 export interface impact {
     info: impactInfo;
     meta: impactMeta;
@@ -37,13 +31,16 @@ interface impactInfo {
 }
 
 interface impactMeta {
-    variables: Array<variable>;
+    flags: metaFlags;
     start: string;
 }
 
-interface variable {
-    name: string;
-    type: string;
+interface metaFlags {
+    [key: string]: "bool" | "int";
+}
+
+export interface gameFlags {
+    [key: string]: boolean | number;
 }
 
 export interface impactBlocks {
@@ -100,9 +97,5 @@ interface impactSong {
 export interface gameState {
     block: impactBlock;
     currentVideo: string;
-    variables: variables;
-}
-
-interface variables {
-    [key: string]: string;
+    flags: gameFlags;
 }

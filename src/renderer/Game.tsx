@@ -1,15 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { userSettings, userSave, impact, gameState, blockTiming } from './interfaces';
+import { userSettings, impact, gameState, blockTiming, gameFlags } from './interfaces';
 import GameControls from './GameControls';
 import ReactPlayer from 'react-player'
 import { Link } from 'react-router-dom';
 import { getRandomValues } from 'crypto';
 
-interface GameProps {
-    settings:userSettings;
-    save?:userSave;
+function getDefaultValue(t:string) {
+    switch (t) {
+        case "bool": return false;
+        case "int": return 0;
+        default: return 0;
+    }
 }
 
+interface GameProps {
+    settings:userSettings;
+    save?:gameState;
+}
+
+/* Game manages the following states/refs
+state impact: holds all of the info for the impact, as read in by impact.json
+state gameState: holds the current block the user has loaded, the current video that was loaded from that block, and all of the runtime variables the impact uses
+state playing: determines whether the player is stopped or playing
+state showControls: determines whether the controls (buttons) are shown or hidden. lock is used so that the controls don't reappear during the closing animation
+ref gamePlayer: ref to the video player so we can do things like move to next video after the current video ends, and raise controls at the right time
+*/
 export default function Game(props:GameProps) {
 
     const [impact, setImpact] = useState<impact>({
@@ -22,7 +37,7 @@ export default function Game(props:GameProps) {
             author: "",
         },
         meta:{
-            variables: [],
+            flags: {},
             start: "",
         },
         blocks:{},
@@ -35,7 +50,7 @@ export default function Game(props:GameProps) {
             videos:[],
         },
         currentVideo: "",
-        variables: {},
+        flags: {},
     });
 
     const [playing, setPlaying] = useState<boolean>(true);
@@ -53,25 +68,67 @@ export default function Game(props:GameProps) {
     useEffect(() => {
         window.electron.ipcRenderer.invoke('get-impact', props.settings.selected_impact, props.settings.impact_folder_path).then((res:impact) => {
             setImpact(res);
+            // get variables
+            var flags:gameFlags = {}
+            Object.keys(res.meta.flags).forEach(f => {
+                flags[f] = getDefaultValue(res.meta.flags[f]);
+            });
             setGameState({
                 block: res.blocks[res.meta.start],
                 currentVideo: res.blocks[res.meta.start].videos[0].path,
-                variables: {},
+                flags: flags,
             })
         })
     }, []);
 
     const selectBlock = (target: string) => {
-        console.log(target);
-        console.log(impact.blocks[target]);
         setShowControls({
             show: false,
             lock: true, // lock the controls so they don't get put back up by handleOnProgress
         });
-        // wait 500 ms before fading out so controls can go away
+        
+        // wait 500 ms then change video
         setTimeout(() => {
-            setGameState((prev) => ({
-                ...prev,
+            // figure out what flags need to change
+            var newFlags = gameState.flags;
+            if (impact.blocks[target].flags) {
+                impact.blocks[target].flags.forEach(flag => {
+                    // if flag is boolean, the value will either be "true", "false", or "flip"
+                    switch (typeof newFlags[flag.name]) {
+                        case "boolean":
+                            switch (flag.value) {
+                                case "true": 
+                                    newFlags[flag.name] = true;
+                                    break;
+                                case "false":
+                                    newFlags[flag.name] = false;
+                                    break;
+                                case "flip":
+                                    newFlags[flag.name] = !newFlags[flag.name];
+                                    break;
+                            }
+                            break;
+                        case "number":
+                            // if value ends in a "+" or "-", it is an operation, otherwise just assign the value
+                            switch (flag.value[-1]) {
+                                case "+":
+                                    newFlags[flag.name] = newFlags[flag.name] as number + parseInt(flag.value.slice(0, -1));
+                                    break; 
+                                case "-":
+                                    newFlags[flag.name] = newFlags[flag.name] as number - parseInt(flag.value.slice(0, -1));
+                                    break;
+                                default:
+                                    newFlags[flag.name] = parseInt(flag.value);
+                                    break;
+                            }
+                            break;
+                    }
+                    
+                });
+            }
+            console.log(newFlags);
+            setGameState(() => ({
+                flags: newFlags,
                 block: impact.blocks[target],
                 currentVideo: impact.blocks[target].videos[0].path,
             }));
