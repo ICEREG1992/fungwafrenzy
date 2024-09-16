@@ -5,7 +5,7 @@ interface GameControlsProps {
     block:impactBlock;
     state:gameState;
     show:boolean;
-    setter: (target: string) => void;
+    setter: (target: blockTarget) => void;
 }
 
 export default function GameControls(props:GameControlsProps) {
@@ -21,7 +21,7 @@ export default function GameControls(props:GameControlsProps) {
 interface ButtonsProps {
     block:impactBlock;
     state:gameState;
-    setter: (target: string) => void;
+    setter: (target: blockTarget) => void;
 }
 
 function Buttons(props:ButtonsProps) {
@@ -35,17 +35,17 @@ function Buttons(props:ButtonsProps) {
         }
     });
     if (currentVideoTargets.length != 0) {
-        currentVideoTargets.forEach(element => {
+        currentVideoTargets.forEach(t => {
             arr.push(
-                <button className="gameButton" onClick={(event) => selectVideo(event, element.target, props.setter)}>{element.text}</button>
+                <button className="gameButton" onClick={(event) => selectVideo(event, t, props.setter)}>{t.text}</button>
             )
         });
     } else {
         // return block targets
         if (props.block.targets) {
-            props.block.targets.forEach(element => {
+            props.block.targets.forEach(t => {
                 arr.push(
-                    <button className="gameButton" onClick={(event) => selectVideo(event, element.target, props.setter)}>{element.text}</button>
+                    <button className="gameButton" onClick={(event) => selectVideo(event, t, props.setter)}>{t.text}</button>
                 )
             });
         }
@@ -53,7 +53,7 @@ function Buttons(props:ButtonsProps) {
     return arr;
 }
 
-const selectVideo = (event: React.MouseEvent<HTMLButtonElement>, target: string, setter: (name: string) => void) => {
+const selectVideo = (event: React.MouseEvent<HTMLButtonElement>, target: blockTarget, setter: (name: blockTarget) => void) => {
     event.preventDefault();
     setter(target);
     return false;

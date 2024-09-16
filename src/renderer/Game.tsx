@@ -153,6 +153,30 @@ export default function Game(props:GameProps) {
         }, 500)
     }
 
+    const nextBlock = (target: string) => {
+        // no need to lower/lock controls as they shouldn't be up
+        // handle block flags
+        var newFlags = gameState.flags;
+        if (impact.blocks[target].flags) {
+            Object.keys(impact.blocks[target].flags as blockFlags).forEach(flag => {
+                handleFlags(newFlags, flag, target);
+            });
+        }
+        // wait 500 ms then change video
+        setTimeout(() => {
+            // figure out next video given block and flags
+
+            // now that we know video, handle video flags
+            
+            // switch to new video
+            setGameState((prev) => ({
+                ...prev,
+                block: impact.blocks[target],
+                currentVideo: impact.blocks[target].videos[0].path, // this will be replaced with game logic
+            }));
+        }, 500)
+    }
+
     if (!impact) {
         return (
             <div>Impact was unable to be loaded from file.</div>
@@ -163,7 +187,7 @@ export default function Game(props:GameProps) {
 
     const handleOnEnded = () => {
         if (gameState.block.next) {
-            selectBlock(gameState.block.next);
+            nextBlock(gameState.block.next);
         } else if (gamePlayer.current) {
             var currentVideoTiming:blockTiming = {targets:-1, loop:-1,};
             gameState.block.videos.forEach(v => {
