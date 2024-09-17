@@ -55,10 +55,11 @@ export interface impactBlock {
     next?: string;
 }
 
-interface blockVideo {
+export interface blockVideo {
     path: string;
     title: string;
-    condition: blockCondition;
+    chance?: number;
+    conditions?: Array<blockCondition>;
     timing: blockTiming;
     music: string;
     flags?: blockFlags;
@@ -66,7 +67,7 @@ interface blockVideo {
     next?: string;
 }
 
-interface blockCondition {
+export interface blockCondition {
     type: string;
     value: string;
 }
@@ -99,4 +100,5 @@ export interface gameState {
     block: impactBlock;
     currentVideo: string;
     flags: gameFlags;
+    seen: Array<string>;
 }

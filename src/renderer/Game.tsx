@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { userSettings, impact, gameState, blockTiming, gameFlags, blockFlags, blockTarget } from './interfaces';
+import { userSettings, impact, impactBlock, gameState, blockTiming, gameFlags, blockFlags, blockTarget, blockVideo, blockCondition } from './interfaces';
 import GameControls from './GameControls';
 import ReactPlayer from 'react-player'
 import { Link } from 'react-router-dom';
@@ -51,6 +51,7 @@ export default function Game(props:GameProps) {
         },
         currentVideo: "",
         flags: {},
+        seen: [],
     });
 
     const [playing, setPlaying] = useState<boolean>(true);
@@ -73,11 +74,13 @@ export default function Game(props:GameProps) {
             Object.keys(res.meta.flags).forEach(f => {
                 flags[f] = getDefaultValue(res.meta.flags[f]);
             });
-            setGameState({
+            setGameState((prev:gameState) => ({
+                ...prev,
+                seen: [...prev.seen, res.meta.start, res.meta.start+"_"+res.blocks[res.meta.start].videos[0].path],
                 block: res.blocks[res.meta.start],
                 currentVideo: res.blocks[res.meta.start].videos[0].path,
                 flags: flags,
-            })
+            }));
         })
     }, []);
 
@@ -114,6 +117,33 @@ export default function Game(props:GameProps) {
         }
     }
 
+    function handleSelect(gameState:gameState, block:impactBlock) {
+        // figure out if this is a chance block or a condition block
+        if (block.videos[0].chance) {
+            // if it is chance, make one chance calculation and run it against each video until it hits
+            const rand = Math.random();
+            var sum = 0;
+            var selectedVideo = block.videos[0];
+            block.videos.some(video => {
+                sum += video.chance as number; // assert this exists always because the first video specifies chance
+                if (rand <= sum) {
+                    selectedVideo = video;
+                    return true;
+                }
+            });
+            return selectedVideo;
+        } else {
+            if (block.videos[0].conditions) {
+                // this is now a flag check, watched check, time check, or location check
+                // todo: logic here
+                return block.videos[0];
+            } else {
+                // no chance or condition, return the first video in the set
+                return block.videos[0];
+            }
+        }
+    }
+
     const selectBlock = (target: blockTarget) => {
         setShowControls({
             show: false,
@@ -136,16 +166,19 @@ export default function Game(props:GameProps) {
         // wait 500 ms then change video
         setTimeout(() => {
             // figure out next video given block and flags
-
+            const nextVideo = handleSelect(gameState, impact.blocks[target.target]);
             // now that we know video, handle video flags
             
             // switch to new video
             console.log(newFlags);
-            setGameState(() => ({
+            setGameState((prev) => ({
+                ...prev,
+                seen: [...prev.seen, target.target, target.target+"_"+nextVideo.path],
                 flags: newFlags,
                 block: impact.blocks[target.target],
-                currentVideo: impact.blocks[target.target].videos[0].path, // this will be replaced with game logic
+                currentVideo: nextVideo.path, // this will be replaced with game logic
             }));
+            console.log(gameState.seen);
             setShowControls({
                 show: false,
                 lock: false,
@@ -171,9 +204,14 @@ export default function Game(props:GameProps) {
             // switch to new video
             setGameState((prev) => ({
                 ...prev,
+                seen: [...prev.seen, target, target+"_"+impact.blocks[target].videos[0].path],
                 block: impact.blocks[target],
                 currentVideo: impact.blocks[target].videos[0].path, // this will be replaced with game logic
             }));
+            setShowControls({
+                show: false,
+                lock: false,
+            });
         }, 500)
     }
 
