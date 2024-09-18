@@ -132,6 +132,7 @@ export default function Game(props:GameProps) {
             var sum = 0;
             var selectedVideo = block.videos[0];
             block.videos.some(video => {
+                // for every video, perform this check, stop once we hit true
                 sum += video.chance as number; // assert this exists always because the first video specifies chance
                 if (rand <= sum) {
                     selectedVideo = video;
@@ -142,12 +143,75 @@ export default function Game(props:GameProps) {
         } else {
             if (block.videos[0].conditions) {
                 // this is now a flag check, watched check, time check, or location check
+                block.videos.some(video => {
+                    // for every video, perform this check, stop once we hit true
+                    if (checkConditions(video.conditions as Array<blockCondition>)) {
+                        selectedVideo = video;
+                        return true;
+                    }
+                })
                 // todo: logic here
                 return block.videos[0];
             } else {
                 // no chance or condition, return the first video in the set
                 return block.videos[0];
             }
+        }
+    }
+
+    function checkConditions(conditions:Array<blockCondition>, mode?:string) {
+        switch (mode) {
+            default:
+            case "AND":
+                var out = true;
+                conditions.forEach(condition => {
+                    out = out && checkCondition(condition);
+                });
+                break;
+            case "OR":
+                var out = false;
+                conditions.forEach(condition => {
+                    out = out || checkCondition(condition);
+                })
+                break;
+        }
+        return true;
+    }
+
+    function checkCondition(condition:blockCondition) {
+        switch (condition.type.toLowerCase()) {
+            case "and":
+                return checkConditions(condition.value as Array<blockCondition>, "AND");
+            case "or":
+                return checkConditions(condition.value as Array<blockCondition>, "OR");
+            case "seen":
+                return gameState.seen.includes(condition.value as string);
+            case "notseen":
+                return !gameState.seen.includes(condition.value as string);
+            case "time":
+                // todo: get local time
+                // todo figure out how to specify a time range inside condition.value
+                return false;
+            case "state":
+                return props.settings.location === condition.value;
+            default:
+                // interpret this as a flag check
+                switch (typeof gameState.flags[condition.type]) {
+                    case "boolean":
+                        switch (condition.value) {
+                            case "true":
+                                return gameState.flags[condition.type] as boolean;
+                            case "false":
+                                return !gameState.flags[condition.type] as boolean;
+                        }
+                        break;
+                    case "number":
+                        // todo: figure out how to elegantly check for integer comparisons at the start of condition.value (==, <=, >=, <, and >)
+                        return false;
+                    default:
+                        return false;
+                }
+                return false;
         }
     }
 

@@ -69,7 +69,7 @@ export interface blockVideo {
 
 export interface blockCondition {
     type: string;
-    value: string;
+    value: string | Array<blockCondition>;
 }
 
 export interface blockTiming {
