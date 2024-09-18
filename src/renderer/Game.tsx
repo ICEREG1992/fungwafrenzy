@@ -84,37 +84,44 @@ export default function Game(props:GameProps) {
         })
     }, []);
 
-    function handleFlags(flags:gameFlags, flag:string, target:string) {
-        // if flag is boolean, the value will either be "true", "false", or "flip"
-        switch (typeof flags[flag]) {
-            case "boolean":
-                switch ((impact.blocks[target].flags as blockFlags)[flag]) {
-                    case "true": 
-                        flags[flag] = true;
-                        break;
-                    case "false":
-                        flags[flag] = false;
-                        break;
-                    case "flip":
-                        flags[flag] = !flags[flag];
-                        break;
-                }
-                break;
-            case "number":
-                // if value ends in a "+" or "-", it is an operation, otherwise just assign the value
-                switch ((impact.blocks[target].flags as blockFlags)[flag].slice(-1)) {
-                    case "+":
-                        flags[flag] = flags[flag] as number + parseInt((impact.blocks[target].flags as blockFlags)[flag].slice(0, -1));
-                        break; 
-                    case "-":
-                        flags[flag] = flags[flag] as number - parseInt((impact.blocks[target].flags as blockFlags)[flag].slice(0, -1));
-                        break;
-                    default:
-                        flags[flag] = parseInt((impact.blocks[target].flags as blockFlags)[flag]);
-                        break;
-                }
-                break;
-        }
+    /*
+        Alters the state of our gameFlags according to a certain object's (block, target, or video) flags
+        out: the current state of flags for this session
+        flags: the flags for the intended object
+    */
+    function handleFlags(out:gameFlags, flags:blockFlags) {
+        Object.keys(flags).forEach(flag => {
+            // if flag is boolean, the value will either be "true", "false", or "flip"
+            switch (typeof out[flag]) {
+                case "boolean":
+                    switch (flags[flag]) {
+                        case "true": 
+                            out[flag] = true;
+                            break;
+                        case "false":
+                            out[flag] = false;
+                            break;
+                        case "flip":
+                            out[flag] = !out[flag];
+                            break;
+                    }
+                    break;
+                case "number":
+                    // if value ends in a "+" or "-", it is an operation, otherwise just assign the value
+                    switch (flags[flag].slice(-1)) {
+                        case "+":
+                            out[flag] = out[flag] as number + parseInt(flags[flag].slice(0, -1));
+                            break; 
+                        case "-":
+                            out[flag] = out[flag] as number - parseInt(flags[flag].slice(0, -1));
+                            break;
+                        default:
+                            out[flag] = parseInt(flags[flag]);
+                            break;
+                    }
+                    break;
+            }
+        });
     }
 
     function handleSelect(gameState:gameState, block:impactBlock) {
@@ -152,23 +159,20 @@ export default function Game(props:GameProps) {
         // handle button flags
         var newFlags = gameState.flags;
         if (target.flags) {
-            Object.keys(target.flags).forEach(flag => {
-                handleFlags(newFlags, flag, target.target);
-            });
+            handleFlags(newFlags, target.flags);
         }
         // handle block flags
-        // var newFlags = gameState.flags;
         if (impact.blocks[target.target].flags) {
-            Object.keys(impact.blocks[target.target].flags as blockFlags).forEach(flag => {
-                handleFlags(newFlags, flag, target.target);
-            });
+            handleFlags(newFlags, impact.blocks[target.target].flags as blockFlags);
         }
         // wait 500 ms then change video
         setTimeout(() => {
             // figure out next video given block and flags
             const nextVideo = handleSelect(gameState, impact.blocks[target.target]);
             // now that we know video, handle video flags
-            
+            if (nextVideo.flags) {
+                handleFlags(newFlags, nextVideo.flags)
+            }
             // switch to new video
             console.log(newFlags);
             setGameState((prev) => ({
@@ -188,19 +192,20 @@ export default function Game(props:GameProps) {
 
     const nextBlock = (target: string) => {
         // no need to lower/lock controls as they shouldn't be up
+        // no need to handle target flags because there are no targets
         // handle block flags
         var newFlags = gameState.flags;
         if (impact.blocks[target].flags) {
-            Object.keys(impact.blocks[target].flags as blockFlags).forEach(flag => {
-                handleFlags(newFlags, flag, target);
-            });
+            handleFlags(newFlags, impact.blocks[target].flags);
         }
         // wait 500 ms then change video
         setTimeout(() => {
             // figure out next video given block and flags
-
+            const nextVideo = handleSelect(gameState, impact.blocks[target]);
             // now that we know video, handle video flags
-            
+            if (nextVideo.flags) {
+                handleFlags(newFlags, nextVideo.flags)
+            }
             // switch to new video
             setGameState((prev) => ({
                 ...prev,
