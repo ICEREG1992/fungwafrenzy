@@ -129,6 +129,7 @@ export default function Game(props:GameProps) {
         if (block.videos[0].chance) {
             // if it is chance, make one chance calculation and run it against each video until it hits
             const rand = Math.random();
+            console.log(rand);
             var sum = 0;
             var selectedVideo = block.videos[0];
             block.videos.some(video => {
@@ -143,6 +144,7 @@ export default function Game(props:GameProps) {
         } else {
             if (block.videos[0].conditions) {
                 // this is now a flag check, watched check, time check, or location check
+                var selectedVideo = block.videos[0];
                 block.videos.some(video => {
                     // for every video, perform this check, stop once we hit true
                     if (checkConditions(video.conditions as Array<blockCondition>)) {
@@ -151,7 +153,7 @@ export default function Game(props:GameProps) {
                     }
                 })
                 // todo: logic here
-                return block.videos[0];
+                return selectedVideo;
             } else {
                 // no chance or condition, return the first video in the set
                 return block.videos[0];
@@ -160,22 +162,23 @@ export default function Game(props:GameProps) {
     }
 
     function checkConditions(conditions:Array<blockCondition>, mode?:string) {
+        var out:boolean;
         switch (mode) {
             default:
             case "AND":
-                var out = true;
+                out = true;
                 conditions.forEach(condition => {
                     out = out && checkCondition(condition);
                 });
                 break;
             case "OR":
-                var out = false;
+                out = false;
                 conditions.forEach(condition => {
                     out = out || checkCondition(condition);
                 })
                 break;
         }
-        return true;
+        return out;
     }
 
     function checkCondition(condition:blockCondition) {
@@ -275,7 +278,7 @@ export default function Game(props:GameProps) {
                 ...prev,
                 seen: [...prev.seen, target, target+"_"+impact.blocks[target].videos[0].path],
                 block: impact.blocks[target],
-                currentVideo: impact.blocks[target].videos[0].path, // this will be replaced with game logic
+                currentVideo: nextVideo.path, // this will be replaced with game logic
             }));
             setShowControls({
                 show: false,
