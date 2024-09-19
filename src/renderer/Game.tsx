@@ -192,8 +192,46 @@ export default function Game(props:GameProps) {
             case "notseen":
                 return !gameState.seen.includes(condition.value as string);
             case "time":
-                // todo: get local time
-                // todo figure out how to specify a time range inside condition.value
+                var now = new Date();
+                const h = now.getHours();
+                const c = splitCondition(condition.value as string); // assert this is a string because it's not an array
+                switch (c[0]) {
+                    case "==":
+                        if (parseInt(c[1])) {
+                            // compare to a const
+                            return h == parseInt(c[1]);
+                        } else {
+                            // compare to another flag
+                            return h == gameState.flags[condition.value as string];
+                        }
+                    case "<=":
+                        if (parseInt(c[1])) {
+                            return h <= parseInt(c[1]);
+                        } else {
+                            return h <= ((gameState.flags[condition.value as string] as unknown) as number);
+                        }
+                    case ">=":
+                        if (parseInt(c[1])) {
+                            return h >= parseInt(c[1]);
+                        } else {
+                            return h >= ((gameState.flags[condition.value as string] as unknown) as number);
+                        }
+                    case "<":
+                        if (parseInt(c[1])) {
+                            return h < parseInt(c[1]);
+                        } else {
+                            return h < ((gameState.flags[condition.value as string] as unknown) as number);
+                        }
+                    case ">":
+                        if (parseInt(c[1])) {
+                            return h > parseInt(c[1]);
+                        } else {
+                            return h > ((gameState.flags[condition.value as string] as unknown) as number);
+                        }
+                    default:
+                        // unknown operator, return false
+                        return false;
+                }
                 return false;
             case "state":
                 return props.settings.location === condition.value;
@@ -206,16 +244,59 @@ export default function Game(props:GameProps) {
                                 return gameState.flags[condition.type] as boolean;
                             case "false":
                                 return !gameState.flags[condition.type] as boolean;
+                            default:
+                                // compare to another flag
+                                return gameState.flags[condition.type] == gameState.flags[condition.value as string];
                         }
-                        break;
                     case "number":
-                        // todo: figure out how to elegantly check for integer comparisons at the start of condition.value (==, <=, >=, <, and >)
-                        return false;
+                        const c = splitCondition(condition.value as string); // assert this is a string because it's not an array
+                        switch (c[0]) {
+                            case "==":
+                                if (parseInt(c[1])) {
+                                    // compare to a const
+                                    return gameState.flags[condition.type] == parseInt(c[1]);
+                                } else {
+                                    // compare to another flag
+                                    return gameState.flags[condition.type] == gameState.flags[condition.value as string];
+                                }
+                            case "<=":
+                                if (parseInt(c[1])) {
+                                    return gameState.flags[condition.type] as number <= parseInt(c[1]);
+                                } else {
+                                    return gameState.flags[condition.type] <= gameState.flags[condition.value as string];
+                                }
+                            case ">=":
+                                if (parseInt(c[1])) {
+                                    return gameState.flags[condition.type] as number >= parseInt(c[1]);
+                                } else {
+                                    return gameState.flags[condition.type] >= gameState.flags[condition.value as string];
+                                }
+                            case "<":
+                                if (parseInt(c[1])) {
+                                    return gameState.flags[condition.type] as number < parseInt(c[1]);
+                                } else {
+                                    return gameState.flags[condition.type] < gameState.flags[condition.value as string];
+                                }
+                            case ">":
+                                if (parseInt(c[1])) {
+                                    return gameState.flags[condition.type] as number > parseInt(c[1]);
+                                } else {
+                                    return gameState.flags[condition.type] > gameState.flags[condition.value as string];
+                                }
+                            default:
+                                // unknown operator, return false
+                                return false;
+                        }
                     default:
                         return false;
                 }
-                return false;
         }
+    }
+
+    function splitCondition(c:string) {
+        // use regex to split a comparison out from the string
+        const match = /^(==|<=|>=|<|>)(.*)/.exec(c);
+        return (match as RegExpExecArray).slice(1); //assert this has a result
     }
 
     const selectBlock = (target: blockTarget) => {
