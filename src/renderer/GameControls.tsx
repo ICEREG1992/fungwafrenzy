@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { impactBlock, gameState, blockTarget } from './interfaces';
+import parse from 'html-react-parser';
 
 interface GameControlsProps {
     block:impactBlock;
@@ -37,7 +38,7 @@ function Buttons(props:ButtonsProps) {
     if (currentVideoTargets.length != 0) {
         currentVideoTargets.forEach(t => {
             arr.push(
-                <button className="gameButton" onClick={(event) => selectVideo(event, t, props.setter)}>{t.text}</button>
+                <button className="gameButton" onClick={(event) => selectVideo(event, t, props.setter)}>{parse(t.text)}</button>
             )
         });
     } else {
@@ -45,12 +46,16 @@ function Buttons(props:ButtonsProps) {
         if (props.block.targets) {
             props.block.targets.forEach(t => {
                 arr.push(
-                    <button className="gameButton" onClick={(event) => selectVideo(event, t, props.setter)}>{t.text}</button>
+                    <button className="gameButton" onClick={(event) => selectVideo(event, t, props.setter)}>{parse(t.text)}</button>
                 )
             });
         }
     }
     return arr;
+}
+
+function stylizeText(s:string) {
+
 }
 
 const selectVideo = (event: React.MouseEvent<HTMLButtonElement>, target: blockTarget, setter: (name: blockTarget) => void) => {
