@@ -183,10 +183,14 @@ app
       const videoName = url.hostname;
       const rootPath = searchParams.get('path');
       const impactName = searchParams.get('impact');
-      const basePath = path.join(rootPath, impactName, 'video');
-      const filePath = path.join(basePath, videoName);
-      console.log(filePath);
-      return net.fetch(pathToFileURL(filePath).toString());
+      if (rootPath && impactName) {
+        const basePath = path.join(rootPath, impactName, 'video');
+        const filePath = path.join(basePath, videoName);
+        console.log(filePath);
+        return net.fetch(pathToFileURL(filePath).toString());
+      } else {
+        return net.fetch(""); // return junk idk fix this later
+      }
     });
     createWindow();
     app.on('activate', () => {

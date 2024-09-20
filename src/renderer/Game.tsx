@@ -24,6 +24,7 @@ state gameState: holds the current block the user has loaded, the current video 
 state playing: determines whether the player is stopped or playing
 state showControls: determines whether the controls (buttons) are shown or hidden. lock is used so that the controls don't reappear during the closing animation
 ref gamePlayer: ref to the video player so we can do things like move to next video after the current video ends, and raise controls at the right time
+ref curtain: ref to the div that we use as a "curtain" to fade to black and such
 */
 export default function Game(props:GameProps) {
 
@@ -313,6 +314,8 @@ export default function Game(props:GameProps) {
         if (impact.blocks[target.target].flags) {
             handleFlags(newFlags, impact.blocks[target.target].flags as blockFlags);
         }
+        // fade out video
+        gameCurtain.current?.setAttribute("style","background-color: black;");
         // wait 500 ms then change video
         setTimeout(() => {
             // figure out next video given block and flags
@@ -335,6 +338,8 @@ export default function Game(props:GameProps) {
                 show: false,
                 lock: false,
             });
+            // fade in video
+            gameCurtain.current?.removeAttribute("style");
         }, 500)
     }
 
@@ -343,6 +348,8 @@ export default function Game(props:GameProps) {
         // no need to handle target flags because there are no targets
         // handle block flags
         var newFlags = gameState.flags;
+        // fade out video
+        gameCurtain.current?.setAttribute("style","background-color: black;");
         if (impact.blocks[target].flags) {
             handleFlags(newFlags, impact.blocks[target].flags);
         }
@@ -365,6 +372,8 @@ export default function Game(props:GameProps) {
                 show: false,
                 lock: false,
             });
+            // fade in video
+            gameCurtain.current?.removeAttribute("style");
         }, 500)
     }
 
@@ -375,6 +384,8 @@ export default function Game(props:GameProps) {
     }
 
     const gamePlayer = useRef<ReactPlayer | null>(null);
+
+    const gameCurtain = useRef<HTMLDivElement>(null);
 
     const handleOnEnded = () => {
         if (gameState.block.next) {
@@ -448,6 +459,7 @@ export default function Game(props:GameProps) {
                         </div>
                         <div className = "gameBody">
                             <div className = "gamePlayer">
+                                <div className="gameCurtain" ref={gameCurtain}></div>
                                 <GameControls block={gameState.block} state={gameState} show={showControls.show} setter={selectBlock}></GameControls>
                                 <ReactPlayer ref={gamePlayer} onEnded={handleOnEnded} onProgress={handleOnProgress} progressInterval={250} controls={false} playing={playing} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact} />
                             </div>

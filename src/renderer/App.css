@@ -309,6 +309,14 @@ input[type="range"] {
   width: 100%;
 }
 
+.gameCurtain {
+  position:absolute;
+  width: 640px;
+  height: 360px;
+  background-color: none;
+  transition: background-color 500ms ease-in-out;
+}
+
 .gameOverlay {
   position:absolute;
   width: 640px;
