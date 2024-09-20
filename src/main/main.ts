@@ -184,10 +184,19 @@ app
       const rootPath = searchParams.get('path');
       const impactName = searchParams.get('impact');
       if (rootPath && impactName) {
-        const basePath = path.join(rootPath, impactName, 'video');
-        const filePath = path.join(basePath, videoName);
-        console.log(filePath);
-        return net.fetch(pathToFileURL(filePath).toString());
+        if (videoName.endsWith('.mp4')) {
+          const basePath = path.join(rootPath, impactName, 'video');
+          const filePath = path.join(basePath, videoName);
+          console.log(filePath);
+          return net.fetch(pathToFileURL(filePath).toString());
+        } else {
+          // assume this is audio for now
+          const basePath = path.join(rootPath, impactName, 'music');
+          const filePath = path.join(basePath, videoName);
+          console.log(filePath);
+          return net.fetch(pathToFileURL(filePath).toString());
+        }
+        
       } else {
         return net.fetch(""); // return junk idk fix this later
       }

@@ -99,6 +99,7 @@ interface impactSong {
 export interface gameState {
     block: impactBlock;
     currentVideo: string;
+    currentMusic: string;
     flags: gameFlags;
     seen: Array<string>;
 }

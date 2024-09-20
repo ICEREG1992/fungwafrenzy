@@ -51,6 +51,7 @@ export default function Game(props:GameProps) {
             videos:[],
         },
         currentVideo: "",
+        currentMusic: "",
         flags: {},
         seen: [],
     });
@@ -80,6 +81,7 @@ export default function Game(props:GameProps) {
                 seen: [...prev.seen, res.meta.start, res.meta.start+"_"+res.blocks[res.meta.start].videos[0].path],
                 block: res.blocks[res.meta.start],
                 currentVideo: res.blocks[res.meta.start].videos[0].path,
+                currentMusic: res.music[res.blocks[res.meta.start].videos[0].music].path,
                 flags: flags,
             }));
         })
@@ -332,6 +334,7 @@ export default function Game(props:GameProps) {
                 flags: newFlags,
                 block: impact.blocks[target.target],
                 currentVideo: nextVideo.path, // this will be replaced with game logic
+                currentMusic: impact.music[nextVideo.music].path,
             }));
             console.log(gameState.seen);
             setShowControls({
@@ -367,6 +370,7 @@ export default function Game(props:GameProps) {
                 seen: [...prev.seen, target, target+"_"+impact.blocks[target].videos[0].path],
                 block: impact.blocks[target],
                 currentVideo: nextVideo.path, // this will be replaced with game logic
+                currentMusic: impact.music[nextVideo.music].path,
             }));
             setShowControls({
                 show: false,
@@ -461,7 +465,8 @@ export default function Game(props:GameProps) {
                             <div className = "gamePlayer">
                                 <div className="gameCurtain" ref={gameCurtain}></div>
                                 <GameControls block={gameState.block} state={gameState} show={showControls.show} setter={selectBlock}></GameControls>
-                                <ReactPlayer ref={gamePlayer} onEnded={handleOnEnded} onProgress={handleOnProgress} progressInterval={250} controls={false} playing={playing} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact} />
+                                <ReactPlayer ref={gamePlayer} onEnded={handleOnEnded} onProgress={handleOnProgress} progressInterval={250} controls={false} playing={playing} volume={(props.settings.volume_video*props.settings.volume_master)/10000} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact} />
+                                <ReactPlayer width={"0px"} height={"0px"} playing={playing} loop={true} volume={(props.settings.volume_music*props.settings.volume_master)/10000} url={"impact://" + gameState.currentMusic + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact}></ReactPlayer>
                             </div>
                         </div>
                         <div className = "gameControls">
