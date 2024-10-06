@@ -27,7 +27,8 @@ state showControls: determines whether the controls (buttons) are shown or hidde
 state fader: controls fade-out for the players
 ref gamePlayer: ref to the video player so we can do things like move to next video after the current video ends, and raise controls at the right time
 ref gameControls: ref to the controls so we can raise and lower them at will
-ref curtain: ref to the div that we use as a "curtain" to fade to black and such
+ref gameCurtain: ref to the div that we use as a "curtain" to fade to black and such
+ref gameSkip: ref to the skip button
 */
 export default function Game(props:GameProps) {
 
@@ -316,7 +317,6 @@ export default function Game(props:GameProps) {
         for (let i = 1; i <= steps; i++) {
             setTimeout(() => {
                 value += step;
-                console.log("set fader to " + value);
                 setFader(value);
             }, delay * i);
         }
@@ -431,24 +431,65 @@ export default function Game(props:GameProps) {
 
     const gameCurtain = useRef<HTMLDivElement>(null);
 
+    const gameSkip = useRef<HTMLDivElement>(null);
+
     const handleOnEnded = () => {
-        if (gameState.block.next) {
-            nextBlock(gameState.block.next);
-        } else if (gamePlayer.current) {
-            var currentVideoTiming:blockTiming = {targets:-1, loop:-1,};
-            gameState.block.videos.forEach(v => {
-                if (v.path == gameState.currentVideo && v.timing) {
-                    currentVideoTiming = v.timing;
-                    return;
-                }
-            });
-            // this is inconsistent
-            console.log("video loops at " + currentVideoTiming.loop);
-            gamePlayer.current.seekTo(0);
-            gamePlayer.current.seekTo(currentVideoTiming.loop);
+        // get current video
+        var currentVideo:blockVideo = gameState.block.videos[0]; // placeholder value to prevent typing issues
+        gameState.block.videos.forEach(v => {
+            if (v.path == gameState.currentVideo) {
+                currentVideo = v;
+                return;
+            }
+        });
+        if (gamePlayer.current) {
+            if (currentVideo.targets) {
+                // this is inconsistent
+                console.log("video loops at " + currentVideo.timing.loop);
+                gamePlayer.current.seekTo(0);
+                gamePlayer.current.seekTo(currentVideo.timing.loop);
+            } else if (currentVideo.next) {
+                nextBlock(currentVideo.next);
+            } else if (gameState.block.targets) {
+                // this is inconsistent
+                console.log("video loops at " + currentVideo.timing.loop);
+                gamePlayer.current.seekTo(0);
+                gamePlayer.current.seekTo(currentVideo.timing.loop);
+            } else if (gameState.block.next) {
+                nextBlock(gameState.block.next);
+            }
         } else {
             console.log("can't get player ref");
         }
+    }
+
+    const skipVideo = () => {
+        // get current video
+        var currentVideo:blockVideo = gameState.block.videos[0]; // placeholder value to prevent typing issues
+        gameState.block.videos.forEach(v => {
+            if (v.path == gameState.currentVideo) {
+                currentVideo = v;
+                return;
+            }
+        });
+        // now if there are targets to be shown, skip to them. prioritize video-specific rules
+        if (gamePlayer.current) {
+            if (currentVideo.targets) {
+                gamePlayer.current.seekTo(currentVideo.timing.targets);
+            } else if (currentVideo.next) {
+                nextBlock(currentVideo.next);
+            } else if (gameState.block.targets) {
+                console.log("seeking to " + currentVideo.timing.targets);
+                gamePlayer.current.seekTo(currentVideo.timing.targets);
+            } else if (gameState.block.next) {
+                nextBlock(gameState.block.next);
+            }
+        }
+        // hide the skip button
+        if (gameSkip.current) {
+            gameSkip.current.hidden = true;
+        }
+        
     }
 
     interface progress {
@@ -475,6 +516,9 @@ export default function Game(props:GameProps) {
                     lock: false,
                 });
             }
+        }
+        if (e.playedSeconds > 3 && gameSkip.current) {
+            gameSkip.current.hidden = false;
         }
     }
 
@@ -505,8 +549,9 @@ export default function Game(props:GameProps) {
                             <div className = "gamePlayer">
                                 <div className="gameCurtain" ref={gameCurtain}></div>
                                 <GameControls block={gameState.block} state={gameState} show={showControls.show} setter={selectBlock}></GameControls>
-                                <ReactPlayer ref={gamePlayer} onEnded={handleOnEnded} onProgress={handleOnProgress} progressInterval={250} controls={false} playing={playing} volume={(props.settings.volume_video*props.settings.volume_master)/10000} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact} />
+                                <ReactPlayer ref={gamePlayer} onEnded={handleOnEnded} onProgress={handleOnProgress} progressInterval={250} controls={true} playing={playing} volume={(props.settings.volume_video*props.settings.volume_master)/10000} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact} />
                                 <ReactPlayer width={"0px"} height={"0px"} playing={playing} loop={true} controls={true} volume={((props.settings.volume_music*props.settings.volume_master)/10000)*(fader/100)} url={"impact://" + gameState.currentMusic + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact}></ReactPlayer>
+                                <div className="gameSkip" ref={gameSkip} onClick={skipVideo}></div>
                             </div>
                         </div>
                         <div className = "gameControls">
