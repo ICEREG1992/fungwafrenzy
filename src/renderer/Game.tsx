@@ -4,6 +4,7 @@ import GameControls from './GameControls';
 import ReactPlayer from 'react-player'
 import { Link } from 'react-router-dom';
 import { getRandomValues } from 'crypto';
+import { flushSync } from 'react-dom';
 
 function getDefaultValue(t:string) {
     switch (t) {
@@ -23,7 +24,9 @@ state impact: holds all of the info for the impact, as read in by impact.json
 state gameState: holds the current block the user has loaded, the current video that was loaded from that block, and all of the runtime variables the impact uses
 state playing: determines whether the player is stopped or playing
 state showControls: determines whether the controls (buttons) are shown or hidden. lock is used so that the controls don't reappear during the closing animation
+state fader: controls fade-out for the players
 ref gamePlayer: ref to the video player so we can do things like move to next video after the current video ends, and raise controls at the right time
+ref gameControls: ref to the controls so we can raise and lower them at will
 ref curtain: ref to the div that we use as a "curtain" to fade to black and such
 */
 export default function Game(props:GameProps) {
@@ -58,6 +61,8 @@ export default function Game(props:GameProps) {
 
     const [playing, setPlaying] = useState<boolean>(true);
 
+    const [fader, setFader] = useState<number>(100);
+
     interface ControlsLock {
         show: boolean;
         lock: boolean;
@@ -86,7 +91,7 @@ export default function Game(props:GameProps) {
             }));
         })
     }, []);
-
+    
     /*
         Alters the state of our gameFlags according to a certain object's (block, target, or video) flags
         out: the current state of flags for this session
@@ -302,6 +307,22 @@ export default function Game(props:GameProps) {
         return (match as RegExpExecArray).slice(1); //assert this has a result
     }
 
+    function fadeAudio(p:boolean) {
+        const steps = 10;
+        const delay = 500 / steps;
+        var value = p ? 0 : 100;
+        const target = p ? 100 : 0;
+        const step = (target - value) / steps;
+        for (let i = 1; i <= steps; i++) {
+            setTimeout(() => {
+                value += step;
+                console.log("set fader to " + value);
+                setFader(value);
+            }, delay * i);
+        }
+    }
+
+    // determines how videos change when a user clicks a button
     const selectBlock = (target: blockTarget) => {
         setShowControls({
             show: false,
@@ -318,10 +339,15 @@ export default function Game(props:GameProps) {
         }
         // fade out video
         gameCurtain.current?.setAttribute("style","background-color: black;");
+        // figure out next video given block and flags
+        const nextVideo = handleSelect(gameState, impact.blocks[target.target]);
+        // if the music changes, fade out audio
+        if (gameState.currentMusic != impact.music[nextVideo.music].path) {
+            console.log(gameState.currentMusic + " " + nextVideo.music);
+            fadeAudio(false);
+        }
         // wait 500 ms then change video
         setTimeout(() => {
-            // figure out next video given block and flags
-            const nextVideo = handleSelect(gameState, impact.blocks[target.target]);
             // now that we know video, handle video flags
             if (nextVideo.flags) {
                 handleFlags(newFlags, nextVideo.flags)
@@ -333,7 +359,7 @@ export default function Game(props:GameProps) {
                 seen: [...prev.seen, target.target, target.target+"_"+nextVideo.path],
                 flags: newFlags,
                 block: impact.blocks[target.target],
-                currentVideo: nextVideo.path, // this will be replaced with game logic
+                currentVideo: nextVideo.path,
                 currentMusic: impact.music[nextVideo.music].path,
             }));
             console.log(gameState.seen);
@@ -343,9 +369,14 @@ export default function Game(props:GameProps) {
             });
             // fade in video
             gameCurtain.current?.removeAttribute("style");
-        }, 500)
+            // if the music changes, fade in audio
+            if (gameState.currentMusic != impact.music[nextVideo.music].path) { // this works as intended due to state weirdness with setTimeout
+                fadeAudio(true);
+            }
+        }, 1000)
     }
 
+    // determines how videos change when it ends and starts a new video
     const nextBlock = (target: string) => {
         // no need to lower/lock controls as they shouldn't be up
         // no need to handle target flags because there are no targets
@@ -356,10 +387,15 @@ export default function Game(props:GameProps) {
         if (impact.blocks[target].flags) {
             handleFlags(newFlags, impact.blocks[target].flags);
         }
+        // figure out next video given block and flags
+        const nextVideo = handleSelect(gameState, impact.blocks[target]);
+        // if the music changes, fade out audio
+        if (gameState.currentMusic != impact.music[nextVideo.music].path) {
+            fadeAudio(false);
+        }
+        
         // wait 500 ms then change video
         setTimeout(() => {
-            // figure out next video given block and flags
-            const nextVideo = handleSelect(gameState, impact.blocks[target]);
             // now that we know video, handle video flags
             if (nextVideo.flags) {
                 handleFlags(newFlags, nextVideo.flags)
@@ -369,7 +405,7 @@ export default function Game(props:GameProps) {
                 ...prev,
                 seen: [...prev.seen, target, target+"_"+impact.blocks[target].videos[0].path],
                 block: impact.blocks[target],
-                currentVideo: nextVideo.path, // this will be replaced with game logic
+                currentVideo: nextVideo.path,
                 currentMusic: impact.music[nextVideo.music].path,
             }));
             setShowControls({
@@ -378,7 +414,11 @@ export default function Game(props:GameProps) {
             });
             // fade in video
             gameCurtain.current?.removeAttribute("style");
-        }, 500)
+            // if the music changes, fade in audio
+            if (gameState.currentMusic != impact.music[nextVideo.music].path) {
+                fadeAudio(true);
+            }
+        }, 1000)
     }
 
     if (!impact) {
@@ -466,7 +506,7 @@ export default function Game(props:GameProps) {
                                 <div className="gameCurtain" ref={gameCurtain}></div>
                                 <GameControls block={gameState.block} state={gameState} show={showControls.show} setter={selectBlock}></GameControls>
                                 <ReactPlayer ref={gamePlayer} onEnded={handleOnEnded} onProgress={handleOnProgress} progressInterval={250} controls={false} playing={playing} volume={(props.settings.volume_video*props.settings.volume_master)/10000} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact} />
-                                <ReactPlayer width={"0px"} height={"0px"} playing={playing} loop={true} volume={(props.settings.volume_music*props.settings.volume_master)/10000} url={"impact://" + gameState.currentMusic + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact}></ReactPlayer>
+                                <ReactPlayer width={"0px"} height={"0px"} playing={playing} loop={true} controls={true} volume={((props.settings.volume_music*props.settings.volume_master)/10000)*(fader/100)} url={"impact://" + gameState.currentMusic + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact}></ReactPlayer>
                             </div>
                         </div>
                         <div className = "gameControls">
