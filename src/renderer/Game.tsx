@@ -487,7 +487,7 @@ export default function Game(props:GameProps) {
         }
         // hide the skip button
         if (gameSkip.current) {
-            gameSkip.current.hidden = true;
+            gameSkip.current.removeAttribute("style");
         }
         
     }
@@ -518,7 +518,7 @@ export default function Game(props:GameProps) {
             }
         }
         if (e.playedSeconds > 3 && gameSkip.current) {
-            gameSkip.current.hidden = false;
+            gameSkip.current.setAttribute("style", "opacity: 1;");
         }
     }
 
@@ -549,8 +549,8 @@ export default function Game(props:GameProps) {
                             <div className = "gamePlayer">
                                 <div className="gameCurtain" ref={gameCurtain}></div>
                                 <GameControls block={gameState.block} state={gameState} show={showControls.show} setter={selectBlock}></GameControls>
-                                <ReactPlayer ref={gamePlayer} onEnded={handleOnEnded} onProgress={handleOnProgress} progressInterval={250} controls={true} playing={playing} volume={(props.settings.volume_video*props.settings.volume_master)/10000} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact} />
-                                <ReactPlayer width={"0px"} height={"0px"} playing={playing} loop={true} controls={true} volume={((props.settings.volume_music*props.settings.volume_master)/10000)*(fader/100)} url={"impact://" + gameState.currentMusic + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact}></ReactPlayer>
+                                <ReactPlayer className="gameVideo" ref={gamePlayer} onEnded={handleOnEnded} onProgress={handleOnProgress} progressInterval={250} controls={false} playing={playing} volume={(props.settings.volume_video*props.settings.volume_master)/10000} url={"impact://" + gameState.currentVideo + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact} />
+                                <ReactPlayer width={"0px"} height={"0px"} playing={playing} loop={true} controls={false} volume={((props.settings.volume_music*props.settings.volume_master)/10000)*(fader/100)} url={"impact://" + gameState.currentMusic + "?path=" + props.settings.impact_folder_path + "&impact=" + props.settings.selected_impact}></ReactPlayer>
                                 <div className="gameSkip" ref={gameSkip} onClick={skipVideo}></div>
                             </div>
                         </div>

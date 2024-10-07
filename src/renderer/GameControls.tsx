@@ -12,6 +12,7 @@ interface GameControlsProps {
 export default function GameControls(props:GameControlsProps) {
     return(
         <div className="gameOverlay" style={(props.show && props.block.targets) ? {height: document.getElementsByClassName('gameButtons')[0].getBoundingClientRect().height} : {height: 0}}>
+            <div className="gameOverlayBorder"></div>
             <div className="gameButtons">
                 <Buttons block={props.block} state={props.state} setter={props.setter}></Buttons>
             </div>
