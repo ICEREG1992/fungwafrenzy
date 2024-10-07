@@ -97,6 +97,13 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+const ensureAppData = () => {
+  const appDataPath = path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts');
+  if (!fs.existsSync(appDataPath)) {
+    fs.mkdirSync(appDataPath, { recursive: true });
+  }
+}
+
 const createWindow = async () => {
   if (isDebug) {
     await installExtensions();
@@ -180,6 +187,7 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
+    ensureAppData();
     // create custom file protocol to serve videos
     protocol.handle("impact", (request) => {
       const url = new URL(request.url);
