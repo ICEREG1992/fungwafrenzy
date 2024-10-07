@@ -8,6 +8,11 @@ interface BrowseProps {
 }
 
 export default function Browse(props:BrowseProps) {
+    const openFolder = () => {
+        console.log("clicked");
+        window.electron.ipcRenderer.sendMessage("open-impacts-path", props.path);
+    }
+
     const [impacts, setImpacts] = useState<Array<Array<string>>>([]);
     useEffect(() => {
         window.electron.ipcRenderer.invoke('get-impacts', props.path).then((res) => {
@@ -18,9 +23,13 @@ export default function Browse(props:BrowseProps) {
       <div className="menuroot">
         <FrenzyNETHeader nav page="browse impacts"/>
         <div id="body">
-            <div className="NETcontainer">
+            <div className="NETcontainer center">
                 <Impacts impacts={impacts} selectImpact={props.selectImpact}></Impacts>
+                <a className="NETheader cursor fullwidth" onClick={openFolder}>
+                    OPEN IMPACTS FOLDER
+                </a>
             </div>
+            
         </div>
       </div>
     )

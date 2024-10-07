@@ -173,6 +173,19 @@ button, a {
   -webkit-user-drag: none;
 }
 
+.center {
+  align-items: center;
+}
+
+.cursor {
+  cursor: pointer;
+}
+
+.fullwidth {
+  width: 670px;
+  text-align: center;
+}
+
 .NETcontainer {
   display: flex;
   flex-direction: column;

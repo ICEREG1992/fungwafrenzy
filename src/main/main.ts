@@ -37,6 +37,10 @@ ipcMain.on('close-app', () => {
   app.quit();
 });
 
+ipcMain.on('open-impacts-path', (event, arg) => {
+  shell.openPath(arg);
+})
+
 ipcMain.handle('get-appdatapaths', () => {
   return [
     path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts'),
