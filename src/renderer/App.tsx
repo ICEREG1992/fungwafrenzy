@@ -83,32 +83,31 @@ export default function App() {
 
   useEffect(() => {
     const loadSettings = async () => {
-      const settings = localStorage.getItem('fungwafrenzy.settings');
-      if (settings) {
-        const data = JSON.parse(settings);
-        if (data) {
-          setUserSettings(data);
+      window.electron.ipcRenderer.invoke('load-usersettings').then((res: userSettings | null) => {
+        if (res) {
+          setUserSettings(res);
+        } else {
+          // data not successfully returned, fill with defaults
+          console.log("filling settings with defaults");
+          window.electron.ipcRenderer.invoke('get-defaultappdatapaths').then((res: Array<string>) => {
+            setUserSettings({
+              "selected_impact": "",
+              "player_theme": "classic",
+              "impact_folder_path": res[0],
+              "save_folder_path": res[1],
+              "username": "",
+              "class": "",
+              "location": "",
+              "resolution_x": 1024,
+              "resolution_y": 728,
+              "fullscreen": false,
+              "volume_master": 100,
+              "volume_video": 100,
+              "volume_music": 80
+            });
+          });
         }
-      }
-      // data not successfully returned, fill with defaults
-      window.electron.ipcRenderer.invoke('get-appdatapaths').then((res: Array<string>) => {
-        setUserSettings({
-          "selected_impact": "",
-          "player_theme": "classic",
-          "impact_folder_path": res[0],
-          "save_folder_path": res[1],
-          "username": "",
-          "class": "",
-          "location": "",
-          "resolution_x": 1024,
-          "resolution_y": 728,
-          "fullscreen": false,
-          "volume_master": 100,
-          "volume_video": 100,
-          "volume_music": 80
-        });
       });
-      
     }
     loadSettings();
   }, [])

@@ -5,8 +5,9 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 export type Channels =
   | 'ipc-example'
   | 'close-app'
-  | 'get-appdatapaths'
-  | 'load-userconfig'
+  | 'get-defaultappdatapaths'
+  | 'load-usersettings'
+  | 'save-usersettings'
   | 'load-saves'
   | 'get-impacts'
   | 'get-impact'

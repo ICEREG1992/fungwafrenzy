@@ -41,11 +41,22 @@ ipcMain.on('open-impacts-path', (event, arg) => {
   shell.openPath(arg);
 })
 
-ipcMain.handle('get-appdatapaths', () => {
+ipcMain.handle('get-defaultappdatapaths', () => {
   return [
     path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts'),
     path.join(app.getPath('appData'), 'fungwafrenzy', 'saves'),
   ];
+});
+
+ipcMain.handle('load-usersettings', () => {
+  const settingsFile = fs.readdirSync(path.join(app.getPath('appData'), 'fungwafrenzy')).filter(file => /^settings\.json/.test(file));
+  if (settingsFile.length) {
+    const userSettings = fs.readFileSync(path.join(app.getPath('appData'), 'fungwafrenzy', 'settings.json'), 'utf-8');
+    const json = JSON.parse(userSettings);
+    return json;
+  } else {
+    return null;
+  }
 });
 
 ipcMain.handle('get-impacts', (e, p:string) => {
@@ -97,10 +108,14 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
-const ensureAppData = () => {
+const ensureAppDataDir = () => {
   const appDataPath = path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts');
+  const savesPath = path.join(app.getPath('appData'), 'fungwafrenzy', 'saves');
   if (!fs.existsSync(appDataPath)) {
     fs.mkdirSync(appDataPath, { recursive: true });
+  }
+  if (!fs.existsSync(savesPath)) {
+    fs.mkdirSync(savesPath, { recursive: true });
   }
 }
 
@@ -187,7 +202,7 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
-    ensureAppData();
+    ensureAppDataDir();
     // create custom file protocol to serve videos
     protocol.handle("impact", (request) => {
       const url = new URL(request.url);
