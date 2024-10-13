@@ -214,6 +214,10 @@ button, a {
   margin: 8px 0px;
 }
 
+.NETline a {
+  cursor: pointer;
+}
+
 .NETimpact {
   display: flex;
   align-items: center;
@@ -239,6 +243,64 @@ button, a {
 
 input[type="range"] {
   width: 500px;
+}
+
+.NETmodal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 736px;
+  margin-left: -368px;
+  padding: 29px;
+  background-color: rgba(255, 255, 255, 0.8);
+  opacity: 0;
+  display: none;
+  transition: opacity 500ms linear;
+}
+
+.NETmodaltitle {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.NETmodaldesc {
+  margin-bottom:30px;
+}
+
+.NETmodalinput {
+  height: 30px;
+}
+
+.NETmodalinput input {
+  height: 30px;
+  font-size: 16px;
+  font-family: "Source Code Pro", "Courier New", "Courier", monospace;
+}
+
+.NETmodalbuttons {
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.NETmodalbuttons a {
+  background-color: rgba(153, 153, 153, 0.6);
+  border-top-color: rgba(255, 255, 255, 0.09);
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+  padding: 16px 20px;
+  border-width: 4px 0px;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+a.purple {
+  background-color: rgb(129, 80, 178);
+  border-top-color: rgb(136, 90, 183);
+  border-bottom-color: rgb(121, 75, 168);
 }
 
 /* CLASSIC THEME STYLING */

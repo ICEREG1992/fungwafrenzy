@@ -123,7 +123,7 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Title />} />
-        <Route path="/settings" element={<Settings settings={userSettings}/>} />
+        <Route path="/settings" element={<Settings settings={userSettings} setter={setUserSettings} />} />
         <Route path="/browse" element={<Browse path={userSettings.impact_folder_path} selectImpact={selectImpact}/>} />
         <Route path="/loadimpact" element={<LoadImpact />} />
         <Route path="/loadgame" element={<LoadGame />} />

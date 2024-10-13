@@ -522,6 +522,12 @@ export default function Game(props:GameProps) {
         }
     }
 
+    const classMap:{ [key: string]: string } = {
+        "#": "Regulator",
+        "$": "Banker",
+        "*": "Senator",
+    }
+
     switch (props.settings.player_theme) {
         case "classic":
             return(
@@ -541,7 +547,7 @@ export default function Game(props:GameProps) {
                                     {props.settings.username ? props.settings.username : "MAIN MENU"}
                                 </div>
                                 <div className = "gameUserclass">
-                                    {props.settings.class ? props.settings.class : ""}
+                                    {props.settings.class ? classMap[props.settings.class] : ""}
                                 </div>
                             </div></Link>
                         </div>

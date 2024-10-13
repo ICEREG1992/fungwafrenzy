@@ -103,3 +103,13 @@ export interface gameState {
     flags: gameFlags;
     seen: Array<string>;
 }
+
+export interface modalState {
+    title:string,
+    desc?:string,
+    default?:string,
+    input:string,
+    button:string,
+    value:string,
+    visible:boolean,
+}
