@@ -11,7 +11,8 @@ export type Channels =
   | 'load-saves'
   | 'get-impacts'
   | 'get-impact'
-  | 'open-impacts-path';
+  | 'open-impacts-path'
+  | 'select-path';
 
 const electronHandler = {
   ipcRenderer: {

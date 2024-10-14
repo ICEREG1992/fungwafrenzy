@@ -17,7 +17,7 @@ export default function Browse(props:BrowseProps) {
     useEffect(() => {
         window.electron.ipcRenderer.invoke('get-impacts', props.path).then((res) => {
             setImpacts(res);
-        })
+        });
     }, []);
     return (
       <div className="menuroot">

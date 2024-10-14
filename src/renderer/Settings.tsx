@@ -33,6 +33,18 @@ export default function Settings(props:SettingsProps) {
     }));
     closeModal();
   }
+
+  function changePath(v:string, p:string) {
+    window.electron.ipcRenderer.invoke('select-path', p).then((res) => {
+      if (res) {
+        props.setter((prev) => ({
+          ...prev,
+          [v]: res,
+        }));
+      }
+    });
+  }
+
   console.log(props.settings)
   return (
     <div className="menuroot">
@@ -57,10 +69,10 @@ export default function Settings(props:SettingsProps) {
               })}>&lt;CHANGE&gt;</a>
             </div>
             <div className = "NETline">
-              <b>impact_folder_path:</b> {props.settings.impact_folder_path} <a>&lt;CHANGE&gt;</a>
+              <b>impact_folder_path:</b> {props.settings.impact_folder_path} <a onClick={() => changePath("impact_folder_path", props.settings.impact_folder_path)}>&lt;CHANGE&gt;</a>
             </div>
             <div className = "NETline">
-              <b>save_folder_path:</b> {props.settings.save_folder_path} <a>&lt;CHANGE&gt;</a>
+              <b>save_folder_path:</b> {props.settings.save_folder_path} <a onClick={() => changePath("save_folder_path", props.settings.save_folder_path)}>&lt;CHANGE&gt;</a>
             </div>
           </div>
           <div className="NETheader">
@@ -143,13 +155,14 @@ export default function Settings(props:SettingsProps) {
           </div>
         </div>
       </div>
-      <NetModal modalState={modalState} setter={changeSetting} close={closeModal}></NetModal>
+      <NetModal modalState={modalState} setter={changeSetting} close={closeModal} curr={props.settings}></NetModal>
     </div>
   )
 }
 
 interface ModalProps {
   modalState: modalState,
+  curr: userSettings,
   setter:(s: string, v: string) => void,
   close:() => void,
 }
@@ -158,41 +171,45 @@ function NetModal(props:ModalProps) {
   switch (props.modalState.input) {
     case "text":
       return (
-        <div className="NETmodal" style={props.modalState.visible ? {opacity: "100%", display: "block"} : {}}>
-          <div className="NETmodaltitle">{props.modalState.title}</div>
-          <div className="NETmodaldesc">{props.modalState.desc}</div>
-          <div className="NETmodalinput">
-            <input type="text" id="NETmodalvalue"></input>
-          </div>
-          <div className="NETmodalbuttons">
-            <a onClick={props.close}>
-              <div>× CANCEL</div>
-            </a>
-            <a className="purple" onClick={() => {
-              const value = document.getElementById("NETmodalvalue") as HTMLInputElement;
-              props.setter(props.modalState.value, value.value)}}>
-              <div>{props.modalState.button}</div>
-            </a>
+        <div className="NETmodal" style={props.modalState.visible ? {opacity: "100%", display: "flex"} : {}}>
+          <div className="NETmodalcontainer">
+            <div className="NETmodaltitle">{props.modalState.title}</div>
+            <div className="NETmodaldesc">{props.modalState.desc}</div>
+            <div className="NETmodalinput">
+              <input type="text" id="NETmodalvalue" defaultValue={props.curr[props.modalState.value as keyof userSettings] as string}></input>
+            </div>
+            <div className="NETmodalbuttons">
+              <a onClick={props.close}>
+                <div>× CANCEL</div>
+              </a>
+              <a className="purple" onClick={() => {
+                const value = document.getElementById("NETmodalvalue") as HTMLInputElement;
+                props.setter(props.modalState.value, value.value)}}>
+                <div>{props.modalState.button}</div>
+              </a>
+            </div>
           </div>
         </div>
       )
     case "number":
       return (
-        <div className="NETmodal" style={props.modalState.visible ? {opacity: "100%", display: "block"} : {}}>
-          <div className="NETmodaltitle">{props.modalState.title}</div>
-          <div className="NETmodaldesc">{props.modalState.desc}</div>
-          <div className="NETmodalinput">
-            <input type="number" id="NETmodalvalue"></input>
-          </div>
-          <div className="NETmodalbuttons">
-            <a onClick={props.close}>
-              <div>× CANCEL</div>
-            </a>
-            <a className="purple" onClick={() => {
-              const value = document.getElementById("NETmodalvalue") as HTMLInputElement;
-              props.setter(props.modalState.value, value.value)}}>
-              <div>{props.modalState.button}</div>
-            </a>
+        <div className="NETmodal" style={props.modalState.visible ? {opacity: "100%", display: "flex"} : {}}>
+          <div className="NETmodalcontainer">
+            <div className="NETmodaltitle">{props.modalState.title}</div>
+            <div className="NETmodaldesc">{props.modalState.desc}</div>
+            <div className="NETmodalinput">
+              <input type="number" id="NETmodalvalue" defaultValue={props.curr[props.modalState.value as keyof userSettings] as string}></input>
+            </div>
+            <div className="NETmodalbuttons">
+              <a onClick={props.close}>
+                <div>× CANCEL</div>
+              </a>
+              <a className="purple" onClick={() => {
+                const value = document.getElementById("NETmodalvalue") as HTMLInputElement;
+                props.setter(props.modalState.value, value.value)}}>
+                <div>{props.modalState.button}</div>
+              </a>
+            </div>
           </div>
         </div>
       )
@@ -213,27 +230,29 @@ function NetModal(props:ModalProps) {
           break;
       }
       return (
-        <div className="NETmodal" style={props.modalState.visible ? {opacity: "100%", display: "block"} : {}}>
-          <div className="NETmodaltitle">{props.modalState.title}</div>
-          <div className="NETmodaldesc">{props.modalState.desc}</div>
-          <div className="NETmodalinput">
-            <select id="NETmodalvalue">
-              {dropdown.map((option: dropdownOption) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="NETmodalbuttons">
-            <a onClick={props.close}>
-              <div>× CANCEL</div>
-            </a>
-            <a className="purple" onClick={() => {
-              const value = document.getElementById("NETmodalvalue") as HTMLInputElement;
-              props.setter(props.modalState.value, value.value)}}>
-              <div>{props.modalState.button}</div>
-            </a>
+        <div className="NETmodal" style={props.modalState.visible ? {opacity: "100%", display: "flex"} : {}}>
+          <div className="NETmodalcontainer">
+            <div className="NETmodaltitle">{props.modalState.title}</div>
+            <div className="NETmodaldesc">{props.modalState.desc}</div>
+            <div className="NETmodalinput">
+              <select id="NETmodalvalue" defaultValue={props.curr[props.modalState.value as keyof userSettings] as string}>
+                {dropdown.map((option: dropdownOption) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="NETmodalbuttons">
+              <a onClick={props.close}>
+                <div>× CANCEL</div>
+              </a>
+              <a className="purple" onClick={() => {
+                const value = document.getElementById("NETmodalvalue") as HTMLInputElement;
+                props.setter(props.modalState.value, value.value)}}>
+                <div>{props.modalState.button}</div>
+              </a>
+            </div>
           </div>
         </div>
       )

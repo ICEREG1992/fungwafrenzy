@@ -10,7 +10,7 @@
  */
 import path, { resolve } from 'path';
 import fs from 'fs';
-import { app, BrowserWindow, protocol, shell, ipcMain, net } from 'electron';
+import { app, BrowserWindow, protocol, shell, ipcMain, net, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { pathToFileURL } from 'url';
 import log from 'electron-log';
@@ -81,6 +81,14 @@ ipcMain.handle('get-impact', (e, i:string, p:string) => {
   const data = fs.readFileSync(path.join(p,i,"impact.json"), 'utf-8');
   const json = JSON.parse(data)
   return json;
+});
+
+ipcMain.handle('select-path', async (e, p:string) => {
+  const res = await dialog.showOpenDialog(mainWindow as BrowserWindow, {
+    properties: ['openDirectory'],
+    defaultPath: p,
+  });
+  return res.filePaths[0];
 })
 
 if (process.env.NODE_ENV === 'production') {
