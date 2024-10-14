@@ -61,7 +61,7 @@ ipcMain.handle('load-usersettings', () => {
 
 ipcMain.handle('get-impacts', (e, p:string) => {
   const impactFolders = fs.readdirSync(p);
-  const out: Array<Array<string>> = [];
+  const out: Array<object> = [];
   impactFolders.forEach(i => {
     const icons = fs.readdirSync(path.join(p,i)).filter(file => /^icon\.(png|jpg|jpeg|gif|webp})/.test(file));
     var image = "";
@@ -72,7 +72,7 @@ ipcMain.handle('get-impacts', (e, p:string) => {
     } else {
       image = "";
     }
-    out.push([i, image]);
+    out.push({'key':i, 'image':image});
   });
   return out;
 });

@@ -7,13 +7,18 @@ interface BrowseProps {
     selectImpact: (name: string) => void;
 }
 
+interface Impact {
+    key: string;
+    image: string;
+}
+
 export default function Browse(props:BrowseProps) {
     const openFolder = () => {
         console.log("clicked");
         window.electron.ipcRenderer.sendMessage("open-impacts-path", props.path);
     }
 
-    const [impacts, setImpacts] = useState<Array<Array<string>>>([]);
+    const [impacts, setImpacts] = useState<Array<Impact>>([]);
     useEffect(() => {
         window.electron.ipcRenderer.invoke('get-impacts', props.path).then((res) => {
             setImpacts(res);
@@ -36,18 +41,18 @@ export default function Browse(props:BrowseProps) {
 }
 
 interface ImpactsProps {
-    impacts: Array<Array<string>>;
+    impacts: Array<Impact>;
     selectImpact: (name: string) => void;
 }
 
 function Impacts(props:ImpactsProps) {
     const arr: Array<JSX.Element> = [];
     if (props.impacts.length) {
-        props.impacts.forEach((e: Array<string>) => {
+        props.impacts.forEach((e: Impact) => {
             arr.push(
-                <a onClick={(event) => selectImpact(event, e[0], props.selectImpact)}>
+                <a onClick={(event) => selectImpact(event, e.key, props.selectImpact)}>
                     <div className="NETimpact">
-                        {e[1] ? <img src={e[1]}></img> : <div className = "NETimpacttext">{e[0]}</div>}
+                        {e.image ? <img src={e.image}></img> : <div className = "NETimpacttext">{e.key}</div>}
                     </div>
                 </a>
             )
