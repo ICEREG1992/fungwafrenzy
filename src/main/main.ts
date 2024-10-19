@@ -16,6 +16,7 @@ import { pathToFileURL } from 'url';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { userSettings } from '../renderer/interfaces';
 
 class AppUpdater {
   constructor() {
@@ -47,6 +48,19 @@ ipcMain.handle('get-defaultappdatapaths', () => {
     path.join(app.getPath('appData'), 'fungwafrenzy', 'saves'),
   ];
 });
+
+ipcMain.handle('save-usersettings', (e, s:userSettings) => {
+  const filePath = path.join(app.getPath('appData'), 'fungwafrenzy', 'settings.json');
+  try {
+      // Convert the object to a JSON string
+      const jsonData = JSON.stringify(s, null, 2); // The `null, 2` adds pretty printing to the JSON file
+      // Write the JSON data to the file
+      fs.writeFileSync(filePath, jsonData, 'utf-8');
+      console.log(`Data successfully saved to ${filePath}`);
+  } catch (error) {
+      console.error(`Failed to save file: ${error}`);
+  }
+})
 
 ipcMain.handle('load-usersettings', () => {
   const settingsFile = fs.readdirSync(path.join(app.getPath('appData'), 'fungwafrenzy')).filter(file => /^settings\.json/.test(file));

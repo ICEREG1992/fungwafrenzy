@@ -110,7 +110,11 @@ export default function App() {
       });
     }
     loadSettings();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    window.electron.ipcRenderer.invoke('save-usersettings', userSettings);
+  }, [userSettings]);
   
   const selectImpact = (name: string) => {
     setUserSettings((prev) => ({
