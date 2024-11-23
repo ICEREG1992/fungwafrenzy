@@ -686,7 +686,6 @@ export default function Game(props: GameProps) {
                 ></GameControls>
                 <ReactPlayer
                   className="gameVideo"
-                  ref={gamePlayer as LegacyRef<ReactPlayer>}
                   onEnded={handleOnEnded}
                   onProgress={handleOnProgress}
                   progressInterval={250}
@@ -696,7 +695,7 @@ export default function Game(props: GameProps) {
                       props.settings.volume_master) /
                     10000
                   }
-                  url={`impact://${localGameState.currentVideo}?path=${props.settings.impact_folder_path}&impact=${props.settings.selected_impact}`}
+                  url={`https://www.youtube.com/watch?v=Fe4d2L09uhM`}
                 />
                 <audio
                   ref={audioPlayer}
