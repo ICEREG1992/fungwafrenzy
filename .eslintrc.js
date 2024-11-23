@@ -34,8 +34,9 @@ module.exports = {
     'jsx-a11y/anchor-is-valid': 'off',
     'react/button-has-type': 'off',
     'jsx-a11y/alt-text': 'off',
-
+    'jsx-a11y/iframe-has-title': 'off',
     'react/jsx-no-bind': 'off',
+    'jsx-a11y/media-has-caption': 'off',
   },
   parserOptions: {
     ecmaVersion: 2022,

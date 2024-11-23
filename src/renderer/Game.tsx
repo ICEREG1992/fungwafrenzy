@@ -89,6 +89,7 @@ export default function Game(props: GameProps) {
   const gameCurtain = useRef<HTMLDivElement>(null);
   const gameSkip = useRef<HTMLDivElement>(null);
   const gameControl = useRef<typeof GameControls | null>(null);
+  const audioPlayer = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const { selected_impact, impact_folder_path } = props.settings;
@@ -697,20 +698,13 @@ export default function Game(props: GameProps) {
                   }
                   url={`impact://${localGameState.currentVideo}?path=${props.settings.impact_folder_path}&impact=${props.settings.selected_impact}`}
                 />
-                <ReactPlayer
-                  width="0px"
-                  height="0px"
-                  playing={playing}
+                <audio
+                  ref={audioPlayer}
+                  src={`impact://${localGameState.currentMusic}?path=${props.settings.impact_folder_path}&impact=${props.settings.selected_impact}`}
+                  autoPlay
                   loop
-                  controls={false}
-                  volume={
-                    ((props.settings.volume_music *
-                      props.settings.volume_master) /
-                      10000) *
-                    (fader / 100)
-                  }
-                  url={`impact://${localGameState.currentMusic}?path=${props.settings.impact_folder_path}&impact=${props.settings.selected_impact}`}
-                ></ReactPlayer>
+                  style={{ display: 'none' }}
+                />
                 <div
                   className="gameSkip"
                   ref={gameSkip}

@@ -190,15 +190,15 @@
 	"music": {
 		"01": {
 			"title": "Regular theme",
-			"path": "01.wav"
+			"path": "01.mp3"
 		},
 		"02": {
 			"title": "Secret theme",
-			"path": "02.wav"
+			"path": "02.mp3"
 		},
 		"03": {
 			"title": "Ending theme",
-			"path": "03.wav"
+			"path": "03.mp3"
 		}
 	}
 }
