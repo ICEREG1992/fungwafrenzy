@@ -10,7 +10,15 @@
  */
 import path, { resolve } from 'path';
 import fs from 'fs';
-import { app, BrowserWindow, protocol, shell, ipcMain, net, dialog } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  protocol,
+  shell,
+  ipcMain,
+  net,
+  dialog,
+} from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { pathToFileURL } from 'url';
 import log from 'electron-log';
@@ -40,7 +48,7 @@ ipcMain.on('close-app', () => {
 
 ipcMain.on('open-impacts-path', (event, arg) => {
   shell.openPath(arg);
-})
+});
 
 ipcMain.handle('get-defaultappdatapaths', () => {
   return [
@@ -49,23 +57,32 @@ ipcMain.handle('get-defaultappdatapaths', () => {
   ];
 });
 
-ipcMain.handle('save-usersettings', (e, s:userSettings) => {
-  const filePath = path.join(app.getPath('appData'), 'fungwafrenzy', 'settings.json');
+ipcMain.handle('save-usersettings', (e, s: userSettings) => {
+  const filePath = path.join(
+    app.getPath('appData'),
+    'fungwafrenzy',
+    'settings.json',
+  );
   try {
-      // Convert the object to a JSON string
-      const jsonData = JSON.stringify(s, null, 2); // The `null, 2` adds pretty printing to the JSON file
-      // Write the JSON data to the file
-      fs.writeFileSync(filePath, jsonData, 'utf-8');
-      console.log(`Data successfully saved to ${filePath}`);
+    // Convert the object to a JSON string
+    const jsonData = JSON.stringify(s, null, 2); // The `null, 2` adds pretty printing to the JSON file
+    // Write the JSON data to the file
+    fs.writeFileSync(filePath, jsonData, 'utf-8');
+    console.log(`Data successfully saved to ${filePath}`);
   } catch (error) {
-      console.error(`Failed to save file: ${error}`);
+    console.error(`Failed to save file: ${error}`);
   }
-})
+});
 
 ipcMain.handle('load-usersettings', () => {
-  const settingsFile = fs.readdirSync(path.join(app.getPath('appData'), 'fungwafrenzy')).filter(file => /^settings\.json/.test(file));
+  const settingsFile = fs
+    .readdirSync(path.join(app.getPath('appData'), 'fungwafrenzy'))
+    .filter((file) => /^settings\.json/.test(file));
   if (settingsFile.length) {
-    const userSettings = fs.readFileSync(path.join(app.getPath('appData'), 'fungwafrenzy', 'settings.json'), 'utf-8');
+    const userSettings = fs.readFileSync(
+      path.join(app.getPath('appData'), 'fungwafrenzy', 'settings.json'),
+      'utf-8',
+    );
     const json = JSON.parse(userSettings);
     return json;
   } else {
@@ -73,37 +90,39 @@ ipcMain.handle('load-usersettings', () => {
   }
 });
 
-ipcMain.handle('get-impacts', (e, p:string) => {
+ipcMain.handle('get-impacts', (e, p: string) => {
   const impactFolders = fs.readdirSync(p);
   const out: Array<object> = [];
-  impactFolders.forEach(i => {
-    const icons = fs.readdirSync(path.join(p,i)).filter(file => /^icon\.(png|jpg|jpeg|gif|webp})/.test(file));
-    var image = "";
+  impactFolders.forEach((i) => {
+    const icons = fs
+      .readdirSync(path.join(p, i))
+      .filter((file) => /^icon\.(png|jpg|jpeg|gif|webp})/.test(file));
+    let image = '';
     if (icons.length) {
-      const firstIcon = path.join(p,i,icons[0]);
+      const firstIcon = path.join(p, i, icons[0]);
       const imageBuffer = fs.readFileSync(firstIcon);
-      image = `data:image/png;base64,` + imageBuffer.toString('base64');
+      image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
     } else {
-      image = "";
+      image = '';
     }
-    out.push({'key':i, 'image':image});
+    out.push({ key: i, image });
   });
   return out;
 });
 
-ipcMain.handle('get-impact', (e, i:string, p:string) => {
-  const data = fs.readFileSync(path.join(p,i,"impact.json"), 'utf-8');
-  const json = JSON.parse(data)
+ipcMain.handle('get-impact', (e, i: string, p: string) => {
+  const data = fs.readFileSync(path.join(p, i, 'impact.json'), 'utf-8');
+  const json = JSON.parse(data);
   return json;
 });
 
-ipcMain.handle('select-path', async (e, p:string) => {
+ipcMain.handle('select-path', async (e, p: string) => {
   const res = await dialog.showOpenDialog(mainWindow as BrowserWindow, {
     properties: ['openDirectory'],
     defaultPath: p,
   });
   return res.filePaths[0];
-})
+});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -131,7 +150,11 @@ const installExtensions = async () => {
 };
 
 const ensureAppDataDir = () => {
-  const appDataPath = path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts');
+  const appDataPath = path.join(
+    app.getPath('appData'),
+    'fungwafrenzy',
+    'impacts',
+  );
   const savesPath = path.join(app.getPath('appData'), 'fungwafrenzy', 'saves');
   if (!fs.existsSync(appDataPath)) {
     fs.mkdirSync(appDataPath, { recursive: true });
@@ -139,7 +162,7 @@ const ensureAppDataDir = () => {
   if (!fs.existsSync(savesPath)) {
     fs.mkdirSync(savesPath, { recursive: true });
   }
-}
+};
 
 const createWindow = async () => {
   if (isDebug) {
@@ -204,10 +227,10 @@ protocol.registerSchemesAsPrivileged([
   {
     scheme: 'impact',
     privileges: {
-        bypassCSP: true,
-        stream: true,
-    }
-  }
+      bypassCSP: true,
+      stream: true,
+    },
+  },
 ]);
 /**
  * Add event listeners...
