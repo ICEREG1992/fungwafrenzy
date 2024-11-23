@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, LegacyRef } from 'react';
 import ReactPlayer from 'react-player';
 import { Link } from 'react-router-dom';
 import GameControls from './GameControls';
@@ -14,6 +14,7 @@ import {
   blockVideo,
   blockCondition,
 } from './interfaces';
+import path from 'path';
 
 function getDefaultValue(t: string) {
   switch (t) {
@@ -85,7 +86,7 @@ export default function Game(props: GameProps) {
     lock: false,
   });
 
-  const gamePlayer = useRef<ReactPlayer | null>(null);
+  const gamePlayer = useRef<HTMLVideoElement | null>(null);
   const gameCurtain = useRef<HTMLDivElement>(null);
   const gameSkip = useRef<HTMLDivElement>(null);
   const gameControl = useRef<typeof GameControls | null>(null);
@@ -599,12 +600,12 @@ export default function Game(props: GameProps) {
     // now if there are targets to be shown, skip to them. prioritize video-specific rules
     if (gamePlayer.current) {
       if (currentVideo.targets) {
-        gamePlayer.current.seekTo(currentVideo.timing.targets);
+        //gamePlayer.current.seekTo(currentVideo.timing.targets);
       } else if (currentVideo.next) {
         nextBlock(currentVideo.next);
       } else if (localGameState.block.targets) {
         console.log(`seeking to ${currentVideo.timing.targets}`);
-        gamePlayer.current.seekTo(currentVideo.timing.targets);
+        //gamePlayer.current.seekTo(currentVideo.timing.targets);
       } else if (localGameState.block.next) {
         nextBlock(localGameState.block.next);
       }
@@ -685,11 +686,10 @@ export default function Game(props: GameProps) {
                 ></GameControls>
                 <ReactPlayer
                   className="gameVideo"
-                  ref={gamePlayer}
+                  ref={gamePlayer as LegacyRef<ReactPlayer>}
                   onEnded={handleOnEnded}
                   onProgress={handleOnProgress}
                   progressInterval={250}
-                  controls={false}
                   playing={playing}
                   volume={
                     (props.settings.volume_video *
