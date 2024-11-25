@@ -14,7 +14,6 @@ import {
   blockVideo,
   blockCondition,
 } from './interfaces';
-import path from 'path';
 
 function getDefaultValue(t: string) {
   switch (t) {
@@ -86,7 +85,7 @@ export default function Game(props: GameProps) {
     lock: false,
   });
 
-  const gamePlayer = useRef<HTMLVideoElement | null>(null);
+  const gamePlayer = useRef<ReactPlayer | null>(null);
   const gameCurtain = useRef<HTMLDivElement>(null);
   const gameSkip = useRef<HTMLDivElement>(null);
   const gameControl = useRef<typeof GameControls | null>(null);
@@ -689,13 +688,14 @@ export default function Game(props: GameProps) {
                   onEnded={handleOnEnded}
                   onProgress={handleOnProgress}
                   progressInterval={250}
+                  ref={gamePlayer as any}
                   playing={playing}
                   volume={
                     (props.settings.volume_video *
                       props.settings.volume_master) /
                     10000
                   }
-                  url={`https://www.youtube.com/watch?v=Fe4d2L09uhM`}
+                  url={`impact://${localGameState.currentVideo}?path=${props.settings.impact_folder_path}&impact=${props.settings.selected_impact}`}
                 />
                 <audio
                   ref={audioPlayer}
