@@ -11,3 +11,5 @@
 *.woff  binary
 *.woff2 binary
 *.wav   binary
+*.mp4   binary
+*.mp3   binary

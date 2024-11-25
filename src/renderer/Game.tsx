@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactPlayer from 'react-player';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import GameControls from './GameControls';
 import {
   userSettings,
@@ -43,6 +43,8 @@ ref gameCurtain: ref to the div that we use as a "curtain" to fade to black and 
 ref gameSkip: ref to the skip button
 */
 export default function Game(props: GameProps) {
+  const navigate = useNavigate();
+
   const [localImpact, setLocalImpact] = useState<impact>({
     info: {
       game: '',
@@ -455,6 +457,19 @@ export default function Game(props: GameProps) {
     if (target.flags) {
       handleFlags(newFlags, target.flags);
     }
+
+    if (target.target.toString() === 'restart') {
+      console.log('restarting game');
+      restartGame();
+      return;
+    }
+
+    if (target.target.toString() === 'menu') {
+      console.log('returning to menu');
+      navigate('/');
+      return;
+    }
+
     // handle block flags
     if (localImpact.blocks[target.target].flags) {
       handleFlags(
@@ -464,6 +479,7 @@ export default function Game(props: GameProps) {
     }
     // fade out video
     gameCurtain.current?.setAttribute('style', 'background-color: black;');
+
     // figure out next video given block and flags
     const nextVideo = handleSelect(
       localGameState,
