@@ -7,6 +7,7 @@ import Settings from './Settings';
 import Browse from './Browse';
 import Game from './Game';
 import './App.css';
+import Credits from './components/Credits';
 
 function LoadImpact() {
   return (
@@ -20,14 +21,6 @@ function LoadGame() {
   return (
     <div className="menuroot">
       <FrenzyNETHeader nav page="load game" />
-    </div>
-  );
-}
-
-function Credits() {
-  return (
-    <div className="menuroot">
-      <FrenzyNETHeader nav page="credits" />
     </div>
   );
 }
