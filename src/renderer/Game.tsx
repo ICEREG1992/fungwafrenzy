@@ -136,6 +136,23 @@ export default function Game(props: GameProps) {
     props.settings,
   ]);
 
+  function restartGame() {
+    const { meta, blocks, music } = localImpact;
+    setLocalGameState((prev: gameState) => ({
+      ...prev,
+      seen: [
+        ...prev.seen,
+        meta.start,
+        `${meta.start}_${blocks[meta.start].videos[0].path}`,
+      ],
+      block: blocks[meta.start],
+      currentVideo: blocks[meta.start].videos[0].path,
+      currentMusic: music[blocks[meta.start].videos[0].music].path,
+      flags: {},
+    }));
+    setPlaying(true);
+  }
+
   // Add this effect to update audio volume when fader or settings change
   useEffect(() => {
     if (audioPlayer.current) {
@@ -715,7 +732,7 @@ export default function Game(props: GameProps) {
               >
                 {playing ? 'Pause' : 'Play'}
               </a>{' '}
-              · <a>Restart</a> · Video playback problems? Just refresh the page.
+              · <a onClick={restartGame}>Restart</a> · Video playback problems?
               You won&apos;t lose your place.
             </div>
           </div>
