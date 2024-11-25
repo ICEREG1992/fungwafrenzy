@@ -14,6 +14,7 @@ import {
   blockVideo,
   blockCondition,
 } from './interfaces';
+
 function getDefaultValue(t: string) {
   switch (t) {
     case 'bool':
@@ -598,7 +599,7 @@ export default function Game(props: GameProps) {
     // now if there are targets to be shown, skip to them. prioritize video-specific rules
     if (gamePlayer.current) {
       if (currentVideo.targets) {
-        //gamePlayer.current.seekTo(currentVideo.timing.targets);
+        gamePlayer.current.seekTo(currentVideo.timing.targets);
       } else if (currentVideo.next) {
         nextBlock(currentVideo.next);
       } else if (localGameState.block.targets) {
@@ -684,6 +685,7 @@ export default function Game(props: GameProps) {
                 ></GameControls>
                 <ReactPlayer
                   className="gameVideo"
+                  ref={gamePlayer}
                   onEnded={handleOnEnded}
                   onProgress={handleOnProgress}
                   progressInterval={250}
