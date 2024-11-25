@@ -37,6 +37,7 @@ module.exports = {
     'jsx-a11y/iframe-has-title': 'off',
     'react/jsx-no-bind': 'off',
     'jsx-a11y/media-has-caption': 'off',
+    'import/prefer-default-export': 'off',
   },
   parserOptions: {
     ecmaVersion: 2022,

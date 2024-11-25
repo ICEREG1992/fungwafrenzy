@@ -14,6 +14,7 @@ import {
   blockVideo,
   blockCondition,
 } from './interfaces';
+import { fadeAudio } from './util/audioUtil';
 
 function getDefaultValue(t: string) {
   switch (t) {
@@ -134,6 +135,15 @@ export default function Game(props: GameProps) {
     props.settings.impact_folder_path,
     props.settings,
   ]);
+
+  // Add this effect to update audio volume when fader or settings change
+  useEffect(() => {
+    if (audioPlayer.current) {
+      const baseVolume =
+        (props.settings.volume_music * props.settings.volume_master) / 10000;
+      audioPlayer.current.volume = (baseVolume * fader) / 100;
+    }
+  }, [fader, props.settings.volume_music, props.settings.volume_master]);
 
   /*
         Alters the state of our gameFlags according to a certain object's (block, target, or video) flags
@@ -418,20 +428,6 @@ export default function Game(props: GameProps) {
     return (match as RegExpExecArray).slice(1); //assert this has a result
   }
 
-  function fadeAudio(p: boolean) {
-    const steps = 10;
-    const delay = 500 / steps;
-    const value = p ? 0 : 100;
-    const target = p ? 100 : 0;
-    const step = (target - value) / steps;
-    for (let i = 1; i <= steps; i += 1) {
-      const targetValue = value + step * i;
-      setTimeout(() => {
-        setFader(targetValue);
-      }, delay * i);
-    }
-  }
-
   // determines how videos change when a user clicks a button
   const selectBlock = (target: blockTarget) => {
     setShowControls({
@@ -463,7 +459,7 @@ export default function Game(props: GameProps) {
       localGameState.currentMusic !== localImpact.music[nextVideo.music].path
     ) {
       console.log(`${localGameState.currentMusic} ${nextVideo.music}`);
-      fadeAudio(false);
+      fadeAudio(fader, setFader, false);
     }
     // wait 500 ms then change video
     setTimeout(() => {
@@ -497,7 +493,7 @@ export default function Game(props: GameProps) {
         localGameState.currentMusic !== localImpact.music[nextVideo.music].path
       ) {
         // this works as intended due to state weirdness with setTimeout
-        fadeAudio(true);
+        fadeAudio(fader, setFader, true);
       }
     }, 1000);
   };
@@ -519,7 +515,7 @@ export default function Game(props: GameProps) {
     if (
       localGameState.currentMusic !== localImpact.music[nextVideo.music].path
     ) {
-      fadeAudio(false);
+      fadeAudio(fader, setFader, false);
     }
 
     // wait 500 ms then change video
@@ -550,7 +546,7 @@ export default function Game(props: GameProps) {
       if (
         localGameState.currentMusic !== localImpact.music[nextVideo.music].path
       ) {
-        fadeAudio(true);
+        fadeAudio(fader, setFader, true);
       }
     }, 1000);
   };
@@ -604,7 +600,7 @@ export default function Game(props: GameProps) {
         nextBlock(currentVideo.next);
       } else if (localGameState.block.targets) {
         console.log(`seeking to ${currentVideo.timing.targets}`);
-        //gamePlayer.current.seekTo(currentVideo.timing.targets);
+        gamePlayer.current.seekTo(currentVideo.timing.targets);
       } else if (localGameState.block.next) {
         nextBlock(localGameState.block.next);
       }
