@@ -130,6 +130,23 @@ export default function Game(props: GameProps) {
     initializeGame();
   }, []);
 
+  function restartGame() {
+    const { meta, blocks, music } = localImpact;
+    setLocalGameState((prev: gameState) => ({
+      ...prev,
+      seen: [
+        ...prev.seen,
+        meta.start,
+        `${meta.start}_${blocks[meta.start].videos[0].path}`,
+      ],
+      block: blocks[meta.start],
+      currentVideo: blocks[meta.start].videos[0].path,
+      currentMusic: music[blocks[meta.start].videos[0].music].path,
+      flags: {},
+    }));
+    setPlaying(true);
+  }
+
   /*
         Alters the state of our gameFlags according to a certain object's (block, target, or video) flags
         out: the current state of flags for this session
@@ -724,7 +741,7 @@ export default function Game(props: GameProps) {
               >
                 {playing ? 'Pause' : 'Play'}
               </a>{' '}
-              · <a>Restart</a> · Video playback problems? Just refresh the page.
+              · <a onClick={restartGame}>Restart</a> · Video playback problems?
               You won&apos;t lose your place.
             </div>
           </div>
