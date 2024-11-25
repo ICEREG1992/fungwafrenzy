@@ -737,12 +737,8 @@ export default function Game(props: GameProps) {
                   autoPlay
                   loop
                   style={{
-                    display: 'block',
-                    width: '1000px',
-                    height: '100px',
-                    backgroundColor: 'red',
+                    display: 'none',
                   }}
-                  controls
                 />
                 <div
                   className="gameSkip"
