@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, LegacyRef } from 'react';
 import ReactPlayer from 'react-player';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import GameControls from './GameControls';
 import {
   userSettings,
@@ -44,6 +44,8 @@ ref gameCurtain: ref to the div that we use as a "curtain" to fade to black and 
 ref gameSkip: ref to the skip button
 */
 export default function Game(props: GameProps) {
+  const navigate = useNavigate();
+
   const [localImpact, setLocalImpact] = useState<impact>({
     info: {
       game: '',
@@ -159,6 +161,8 @@ export default function Game(props: GameProps) {
       const baseVolume =
         (props.settings.volume_music * props.settings.volume_master) / 10000;
       audioPlayer.current.volume = (baseVolume * fader) / 100;
+
+      console.log('audio volume set to', audioPlayer.current.volume);
     }
   }, [fader, props.settings.volume_music, props.settings.volume_master]);
 
@@ -456,6 +460,19 @@ export default function Game(props: GameProps) {
     if (target.flags) {
       handleFlags(newFlags, target.flags);
     }
+
+    if (target.target.toString() === 'restart') {
+      console.log('restarting game');
+      restartGame();
+      return;
+    }
+
+    if (target.target.toString() === 'menu') {
+      console.log('returning to menu');
+      navigate('/');
+      return;
+    }
+
     // handle block flags
     if (localImpact.blocks[target.target].flags) {
       handleFlags(
@@ -465,6 +482,7 @@ export default function Game(props: GameProps) {
     }
     // fade out video
     gameCurtain.current?.setAttribute('style', 'background-color: black;');
+
     // figure out next video given block and flags
     const nextVideo = handleSelect(
       localGameState,
@@ -509,6 +527,7 @@ export default function Game(props: GameProps) {
       if (
         localGameState.currentMusic !== localImpact.music[nextVideo.music].path
       ) {
+        console.log('fading in audio');
         // this works as intended due to state weirdness with setTimeout
         fadeAudio(fader, setFader, true);
       }
@@ -532,6 +551,7 @@ export default function Game(props: GameProps) {
     if (
       localGameState.currentMusic !== localImpact.music[nextVideo.music].path
     ) {
+      console.log('fading out audio');
       fadeAudio(fader, setFader, false);
     }
 
@@ -563,6 +583,7 @@ export default function Game(props: GameProps) {
       if (
         localGameState.currentMusic !== localImpact.music[nextVideo.music].path
       ) {
+        console.log('fading in audio');
         fadeAudio(fader, setFader, true);
       }
     }, 1000);
@@ -715,7 +736,13 @@ export default function Game(props: GameProps) {
                   src={`impact://${localGameState.currentMusic}?path=${props.settings.impact_folder_path}&impact=${props.settings.selected_impact}`}
                   autoPlay
                   loop
-                  style={{ display: 'none' }}
+                  style={{
+                    display: 'block',
+                    width: '1000px',
+                    height: '100px',
+                    backgroundColor: 'red',
+                  }}
+                  controls
                 />
                 <div
                   className="gameSkip"
