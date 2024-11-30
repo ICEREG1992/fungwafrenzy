@@ -35,7 +35,6 @@ module.exports = {
     'react/button-has-type': 'off',
     'jsx-a11y/alt-text': 'off',
     'jsx-a11y/iframe-has-title': 'off',
-    'react/jsx-no-bind': 'off',
     'jsx-a11y/media-has-caption': 'off',
     'import/prefer-default-export': 'off',
     'react-hooks/exhaustive-deps': 'off',

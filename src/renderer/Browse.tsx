@@ -29,7 +29,7 @@ export default function Browse(props: BrowseProps) {
       .catch((err) => {
         console.error('Failed to get impacts:', err);
       });
-  }, [props.path]);
+  }, []);
   return (
     <div className="menuroot">
       <FrenzyNETHeader nav page="browse impacts" />

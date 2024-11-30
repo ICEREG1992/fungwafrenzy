@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, LegacyRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactPlayer from 'react-player';
 import { Link, useNavigate } from 'react-router-dom';
 import GameControls from './GameControls';
@@ -90,7 +90,6 @@ export default function Game(props: GameProps) {
   const gameCurtain = useRef<HTMLDivElement>(null);
   const gameSkip = useRef<HTMLDivElement>(null);
   const gameControl = useRef<typeof GameControls | null>(null);
-  const audioPlayer = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const { selected_impact, impact_folder_path } = settings;
@@ -102,9 +101,7 @@ export default function Game(props: GameProps) {
           selected_impact,
           impact_folder_path,
         );
-
         setLocalImpact(res);
-
         // Initialize flags
         const flags: gameFlags = {};
         Object.keys(res.meta.flags).forEach((f) => {
@@ -148,17 +145,6 @@ export default function Game(props: GameProps) {
     }));
     setPlaying(true);
   }
-
-  // Add this effect to update audio volume when fader or settings change
-  useEffect(() => {
-    if (audioPlayer.current) {
-      const baseVolume =
-        (settings.volume_music * settings.volume_master) / 10000;
-      audioPlayer.current.volume = (baseVolume * fader) / 100;
-
-      console.log('audio volume set to', audioPlayer.current.volume);
-    }
-  }, [fader, settings.volume_music, settings.volume_master]);
 
   if (!localImpact) {
     return <div>Impact was unable to be loaded from file.</div>;
@@ -262,14 +248,15 @@ export default function Game(props: GameProps) {
     }
     // figure out next video given block and flags
     const nextVideo = handleSelect(localGameState, localImpact.blocks[target]);
+
     // if the music changes, fade out audio
     if (
       localGameState.currentMusic !== localImpact.music[nextVideo.music].path
     ) {
-      console.log('fading out audio');
+      console.log(`${localGameState.currentMusic} ${nextVideo.music}`);
       fadeAudio(fader, setFader, false);
     }
-
+    
     // wait 500 ms then change video
     setTimeout(() => {
       // now that we know video, handle video flags
@@ -277,6 +264,7 @@ export default function Game(props: GameProps) {
         handleFlags(newFlags, nextVideo.flags);
       }
       // switch to new video
+      console.log(newFlags);
       setLocalGameState((prev) => ({
         ...prev,
         seen: [
@@ -284,10 +272,12 @@ export default function Game(props: GameProps) {
           target,
           `${target} ${localImpact.blocks[target].videos[0].path}`,
         ],
+        flags: newFlags,
         block: localImpact.blocks[target],
         currentVideo: nextVideo.path,
         currentMusic: localImpact.music[nextVideo.music].path,
       }));
+      console.log(localGameState.seen);
       setShowControls({
         show: false,
         lock: false,
@@ -298,7 +288,7 @@ export default function Game(props: GameProps) {
       if (
         localGameState.currentMusic !== localImpact.music[nextVideo.music].path
       ) {
-        console.log('fading in audio');
+        // this works as intended due to state weirdness with setTimeout
         fadeAudio(fader, setFader, true);
       }
     }, 1000);
@@ -389,7 +379,7 @@ export default function Game(props: GameProps) {
 
   const classMap: { [key: string]: string } = {
     '#': 'Regulator',
-    $: 'Banker',
+    '$': 'Banker',
     '*': 'Senator',
   };
 
@@ -432,21 +422,25 @@ export default function Game(props: GameProps) {
                   onEnded={handleOnEnded}
                   onProgress={handleOnProgress}
                   progressInterval={250}
+                  controls={false}
                   playing={playing}
                   volume={
                     (settings.volume_video * settings.volume_master) / 10000
                   }
                   url={`impact://${localGameState.currentVideo}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                 />
-                <audio
-                  ref={audioPlayer}
-                  src={`impact://${localGameState.currentMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
-                  autoPlay
+                <ReactPlayer
+                  width="0px"
+                  height="0px"
+                  playing={playing}
                   loop
-                  style={{
-                    display: 'none',
-                  }}
-                />
+                  controls={false}
+                  volume={
+                    ((settings.volume_music * settings.volume_master) / 10000) *
+                    (fader / 100)
+                  }
+                  url={`impact://${localGameState.currentMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
+                ></ReactPlayer>
                 <div
                   className="gameSkip"
                   ref={gameSkip}

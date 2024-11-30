@@ -8,7 +8,6 @@ import Browse from './Browse';
 import Game from './Game';
 import './App.css';
 import Credits from './components/Credits';
-
 import { useSettingsStore } from '../hooks/useSettingsStore';
 
 function LoadImpact() {

@@ -390,7 +390,9 @@ interface dropdownOption {
   label: string;
 }
 
-const defaultDropdown: dropdownOption[] = [{ value: 'NONE', label: 'NONE' }];
+const defaultDropdown: dropdownOption[] = [
+  { value: 'NONE', label: 'NONE' },
+];
 
 const themeDropdown: dropdownOption[] = [
   { value: 'classic', label: 'classic' },
