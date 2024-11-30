@@ -1,204 +1,240 @@
 {
-	"info": {
-		"game": "Fung-Wa Frenzy",
-		"title": "Test Impact",
-		"subtitle": "Fung-Wa Frenzy Test File",
-		"description": "Test file that showcases branching, flags, and conditions",
-		"length": "3 minutes",
-		"author": "ICEREG1992"
-	},
-	"meta": {
-		"flags": {
-			"flag": "bool"
-		},
-		"start": "0101"
-	},
-	"blocks": {
-		"0101": {
-			"title": "Grey scene",
-			"videos": [{
-				"path": "0101.mp4",
-				"title": "Grey scene",
-				"timing": {
-					"targets": 15,
-					"loop": 20
-				},
-				"music": "01"
-			}],
-			"targets": [{
-				"target": "0201",
-				"text": "I'd like to go to the <b>Red</b> video please."
-			},
-			{
-				"target": "0202",
-				"text": "I'd like to go to the <b>Green</b> video please."
-			},
-			{
-				"target": "0203",
-				"text": "I'd like to go to the <b>Blue</b> video please."
-			}]
-		},
-		"0201": {
-			"title": "Red scene",
-			"videos": [{
-				"path": "0201.mp4",
-				"title": "Red scene",
-				"timing": {
-					"targets": 10,
-					"loop": 15
-				},
-				"music": "01"
-			}],
-			"next": "0401"
-		},
-		"0202": {
-			"title": "Green scene",
-			"videos": [{
-				"path": "0202.mp4",
-				"title": "Green scene",
-				"timing": {
-					"targets": 10,
-					"loop": 18.5
-				},
-				"music": "01"
-			}],
-			"targets": [{
-				"target": "0401",
-				"text": "Okay, take me to the <b>Pink</b> scene now."
-			}]
-		},
-		"0203": {
-			"title": "Blue scene",
-			"videos": [{
-				"path": "0203.mp4",
-				"title": "Blue scene",
-				"timing": {
-					"targets": 10,
-					"loop": 16
-				},
-				"music": "01"
-			}],
-			"targets": [{
-				"target": "0401",
-				"text": "I'd like to go to the <b>Pink</b> video please."
-			},
-			{
-				"target": "0301",
-				"text": "I'd like to go to the <b>Dark Blue</b> video please."
-			}]
-		},
-		"0301": {
-			"title": "Dark Blue scene",
-			"videos": [{
-				"path": "0301.mp4",
-				"title": "Dark Blue scene",
-				"timing": {
-					"targets": 10,
-					"loop": 15
-				},
-				"music": "02"
-			}],
-			"flags": {
-				"flag": "true"
-			},
-			"next": "0401"
-		},
-		"0401": {
-			"title": "Pink scene",
-			"videos": [{
-				"path": "0401a.mp4",
-				"title": "Pink scene A",
-				"chance": 0.5,
-				"timing": {
-					"targets": 16,
-					"loop": 22
-				},
-				"targets": [{
-					"target": "0501",
-					"text": "Looks like I got <i>Pink video A</i> this time!"
-				}],
-				"music": "01"
-			},{
-				"path": "0401b.mp4",
-				"title": "Pink scene B",
-				"chance": 0.5,
-				"timing": {
-					"targets": 18.5,
-					"loop": 24
-				},
-				"targets": [{
-					"target": "0501",
-					"text": "Looks like I got <i>Pink video B</i> this time!"
-				}],
-				"music": "01"
-			}],
-			"targets": [{
-				"target": "0501",
-				"text": "This is a default target and should never display due to variant override."
-			}]
-		},
-		"0501": {
-			"title": "White scene",
-			"videos": [{
-				"path": "0501a.mp4",
-				"title": "Ending regular",
-				"conditions": [{
-					"type": "flag",
-					"value": "false"
-				}],
-				"timing": {
-					"targets": 10,
-					"loop": 15
-				},
-				"music": "03"
-			},{
-				"path": "0501b.mp4",
-				"title": "Ending key",
-				"conditions": [{
-					"type": "flag",
-					"value": "true"
-				}],
-				"timing": {
-					"targets": 10,
-					"loop": 15
-				},
-				"music": "03"
-			}],
-			"next": "0601"
-		},
-		"0601": {
-			"title": "Full ending",
-			"videos": [{
-				"path": "0601.mp4",
-				"title": "Full ending",
-				"timing": {
-					"targets": 2,
-					"loop": 0
-				},
-				"music": "02"
-			}],
-			"targets": [{
-				"target": "restart",
-				"text": "I'd like to restart the Impact."
-			},
-			{
-				"target": "menu",
-				"text": "I'd like to go back to the main menu."
-			}]
-		}
-	},
-	"music": {
-		"01": {
-			"title": "Regular theme",
-			"path": "01.mp3"
-		},
-		"02": {
-			"title": "Secret theme",
-			"path": "02.mp3"
-		},
-		"03": {
-			"title": "Ending theme",
-			"path": "03.mp3"
-		}
-	}
+  "info": {
+    "game": "Fung-Wa Frenzy",
+    "title": "Test Impact",
+    "subtitle": "Fung-Wa Frenzy Test File",
+    "description": "Test file that showcases branching, flags, and conditions",
+    "length": "3 minutes",
+    "author": "ICEREG1992"
+  },
+  "meta": {
+    "flags": {
+      "flag": "bool"
+    },
+    "start": "0101"
+  },
+  "blocks": {
+    "0101": {
+      "title": "Grey scene",
+      "videos": [
+        {
+          "path": "0101.mp4",
+          "title": "Grey scene",
+          "timing": {
+            "targets": 15,
+            "loop": 20
+          },
+          "music": "01"
+        }
+      ],
+      "targets": [
+        {
+          "target": "0201",
+          "text": "I'd like to go to the <b>Red</b> video please."
+        },
+        {
+          "target": "0202",
+          "text": "I'd like to go to the <b>Green</b> video please."
+        },
+        {
+          "target": "0203",
+          "text": "I'd like to go to the <b>Blue</b> video please."
+        }
+      ]
+    },
+    "0201": {
+      "title": "Red scene",
+      "videos": [
+        {
+          "path": "0201.mp4",
+          "title": "Red scene",
+          "timing": {
+            "targets": 10,
+            "loop": 15
+          },
+          "music": "01"
+        }
+      ],
+      "next": "0401"
+    },
+    "0202": {
+      "title": "Green scene",
+      "videos": [
+        {
+          "path": "0202.mp4",
+          "title": "Green scene",
+          "timing": {
+            "targets": 10,
+            "loop": 18.5
+          },
+          "music": "01"
+        }
+      ],
+      "targets": [
+        {
+          "target": "0401",
+          "text": "Okay, take me to the <b>Pink</b> scene now."
+        }
+      ]
+    },
+    "0203": {
+      "title": "Blue scene",
+      "videos": [
+        {
+          "path": "0203.mp4",
+          "title": "Blue scene",
+          "timing": {
+            "targets": 10,
+            "loop": 16
+          },
+          "music": "01"
+        }
+      ],
+      "targets": [
+        {
+          "target": "0401",
+          "text": "I'd like to go to the <b>Pink</b> video please."
+        },
+        {
+          "target": "0301",
+          "text": "I'd like to go to the <b>Dark Blue</b> video please."
+        }
+      ]
+    },
+    "0301": {
+      "title": "Dark Blue scene",
+      "videos": [
+        {
+          "path": "0301.mp4",
+          "title": "Dark Blue scene",
+          "timing": {
+            "targets": 10,
+            "loop": 15
+          },
+          "music": "02"
+        }
+      ],
+      "flags": {
+        "flag": "true"
+      },
+      "next": "0401"
+    },
+    "0401": {
+      "title": "Pink scene",
+      "videos": [
+        {
+          "path": "0401a.mp4",
+          "title": "Pink scene A",
+          "chance": 0.5,
+          "timing": {
+            "targets": 16,
+            "loop": 22
+          },
+          "targets": [
+            {
+              "target": "0501",
+              "text": "Looks like I got <i>Pink video A</i> this time!"
+            }
+          ],
+          "music": "01"
+        },
+        {
+          "path": "0401b.mp4",
+          "title": "Pink scene B",
+          "chance": 0.5,
+          "timing": {
+            "targets": 18.5,
+            "loop": 24
+          },
+          "targets": [
+            {
+              "target": "0501",
+              "text": "Looks like I got <i>Pink video B</i> this time!"
+            }
+          ],
+          "music": "01"
+        }
+      ],
+      "targets": [
+        {
+          "target": "0501",
+          "text": "This is a default target and should never display due to variant override."
+        }
+      ]
+    },
+    "0501": {
+      "title": "White scene",
+      "videos": [
+        {
+          "path": "0501a.mp4",
+          "title": "Ending regular",
+          "conditions": [
+            {
+              "type": "flag",
+              "value": "false"
+            }
+          ],
+          "timing": {
+            "targets": 10,
+            "loop": 15
+          },
+          "music": "03"
+        },
+        {
+          "path": "0501b.mp4",
+          "title": "Ending key",
+          "conditions": [
+            {
+              "type": "flag",
+              "value": "true"
+            }
+          ],
+          "timing": {
+            "targets": 10,
+            "loop": 15
+          },
+          "music": "03"
+        }
+      ],
+      "next": "0601"
+    },
+    "0601": {
+      "title": "Full ending",
+      "videos": [
+        {
+          "path": "0601.mp4",
+          "title": "Full ending",
+          "timing": {
+            "targets": 2,
+            "loop": 0
+          },
+          "music": "02"
+        }
+      ],
+      "targets": [
+        {
+          "target": "restart",
+          "text": "I'd like to restart the Impact."
+        },
+        {
+          "target": "menu",
+          "text": "I'd like to go back to the main menu."
+        }
+      ]
+    }
+  },
+  "music": {
+    "01": {
+      "title": "Regular theme",
+      "path": "01.wav"
+    },
+    "02": {
+      "title": "Secret theme",
+      "path": "02.wav"
+    },
+    "03": {
+      "title": "Ending theme",
+      "path": "03.wav"
+    }
+  }
 }
