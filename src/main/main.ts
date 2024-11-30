@@ -249,7 +249,9 @@ app
   .then(() => {
     ensureAppDataDir();
     // create custom file protocol to serve videos
+
     protocol.handle("impact", async (request) => {
+
       const url = new URL(request.url);
       const searchParams = new URLSearchParams(url.search);
       const videoName = url.hostname;
@@ -334,7 +336,8 @@ app
           return new Response("File not found", { status: 404 });
         }
       } else {
-        return new Response("Bad Request", { status: 400 });
+
+        return net.fetch(''); // return junk idk fix this later
       }
     });
     

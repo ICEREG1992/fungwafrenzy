@@ -3,13 +3,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import FrenzyNETHeader from './FrenzyNETHeader';
 import { userSettings, modalState } from './interfaces';
+import { useSettingsStore } from '../hooks/useSettingsStore';
 
-interface SettingsProps {
-  settings: userSettings;
-  setter: (value: React.SetStateAction<userSettings>) => void;
-}
-
-export default function Settings(props: SettingsProps) {
+export default function Settings() {
+  const { settings, updateSettings } = useSettingsStore();
   const [modalState, setModalState] = useState<modalState>({
     title: 'TEST',
     desc: 'Testing modal state.',
@@ -27,10 +24,10 @@ export default function Settings(props: SettingsProps) {
   }
 
   function changeSetting(s: string, v: string) {
-    props.setter((prev) => ({
-      ...prev,
+    updateSettings({
+      ...settings,
       [s]: v,
-    }));
+    });
     closeModal();
   }
   function changePath(v: string, p: string) {
@@ -38,10 +35,10 @@ export default function Settings(props: SettingsProps) {
       .invoke('select-path', p)
       .then((res) => {
         if (res) {
-          props.setter((prev) => ({
-            ...prev,
+          updateSettings({
+            ...settings,
             [v]: res,
-          }));
+          });
         }
         return res;
       })
@@ -50,7 +47,7 @@ export default function Settings(props: SettingsProps) {
       });
   }
 
-  console.log(props.settings);
+  console.log(settings);
   return (
     <div className="menuroot">
       <FrenzyNETHeader nav page="settings" />
@@ -60,15 +57,13 @@ export default function Settings(props: SettingsProps) {
           <div className="NETbody">
             <div className="NETline">
               <b>selected_impact:</b>{' '}
-              {props.settings.selected_impact
-                ? props.settings.selected_impact
-                : 'NONE'}{' '}
+              {settings.selected_impact ? settings.selected_impact : 'NONE'}{' '}
               <Link to="/browse" tabIndex={-1}>
                 <a>&lt;CHANGE&gt;</a>
               </Link>
             </div>
             <div className="NETline">
-              <b>player_theme:</b> {props.settings.player_theme}{' '}
+              <b>player_theme:</b> {settings.player_theme}{' '}
               <a
                 onClick={() =>
                   setModalState({
@@ -85,26 +80,20 @@ export default function Settings(props: SettingsProps) {
               </a>
             </div>
             <div className="NETline">
-              <b>impact_folder_path:</b> {props.settings.impact_folder_path}{' '}
+              <b>impact_folder_path:</b> {settings.impact_folder_path}{' '}
               <a
                 onClick={() =>
-                  changePath(
-                    'impact_folder_path',
-                    props.settings.impact_folder_path,
-                  )
+                  changePath('impact_folder_path', settings.impact_folder_path)
                 }
               >
                 &lt;CHANGE&gt;
               </a>
             </div>
             <div className="NETline">
-              <b>save_folder_path:</b> {props.settings.save_folder_path}{' '}
+              <b>save_folder_path:</b> {settings.save_folder_path}{' '}
               <a
                 onClick={() =>
-                  changePath(
-                    'save_folder_path',
-                    props.settings.save_folder_path,
-                  )
+                  changePath('save_folder_path', settings.save_folder_path)
                 }
               >
                 &lt;CHANGE&gt;
@@ -114,8 +103,7 @@ export default function Settings(props: SettingsProps) {
           <div className="NETheader">USER SETTINGS</div>
           <div className="NETbody">
             <div className="NETline">
-              <b>username:</b>{' '}
-              {props.settings.username ? props.settings.username : 'NONE'}{' '}
+              <b>username:</b> {settings.username ? settings.username : 'NONE'}{' '}
               <a
                 onClick={() =>
                   setModalState({
@@ -132,8 +120,7 @@ export default function Settings(props: SettingsProps) {
               </a>
             </div>
             <div className="NETline">
-              <b>class:</b>{' '}
-              {props.settings.class ? props.settings.class : 'NONE'}{' '}
+              <b>class:</b> {settings.class ? settings.class : 'NONE'}{' '}
               <a
                 onClick={() =>
                   setModalState({
@@ -150,8 +137,7 @@ export default function Settings(props: SettingsProps) {
               </a>
             </div>
             <div className="NETline">
-              <b>location:</b>{' '}
-              {props.settings.location ? props.settings.location : 'NONE'}{' '}
+              <b>location:</b> {settings.location ? settings.location : 'NONE'}{' '}
               <a
                 onClick={() =>
                   setModalState({
@@ -171,19 +157,18 @@ export default function Settings(props: SettingsProps) {
           <div className="NETheader">VIDEO SETTINGS</div>
           <div className="NETbody">
             <div className="NETline">
-              <b>resolution:</b> {props.settings.resolution_x}x
-              {props.settings.resolution_y} <a>&lt;CHANGE&gt;</a>
+              <b>resolution:</b> {settings.resolution_x}x{settings.resolution_y}{' '}
+              <a>&lt;CHANGE&gt;</a>
             </div>
             <div className="NETline">
-              <b>fullscreen:</b>{' '}
-              {props.settings.fullscreen ? 'ENABLED' : 'DISABLED'}{' '}
+              <b>fullscreen:</b> {settings.fullscreen ? 'ENABLED' : 'DISABLED'}{' '}
               <a>&lt;CHANGE&gt;</a>
             </div>
           </div>
           <div className="NETheader">AUDIO SETTINGS</div>
           <div className="NETbody">
             <div className="NETline">
-              <b>volume_master:</b> {props.settings.volume_master}{' '}
+              <b>volume_master:</b> {settings.volume_master}{' '}
               <a
                 onClick={() =>
                   setModalState({
@@ -199,7 +184,7 @@ export default function Settings(props: SettingsProps) {
               </a>
             </div>
             <div className="NETline">
-              <b>volume_video:</b> {props.settings.volume_video}{' '}
+              <b>volume_video:</b> {settings.volume_video}{' '}
               <a
                 onClick={() =>
                   setModalState({
@@ -215,7 +200,7 @@ export default function Settings(props: SettingsProps) {
               </a>
             </div>
             <div className="NETline">
-              <b>volume_music:</b> {props.settings.volume_music}{' '}
+              <b>volume_music:</b> {settings.volume_music}{' '}
               <a
                 onClick={() =>
                   setModalState({
@@ -237,7 +222,7 @@ export default function Settings(props: SettingsProps) {
         modalState={modalState}
         setter={changeSetting}
         close={closeModal}
-        curr={props.settings}
+        curr={settings}
       ></NetModal>
     </div>
   );
