@@ -113,3 +113,7 @@ export interface modalState {
   value: string;
   visible: boolean;
 }
+
+export interface GameProps {
+  save?: gameState;
+}
