@@ -9,6 +9,8 @@ import Game from './Game';
 import './App.css';
 import Credits from './components/Credits';
 
+import { useSettingsStore } from '../hooks/useSettingsStore';
+
 function LoadImpact() {
   return (
     <div className="menuroot">
@@ -63,21 +65,7 @@ function Title() {
 }
 
 export default function App() {
-  const [userSettingsLocal, setUserSettingsLocal] = useState<userSettings>({
-    selected_impact: '',
-    player_theme: 'classic',
-    impact_folder_path: 'x',
-    save_folder_path: 'y',
-    username: '',
-    class: '',
-    location: '',
-    resolution_x: 1024,
-    resolution_y: 728,
-    fullscreen: false,
-    volume_master: 100,
-    volume_video: 100,
-    volume_music: 80,
-  });
+  const { settings, setSettings } = useSettingsStore();
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -85,7 +73,7 @@ export default function App() {
         const res =
           await window.electron.ipcRenderer.invoke('load-usersettings');
         if (res) {
-          setUserSettingsLocal(res);
+          setSettings(res);
           return;
         }
 
@@ -94,7 +82,7 @@ export default function App() {
         const defaultPaths = await window.electron.ipcRenderer.invoke(
           'get-defaultappdatapaths',
         );
-        setUserSettingsLocal({
+        setSettings({
           selected_impact: '',
           player_theme: 'classic',
           impact_folder_path: defaultPaths[0],
@@ -117,34 +105,26 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    window.electron.ipcRenderer.invoke('save-usersettings', userSettingsLocal);
-  }, [userSettingsLocal]);
+    window.electron.ipcRenderer.invoke('save-usersettings', settings);
+  }, [settings]);
 
   const selectImpact = (name: string) => {
-    setUserSettingsLocal((prev) => ({
-      ...prev,
+    setSettings({
+      ...settings,
       selected_impact: name,
-    }));
+    });
   };
 
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Title />} />
-        <Route
-          path="/settings"
-          element={
-            <Settings
-              settings={userSettingsLocal}
-              setter={setUserSettingsLocal}
-            />
-          }
-        />
+        <Route path="/settings" element={<Settings />} />
         <Route
           path="/browse"
           element={
             <Browse
-              path={userSettingsLocal.impact_folder_path}
+              path={settings.impact_folder_path}
               selectImpact={selectImpact}
             />
           }
@@ -152,7 +132,7 @@ export default function App() {
         <Route path="/loadimpact" element={<LoadImpact />} />
         <Route path="/loadgame" element={<LoadGame />} />
         <Route path="/credits" element={<Credits />} />
-        <Route path="/game" element={<Game settings={userSettingsLocal} />} />
+        <Route path="/game" element={<Game />} />
       </Routes>
     </Router>
   );

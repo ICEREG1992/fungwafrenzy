@@ -115,6 +115,5 @@ export interface modalState {
 }
 
 export interface GameProps {
-  settings: userSettings;
   save?: gameState;
 }

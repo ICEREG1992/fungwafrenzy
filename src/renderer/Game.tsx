@@ -17,6 +17,7 @@ import {
 } from './interfaces';
 import { fadeAudio } from './util/util';
 import { handleFlags, handleSelect } from '../lib/GameLogic';
+import { useSettingsStore } from '../hooks/useSettingsStore';
 
 function getDefaultValue(t: string) {
   switch (t) {
@@ -42,7 +43,7 @@ ref gameSkip: ref to the skip button
 */
 export default function Game(props: GameProps) {
   const navigate = useNavigate();
-
+  const { settings } = useSettingsStore();
   const [localImpact, setLocalImpact] = useState<impact>({
     info: {
       game: '',
@@ -92,7 +93,7 @@ export default function Game(props: GameProps) {
   const audioPlayer = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const { selected_impact, impact_folder_path } = props.settings;
+    const { selected_impact, impact_folder_path } = settings;
 
     const initializeGame = async () => {
       try {
@@ -152,12 +153,12 @@ export default function Game(props: GameProps) {
   useEffect(() => {
     if (audioPlayer.current) {
       const baseVolume =
-        (props.settings.volume_music * props.settings.volume_master) / 10000;
+        (settings.volume_music * settings.volume_master) / 10000;
       audioPlayer.current.volume = (baseVolume * fader) / 100;
 
       console.log('audio volume set to', audioPlayer.current.volume);
     }
-  }, [fader, props.settings.volume_music, props.settings.volume_master]);
+  }, [fader, settings.volume_music, settings.volume_master]);
 
   if (!localImpact) {
     return <div>Impact was unable to be loaded from file.</div>;
@@ -392,7 +393,7 @@ export default function Game(props: GameProps) {
     '*': 'Senator',
   };
 
-  switch (props.settings.player_theme) {
+  switch (settings.player_theme) {
     case 'classic':
       return (
         <div className="gameRoot">
@@ -408,12 +409,10 @@ export default function Game(props: GameProps) {
               <Link to="/">
                 <div className="gameUser">
                   <div className="gameUsername">
-                    {props.settings.username
-                      ? props.settings.username
-                      : 'MAIN MENU'}
+                    {settings.username ? settings.username : 'MAIN MENU'}
                   </div>
                   <div className="gameUserclass">
-                    {props.settings.class ? classMap[props.settings.class] : ''}
+                    {settings.class ? classMap[settings.class] : ''}
                   </div>
                 </div>
               </Link>
@@ -435,15 +434,13 @@ export default function Game(props: GameProps) {
                   progressInterval={250}
                   playing={playing}
                   volume={
-                    (props.settings.volume_video *
-                      props.settings.volume_master) /
-                    10000
+                    (settings.volume_video * settings.volume_master) / 10000
                   }
-                  url={`impact://${localGameState.currentVideo}?path=${props.settings.impact_folder_path}&impact=${props.settings.selected_impact}`}
+                  url={`impact://${localGameState.currentVideo}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                 />
                 <audio
                   ref={audioPlayer}
-                  src={`impact://${localGameState.currentMusic}?path=${props.settings.impact_folder_path}&impact=${props.settings.selected_impact}`}
+                  src={`impact://${localGameState.currentMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                   autoPlay
                   loop
                   style={{
