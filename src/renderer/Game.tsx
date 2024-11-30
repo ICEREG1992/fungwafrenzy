@@ -14,7 +14,7 @@ import {
   blockVideo,
   blockCondition,
 } from './interfaces';
-import { fadeAudio } from './util/audioUtil';
+import { fadeAudio } from './util/util';
 
 function getDefaultValue(t: string) {
   switch (t) {
@@ -132,11 +132,7 @@ export default function Game(props: GameProps) {
     };
 
     initializeGame();
-  }, [
-    props.settings.selected_impact,
-    props.settings.impact_folder_path,
-    props.settings,
-  ]);
+  }, []);
 
   function restartGame() {
     const { meta, blocks, music } = localImpact;
