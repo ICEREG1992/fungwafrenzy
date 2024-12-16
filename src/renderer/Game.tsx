@@ -111,17 +111,27 @@ export default function Game(props: GameProps) {
           flags[f] = getDefaultValue(res.meta.flags[f]);
         });
 
+        // figure out first video given block and flags
+        const firstVideo = handleSelect(
+          res.blocks[res.meta.start]
+        );
+
+        // if music does not exist, send null so it plays nothing
+        let initialMusic = "";
+        if (firstVideo.music) {
+          initialMusic = res.music[firstVideo.music].path;
+        }
+
         setLocalGameState((prev: gameState) => ({
           ...prev,
           seen: [
             ...prev.seen,
             res.meta.start,
-            `${res.meta.start}_${res.blocks[res.meta.start].videos[0].path}`,
+            `${res.meta.start}_${firstVideo.path}`,
           ],
           block: res.blocks[res.meta.start],
-          currentVideo: res.blocks[res.meta.start].videos[0].path,
-          currentMusic:
-            res.music[res.blocks[res.meta.start].videos[0].music].path,
+          currentVideo: firstVideo.path,
+          currentMusic: initialMusic,
           flags,
         }));
       } catch (error) {
@@ -383,7 +393,7 @@ export default function Game(props: GameProps) {
     return out;
   }
 
-  function handleSelect(gameState: gameState, block: impactBlock) {
+  function handleSelect(block: impactBlock) {
     // figure out if this is a chance block or a condition block
     if (block.videos[0].chance) {
       // if it is chance, make one chance calculation and run it against each video until it hits
@@ -482,12 +492,11 @@ export default function Game(props: GameProps) {
 
     // figure out next video given block and flags
     const nextVideo = handleSelect(
-      localGameState,
       localImpact.blocks[target.target],
     );
 
     // if the music changes, fade out audio
-    if (
+    if ( nextVideo.music &&
       localGameState.currentMusic !== localImpact.music[nextVideo.music].path
     ) {
       console.log(`${localGameState.currentMusic} ${nextVideo.music}`);
@@ -498,6 +507,11 @@ export default function Game(props: GameProps) {
       // now that we know video, handle video flags
       if (nextVideo.flags) {
         handleFlags(newFlags, nextVideo.flags);
+      }
+      // if music does not exist, send null so it plays nothing
+      let nextMusic = "";
+      if (nextVideo.music) {
+        nextMusic = localImpact.music[nextVideo.music].path;
       }
       // switch to new video
       console.log(newFlags);
@@ -511,7 +525,7 @@ export default function Game(props: GameProps) {
         flags: newFlags,
         block: localImpact.blocks[target.target],
         currentVideo: nextVideo.path,
-        currentMusic: localImpact.music[nextVideo.music].path,
+        currentMusic: nextMusic,
       }));
       console.log(localGameState.seen);
       setShowControls({
@@ -521,7 +535,7 @@ export default function Game(props: GameProps) {
       // fade in video
       gameCurtain.current?.removeAttribute('style');
       // if the music changes, fade in audio
-      if (
+      if ( nextVideo.music &&
         localGameState.currentMusic !== localImpact.music[nextVideo.music].path
       ) {
         // this works as intended due to state weirdness with setTimeout
@@ -542,9 +556,9 @@ export default function Game(props: GameProps) {
       handleFlags(newFlags, localImpact.blocks[target].flags);
     }
     // figure out next video given block and flags
-    const nextVideo = handleSelect(localGameState, localImpact.blocks[target]);
+    const nextVideo = handleSelect(localImpact.blocks[target]);
     // if the music changes, fade out audio
-    if (
+    if ( nextVideo.music &&
       localGameState.currentMusic !== localImpact.music[nextVideo.music].path
     ) {
       fadeAudio(false);
@@ -556,6 +570,11 @@ export default function Game(props: GameProps) {
       if (nextVideo.flags) {
         handleFlags(newFlags, nextVideo.flags);
       }
+      // if music does not exist, send null so it plays nothing
+      let nextMusic = "";
+      if (nextVideo.music) {
+        nextMusic = localImpact.music[nextVideo.music].path;
+      }
       // switch to new video
       setLocalGameState((prev) => ({
         ...prev,
@@ -566,7 +585,7 @@ export default function Game(props: GameProps) {
         ],
         block: localImpact.blocks[target],
         currentVideo: nextVideo.path,
-        currentMusic: localImpact.music[nextVideo.music].path,
+        currentMusic: nextMusic,
       }));
       setShowControls({
         show: false,
@@ -575,7 +594,7 @@ export default function Game(props: GameProps) {
       // fade in video
       gameCurtain.current?.removeAttribute('style');
       // if the music changes, fade in audio
-      if (
+      if ( nextVideo.music &&
         localGameState.currentMusic !== localImpact.music[nextVideo.music].path
       ) {
         fadeAudio(true);
@@ -600,14 +619,14 @@ export default function Game(props: GameProps) {
         // this is inconsistent
         console.log(`video loops at ${currentVideo.timing.loop}`);
         gamePlayer.current.seekTo(0);
-        gamePlayer.current.seekTo(currentVideo.timing.loop);
+        gamePlayer.current.seekTo(currentVideo.timing.loop as number);
       } else if (currentVideo.next) {
         nextBlock(currentVideo.next);
       } else if (localGameState.block.targets) {
         // this is inconsistent
         console.log(`video loops at ${currentVideo.timing.loop}`);
         gamePlayer.current.seekTo(0);
-        gamePlayer.current.seekTo(currentVideo.timing.loop);
+        gamePlayer.current.seekTo(currentVideo.timing.loop as number);
       } else if (localGameState.block.next) {
         nextBlock(localGameState.block.next);
       }
@@ -627,12 +646,12 @@ export default function Game(props: GameProps) {
     // now if there are targets to be shown, skip to them. prioritize video-specific rules
     if (gamePlayer.current) {
       if (currentVideo.targets) {
-        gamePlayer.current.seekTo(currentVideo.timing.targets);
+        gamePlayer.current.seekTo(currentVideo.timing.targets as number);
       } else if (currentVideo.next) {
         nextBlock(currentVideo.next);
       } else if (localGameState.block.targets) {
         console.log(`seeking to ${currentVideo.timing.targets}`);
-        gamePlayer.current.seekTo(currentVideo.timing.targets);
+        gamePlayer.current.seekTo(currentVideo.timing.targets as number);
       } else if (localGameState.block.next) {
         nextBlock(localGameState.block.next);
       }
@@ -651,19 +670,30 @@ export default function Game(props: GameProps) {
   }
 
   const handleOnProgress = (e: progress) => {
-    let currentVideoTiming: blockTiming = { targets: -1, loop: -1 };
+    let currentVideoTiming: blockTiming = {};
     localGameState.block.videos.forEach((v) => {
       if (v.path === localGameState.currentVideo && v.timing) {
         currentVideoTiming = v.timing;
       }
     });
-    if (e.playedSeconds > currentVideoTiming.targets) {
+    if (currentVideoTiming.targets && e.playedSeconds > currentVideoTiming.targets) {
       if (!showControls.lock) {
         setShowControls({
           show: true,
           lock: false,
         });
       }
+    }
+    if (currentVideoTiming.silence && e.playedSeconds > currentVideoTiming.silence) {
+      // fade out audio gracefully
+      fadeAudio(false);
+      // set audio to blank in half a second
+      setTimeout(() => {
+        setLocalGameState((prev) => ({
+          ...prev,
+          currentMusic: "",
+        }));
+      })
     }
     if (e.playedSeconds > 3 && gameSkip.current) {
       gameSkip.current.setAttribute('style', 'opacity: 1;');
@@ -726,7 +756,7 @@ export default function Game(props: GameProps) {
                       props.settings.volume_master) /
                     10000
                   }
-                  url={`impact://${localGameState.currentVideo}?path=${props.settings.impact_folder_path}&impact=${props.settings.selected_impact}`}
+                  url={`impact://${encodeURIComponent(localGameState.currentVideo)}?path=${props.settings.impact_folder_path}&impact=${props.settings.selected_impact}`}
                 />
                 <ReactPlayer
                   width="0px"
