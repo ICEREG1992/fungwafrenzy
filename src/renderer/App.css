@@ -452,6 +452,7 @@ a.purple {
   cursor: pointer;
   line-height: 16px;
   font-size: 12px;
+  text-wrap: balance;
 }
 
 .gameButton:hover {
