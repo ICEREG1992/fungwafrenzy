@@ -253,14 +253,14 @@ app
     protocol.handle("impact", async (request) => {
 
       const url = new URL(request.url);
-      const searchParams = new URLSearchParams(url.search);
-      const videoName = url.hostname;
+      const searchParams = url.searchParams;
+      const videoName = decodeURIComponent(url.hostname);
       const rootPath = searchParams.get("path");
       const impactName = searchParams.get("impact");
-    
+      
       if (rootPath && impactName) {
         let basePath, filePath, contentType;
-    
+        console.log(videoName);
         if (videoName.endsWith(".mp4")) {
           basePath = path.join(rootPath, impactName, "video");
           filePath = path.join(basePath, videoName);
