@@ -143,6 +143,11 @@ export default function Game(props: GameProps) {
     initializeGame(settings.selected_impact, settings.impact_folder_path);
     gamePlayer.current?.seekTo(0);
     setPlaying(true);
+    // hide and unlock controls so they can show up later
+    setShowControls({
+      show: false,
+      lock: false,
+    });
   }
 
   // determines how videos change when a user clicks a button
