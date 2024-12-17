@@ -398,7 +398,7 @@ export default function Game(props: GameProps) {
           ...prev,
           currentMusic: "",
         }));
-      })
+      }, 500)
     }
     if (e.playedSeconds > 3 && gameSkip.current) {
       gameSkip.current.setAttribute('style', 'opacity: 1;');
