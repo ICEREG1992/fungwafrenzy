@@ -3,7 +3,6 @@ import parse from 'html-react-parser';
 import { impactBlock, gameState, blockTarget } from './interfaces';
 
 interface GameControlsProps {
-  block: impactBlock;
   state: gameState;
   show: boolean;
   setter: (target: blockTarget) => void;
@@ -14,7 +13,7 @@ export default function GameControls(props: GameControlsProps) {
     <div
       className="gameOverlay"
       style={
-        props.show && props.block.targets
+        props.show && props.state.block.targets
           ? {
               height: document
                 .getElementsByClassName('gameButtons')[0]
@@ -26,7 +25,6 @@ export default function GameControls(props: GameControlsProps) {
       <div className="gameOverlayBorder"></div>
       <div className="gameButtons">
         <Buttons
-          block={props.block}
           state={props.state}
           setter={props.setter}
         ></Buttons>
@@ -36,7 +34,6 @@ export default function GameControls(props: GameControlsProps) {
 }
 
 interface ButtonsProps {
-  block: impactBlock;
   state: gameState;
   setter: (target: blockTarget) => void;
 }
@@ -44,7 +41,7 @@ function Buttons(props: ButtonsProps) {
   const arr: Array<React.JSX.Element> = [];
   // get current video data
   let currentVideoTargets: Array<blockTarget> = [];
-  props.block.videos.forEach((v) => {
+  props.state.block.videos.forEach((v) => {
     if (v.path === props.state.currentVideo && v.targets) {
       currentVideoTargets = v.targets;
     }
@@ -62,8 +59,8 @@ function Buttons(props: ButtonsProps) {
     });
   } else {
     // return block targets
-    if (props.block.targets) {
-      props.block.targets.forEach((t) => {
+    if (props.state.block.targets) {
+      props.state.block.targets.forEach((t) => {
         arr.push(
           <button
             className="gameButton"
@@ -77,8 +74,6 @@ function Buttons(props: ButtonsProps) {
   }
   return arr;
 }
-
-function stylizeText(s: string) {}
 
 const selectVideo = (
   event: React.MouseEvent<HTMLButtonElement>,

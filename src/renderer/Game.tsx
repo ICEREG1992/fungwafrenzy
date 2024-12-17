@@ -91,69 +91,57 @@ export default function Game(props: GameProps) {
   const gameSkip = useRef<HTMLDivElement>(null);
   const gameControl = useRef<typeof GameControls | null>(null);
 
+ async function initializeGame(selected_impact:string, impact_folder_path:string) {
+    try {
+      const res: impact = await window.electron.ipcRenderer.invoke(
+        'get-impact',
+        selected_impact,
+        impact_folder_path,
+      );
+      setLocalImpact(res);
+      // Initialize flags
+      const flags: gameFlags = {};
+      Object.keys(res.meta.flags).forEach((f) => {
+        flags[f] = getDefaultValue(res.meta.flags[f]);
+      });
+
+      // figure out first video given block and flags
+      const firstVideo = handleSelect(
+        localGameState,
+        res.blocks[res.meta.start]
+      );
+
+      // if music does not exist, send null so it plays nothing
+      let initialMusic = "";
+      if (firstVideo.music) {
+        initialMusic = res.music[firstVideo.music].path;
+      }
+
+      setLocalGameState((prev: gameState) => ({
+        ...prev,
+        seen: [
+          res.meta.start,
+          `${res.meta.start}_${firstVideo.path}`,
+        ],
+        block: res.blocks[res.meta.start],
+        currentVideo: firstVideo.path,
+        currentMusic: initialMusic,
+        flags,
+      }));
+    } catch (error) {
+      console.error('Failed to initialize game:', error);
+    }
+  };
+
+
   useEffect(() => {
     const { selected_impact, impact_folder_path } = settings;
-
-    const initializeGame = async () => {
-      try {
-        const res: impact = await window.electron.ipcRenderer.invoke(
-          'get-impact',
-          selected_impact,
-          impact_folder_path,
-        );
-        setLocalImpact(res);
-        // Initialize flags
-        const flags: gameFlags = {};
-        Object.keys(res.meta.flags).forEach((f) => {
-          flags[f] = getDefaultValue(res.meta.flags[f]);
-        });
-
-        // figure out first video given block and flags
-        const firstVideo = handleSelect(
-          localGameState,
-          res.blocks[res.meta.start]
-        );
-
-        // if music does not exist, send null so it plays nothing
-        let initialMusic = "";
-        if (firstVideo.music) {
-          initialMusic = res.music[firstVideo.music].path;
-        }
-
-        setLocalGameState((prev: gameState) => ({
-          ...prev,
-          seen: [
-            ...prev.seen,
-            res.meta.start,
-            `${res.meta.start}_${firstVideo.path}`,
-          ],
-          block: res.blocks[res.meta.start],
-          currentVideo: firstVideo.path,
-          currentMusic: initialMusic,
-          flags,
-        }));
-      } catch (error) {
-        console.error('Failed to initialize game:', error);
-      }
-    };
-
-    initializeGame();
+    initializeGame(selected_impact, impact_folder_path);
   }, []);
 
   function restartGame() {
-    const { meta, blocks, music } = localImpact;
-    setLocalGameState((prev: gameState) => ({
-      ...prev,
-      seen: [
-        ...prev.seen,
-        meta.start,
-        `${meta.start}_${blocks[meta.start].videos[0].path}`,
-      ],
-      block: blocks[meta.start],
-      currentVideo: blocks[meta.start].videos[0].path,
-      currentMusic: music[blocks[meta.start].videos[0].music].path,
-      flags: {},
-    }));
+    initializeGame(settings.selected_impact, settings.impact_folder_path);
+    gamePlayer.current?.seekTo(0);
     setPlaying(true);
   }
 
@@ -439,7 +427,6 @@ export default function Game(props: GameProps) {
               <div className="gamePlayer">
                 <div className="gameCurtain" ref={gameCurtain}></div>
                 <GameControls
-                  block={localGameState.block}
                   state={localGameState}
                   show={showControls.show}
                   setter={selectBlock}
