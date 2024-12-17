@@ -378,9 +378,11 @@ export default function Game(props: GameProps) {
 
   const handleOnProgress = (e: progress) => {
     let currentVideoTiming: blockTiming = {};
+    let currentVideoMusic: string = '';
     localGameState.block.videos.forEach((v) => {
       if (v.path === localGameState.currentVideo && v.timing) {
         currentVideoTiming = v.timing;
+        currentVideoMusic = v.music;
       }
     });
     if (
@@ -406,7 +408,33 @@ export default function Game(props: GameProps) {
           ...prev,
           currentMusic: '',
         }));
-      }, 500);
+      }, 1000);
+    }
+    if (
+      currentVideoTiming.music &&
+      e.playedSeconds < currentVideoTiming.music
+    ) {
+      // no audio should be playing, set audio to blank and fader to off
+      setLocalGameState((prev) => ({
+        ...prev,
+        currentMusic: '',
+      }));
+      fadeAudio(fader, setFader, false);
+    }
+    if (
+      (currentVideoTiming.music &&
+        !currentVideoTiming.silence &&
+        e.playedSeconds > currentVideoTiming.music) ||
+      (currentVideoTiming.music &&
+        currentVideoTiming.silence &&
+        e.playedSeconds > currentVideoTiming.music &&
+        e.playedSeconds < currentVideoTiming.silence)
+    ) {
+      setLocalGameState((prev) => ({
+        ...prev,
+        currentMusic: currentVideoMusic,
+      }));
+      fadeAudio(fader, setFader, true);
     }
     if (e.playedSeconds > 3 && gameSkip.current) {
       gameSkip.current.setAttribute('style', 'opacity: 1;');

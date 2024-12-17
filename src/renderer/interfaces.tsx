@@ -75,6 +75,7 @@ export interface blockCondition {
 export interface blockTiming {
   targets?: number;
   loop?: number;
+  music?: number;
   silence?: number;
 }
 
