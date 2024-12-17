@@ -6,6 +6,7 @@ import {
   impactBlock,
   userSettings,
 } from '../renderer/interfaces';
+import { useSettingsStore } from '../hooks/useSettingsStore';
 
 /*
         Alters the state of our gameFlags according to a certain object's (block, target, or video) flags
@@ -56,6 +57,7 @@ export function handleFlags(out: gameFlags, flags: blockFlags) {
 export function checkCondition(
   condition: blockCondition,
   localGameState: gameState,
+  settings: userSettings,
 ) {
   switch (condition.type.toLowerCase()) {
     case 'and':
@@ -63,12 +65,14 @@ export function checkCondition(
       return checkConditions(
         condition.value as Array<blockCondition>,
         localGameState,
+        settings,
         'AND',
       );
     case 'or':
       return checkConditions(
         condition.value as Array<blockCondition>,
         localGameState,
+        settings,
         'OR',
       );
     case 'seen':
@@ -137,9 +141,7 @@ export function checkCondition(
           return false;
       }
     case 'state':
-      //TODO: Fix this
-      return false;
-    //return props.settings.location === condition.value;
+      return settings.location === condition.value;
     default:
       // interpret this as a flag check
       switch (typeof localGameState.flags[condition.type]) {
@@ -231,6 +233,7 @@ export function checkCondition(
 export function checkConditions(
   conditions: Array<blockCondition>,
   localGameState: gameState,
+  settings: userSettings,
   mode?: string,
 ) {
   let out: boolean;
@@ -238,25 +241,30 @@ export function checkConditions(
     case 'AND':
       out = true;
       conditions.forEach((condition) => {
-        out = out && checkCondition(condition, localGameState);
+        out = out && checkCondition(condition, localGameState, settings);
       });
       break;
     case 'OR':
+      console.log('entering OR block');
       out = false;
       conditions.forEach((condition) => {
-        out = out || checkCondition(condition, localGameState);
+        out = out || checkCondition(condition, localGameState, settings);
       });
       break;
     default:
       out = true;
       conditions.forEach((condition) => {
-        out = out && checkCondition(condition, localGameState);
+        out = out && checkCondition(condition, localGameState, settings);
       });
   }
   return out;
 }
 
-export function handleSelect(gameState: gameState, block: impactBlock) {
+export function handleSelect(
+  gameState: gameState,
+  block: impactBlock,
+  settings: userSettings,
+) {
   // figure out if this is a chance block or a condition block
   if (block.videos[0].chance) {
     // if it is chance, make one chance calculation and run it against each video until it hits
@@ -283,7 +291,11 @@ export function handleSelect(gameState: gameState, block: impactBlock) {
       block.videos.some((video) => {
         // for every video, perform this check, stop once we hit true
         if (
-          checkConditions(video.conditions as Array<blockCondition>, gameState)
+          checkConditions(
+            video.conditions as Array<blockCondition>,
+            gameState,
+            settings,
+          )
         ) {
           selectedVideo = video;
           return true;

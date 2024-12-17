@@ -112,6 +112,7 @@ export default function Game(props: GameProps) {
       const firstVideo = handleSelect(
         localGameState,
         res.blocks[res.meta.start],
+        settings,
       );
 
       // if music does not exist, send null so it plays nothing
@@ -187,6 +188,7 @@ export default function Game(props: GameProps) {
     const nextVideo = handleSelect(
       localGameState,
       localImpact.blocks[target.target],
+      settings,
     );
 
     // if the music changes, fade out audio
@@ -253,7 +255,11 @@ export default function Game(props: GameProps) {
       handleFlags(newFlags, localImpact.blocks[target].flags);
     }
     // figure out next video given block and flags
-    const nextVideo = handleSelect(localGameState, localImpact.blocks[target]);
+    const nextVideo = handleSelect(
+      localGameState,
+      localImpact.blocks[target],
+      settings,
+    );
 
     // if the music changes, fade out audio
     if (
