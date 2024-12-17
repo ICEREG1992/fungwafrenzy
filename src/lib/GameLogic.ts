@@ -245,7 +245,6 @@ export function checkConditions(
       });
       break;
     case 'OR':
-      console.log('entering OR block');
       out = false;
       conditions.forEach((condition) => {
         out = out || checkCondition(condition, localGameState, settings);
