@@ -91,7 +91,10 @@ export default function Game(props: GameProps) {
   const gameSkip = useRef<HTMLDivElement>(null);
   const gameControl = useRef<typeof GameControls | null>(null);
 
- async function initializeGame(selected_impact:string, impact_folder_path:string) {
+  async function initializeGame(
+    selected_impact: string,
+    impact_folder_path: string,
+  ) {
     try {
       const res: impact = await window.electron.ipcRenderer.invoke(
         'get-impact',
@@ -108,21 +111,18 @@ export default function Game(props: GameProps) {
       // figure out first video given block and flags
       const firstVideo = handleSelect(
         localGameState,
-        res.blocks[res.meta.start]
+        res.blocks[res.meta.start],
       );
 
       // if music does not exist, send null so it plays nothing
-      let initialMusic = "";
+      let initialMusic = '';
       if (firstVideo.music) {
         initialMusic = res.music[firstVideo.music].path;
       }
 
       setLocalGameState((prev: gameState) => ({
         ...prev,
-        seen: [
-          res.meta.start,
-          `${res.meta.start}_${firstVideo.path}`,
-        ],
+        seen: [res.meta.start, `${res.meta.start}_${firstVideo.path}`],
         block: res.blocks[res.meta.start],
         currentVideo: firstVideo.path,
         currentMusic: initialMusic,
@@ -131,8 +131,7 @@ export default function Game(props: GameProps) {
     } catch (error) {
       console.error('Failed to initialize game:', error);
     }
-  };
-
+  }
 
   useEffect(() => {
     const { selected_impact, impact_folder_path } = settings;
@@ -191,7 +190,8 @@ export default function Game(props: GameProps) {
     );
 
     // if the music changes, fade out audio
-    if ( nextVideo.music &&
+    if (
+      nextVideo.music &&
       localGameState.currentMusic !== localImpact.music[nextVideo.music].path
     ) {
       console.log(`${localGameState.currentMusic} ${nextVideo.music}`);
@@ -204,7 +204,7 @@ export default function Game(props: GameProps) {
         handleFlags(newFlags, nextVideo.flags);
       }
       // if music does not exist, send null so it plays nothing
-      let nextMusic = "";
+      let nextMusic = '';
       if (nextVideo.music) {
         nextMusic = localImpact.music[nextVideo.music].path;
       }
@@ -230,7 +230,8 @@ export default function Game(props: GameProps) {
       // fade in video
       gameCurtain.current?.removeAttribute('style');
       // if the music changes, fade in audio
-      if ( nextVideo.music &&
+      if (
+        nextVideo.music &&
         localGameState.currentMusic !== localImpact.music[nextVideo.music].path
       ) {
         console.log('fading in audio');
@@ -255,13 +256,14 @@ export default function Game(props: GameProps) {
     const nextVideo = handleSelect(localGameState, localImpact.blocks[target]);
 
     // if the music changes, fade out audio
-    if ( nextVideo.music &&
+    if (
+      nextVideo.music &&
       localGameState.currentMusic !== localImpact.music[nextVideo.music].path
     ) {
       console.log(`${localGameState.currentMusic} ${nextVideo.music}`);
       fadeAudio(fader, setFader, false);
     }
-    
+
     // wait 500 ms then change video
     setTimeout(() => {
       // now that we know video, handle video flags
@@ -269,7 +271,7 @@ export default function Game(props: GameProps) {
         handleFlags(newFlags, nextVideo.flags);
       }
       // if music does not exist, send null so it plays nothing
-      let nextMusic = "";
+      let nextMusic = '';
       if (nextVideo.music) {
         nextMusic = localImpact.music[nextVideo.music].path;
       }
@@ -295,7 +297,8 @@ export default function Game(props: GameProps) {
       // fade in video
       gameCurtain.current?.removeAttribute('style');
       // if the music changes, fade in audio
-      if ( nextVideo.music &&
+      if (
+        nextVideo.music &&
         localGameState.currentMusic !== localImpact.music[nextVideo.music].path
       ) {
         // this works as intended due to state weirdness with setTimeout
@@ -374,7 +377,10 @@ export default function Game(props: GameProps) {
         currentVideoTiming = v.timing;
       }
     });
-    if (currentVideoTiming.targets && e.playedSeconds > currentVideoTiming.targets) {
+    if (
+      currentVideoTiming.targets &&
+      e.playedSeconds > currentVideoTiming.targets
+    ) {
       if (!showControls.lock) {
         setShowControls({
           show: true,
@@ -382,16 +388,19 @@ export default function Game(props: GameProps) {
         });
       }
     }
-    if (currentVideoTiming.silence && e.playedSeconds > currentVideoTiming.silence) {
+    if (
+      currentVideoTiming.silence &&
+      e.playedSeconds > currentVideoTiming.silence
+    ) {
       // fade out audio gracefully
       fadeAudio(fader, setFader, false);
       // set audio to blank in half a second
       setTimeout(() => {
         setLocalGameState((prev) => ({
           ...prev,
-          currentMusic: "",
+          currentMusic: '',
         }));
-      }, 500)
+      }, 500);
     }
     if (e.playedSeconds > 3 && gameSkip.current) {
       gameSkip.current.setAttribute('style', 'opacity: 1;');
