@@ -205,9 +205,9 @@ export default function Game(props: GameProps) {
       if (nextVideo.flags) {
         handleFlags(newFlags, nextVideo.flags);
       }
-      // if music does not exist, send null so it plays nothing
+      // if music does not exist, or doesn't start at video start, send null so it plays nothing
       let nextMusic = '';
-      if (nextVideo.music) {
+      if (nextVideo.music || nextVideo.timing?.music) {
         nextMusic = localImpact.music[nextVideo.music].path;
       }
       // switch to new video
@@ -276,9 +276,9 @@ export default function Game(props: GameProps) {
       if (nextVideo.flags) {
         handleFlags(newFlags, nextVideo.flags);
       }
-      // if music does not exist, send null so it plays nothing
+      // if music does not exist, or doesn't start at video start, send null so it plays nothing
       let nextMusic = '';
-      if (nextVideo.music) {
+      if (nextVideo.music || nextVideo.timing?.music) {
         nextMusic = localImpact.music[nextVideo.music].path;
       }
       // switch to new video
