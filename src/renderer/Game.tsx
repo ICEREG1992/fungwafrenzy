@@ -432,7 +432,7 @@ export default function Game(props: GameProps) {
     ) {
       setLocalGameState((prev) => ({
         ...prev,
-        currentMusic: currentVideoMusic,
+        currentMusic: localImpact.music[currentVideoMusic].path,
       }));
       fadeAudio(fader, setFader, true);
     }
