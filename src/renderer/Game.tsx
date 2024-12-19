@@ -67,6 +67,7 @@ export default function Game(props: GameProps) {
       videos: [],
     },
     currentVideo: '',
+    currentTiming: {},
     currentMusic: '',
     flags: {},
     seen: [],
@@ -126,6 +127,7 @@ export default function Game(props: GameProps) {
         seen: [res.meta.start, `${res.meta.start}_${firstVideo.path}`],
         block: res.blocks[res.meta.start],
         currentVideo: firstVideo.path,
+        currentTiming: firstVideo.timing,
         currentMusic: initialMusic,
         flags,
       }));
@@ -222,6 +224,7 @@ export default function Game(props: GameProps) {
         flags: newFlags,
         block: localImpact.blocks[target.target],
         currentVideo: nextVideo.path,
+        currentTiming: nextVideo.timing,
         currentMusic: nextMusic,
       }));
       console.log(localGameState.seen);
@@ -293,6 +296,7 @@ export default function Game(props: GameProps) {
         flags: newFlags,
         block: localImpact.blocks[target],
         currentVideo: nextVideo.path,
+        currentTiming: nextVideo.timing,
         currentMusic: nextMusic,
       }));
       console.log(localGameState.seen);
@@ -377,17 +381,10 @@ export default function Game(props: GameProps) {
   }
 
   const handleOnProgress = (e: progress) => {
-    let currentVideoTiming: blockTiming = {};
-    let currentVideoMusic: string = '';
-    localGameState.block.videos.forEach((v) => {
-      if (v.path === localGameState.currentVideo && v.timing && v.music) {
-        currentVideoTiming = v.timing;
-        currentVideoMusic = v.music;
-      }
-    });
+    // show targets
     if (
-      currentVideoTiming.targets &&
-      e.playedSeconds > currentVideoTiming.targets
+      localGameState.currentTiming?.targets &&
+      e.playedSeconds > localGameState.currentTiming.targets
     ) {
       if (!showControls.lock) {
         setShowControls({
@@ -396,9 +393,10 @@ export default function Game(props: GameProps) {
         });
       }
     }
+    // cut out music
     if (
-      currentVideoTiming.silence &&
-      e.playedSeconds > currentVideoTiming.silence
+      localGameState.currentTiming?.silence &&
+      e.playedSeconds > localGameState.currentTiming.silence
     ) {
       // fade out audio gracefully
       fadeAudio(fader, setFader, false);
@@ -410,9 +408,10 @@ export default function Game(props: GameProps) {
         }));
       }, 1000);
     }
+    // start music
     if (
-      currentVideoTiming.music &&
-      e.playedSeconds < currentVideoTiming.music
+      localGameState.currentTiming?.music &&
+      e.playedSeconds < localGameState.currentTiming.music
     ) {
       // no audio should be playing, set audio to blank and fader to off
       setLocalGameState((prev) => ({
@@ -421,26 +420,29 @@ export default function Game(props: GameProps) {
       }));
       fadeAudio(fader, setFader, false);
     }
+    // start and cut out music
     if (
-      (currentVideoTiming.music &&
-        !currentVideoTiming.silence &&
-        e.playedSeconds > currentVideoTiming.music) ||
-      (currentVideoTiming.music &&
-        currentVideoTiming.silence &&
-        e.playedSeconds > currentVideoTiming.music &&
-        e.playedSeconds < currentVideoTiming.silence)
+      (localGameState.currentTiming?.music &&
+        !localGameState.currentTiming.silence &&
+        e.playedSeconds > localGameState.currentTiming.music) ||
+      (localGameState.currentTiming?.music &&
+        localGameState.currentTiming.silence &&
+        e.playedSeconds > localGameState.currentTiming.music &&
+        e.playedSeconds < localGameState.currentTiming.silence)
     ) {
       setLocalGameState((prev) => ({
         ...prev,
-        currentMusic: localImpact.music[currentVideoMusic].path,
+        currentMusic: localImpact.music[localGameState.currentMusic].path,
       }));
       fadeAudio(fader, setFader, true);
     }
+    // show skip button
     if (e.playedSeconds > 3 && gameSkip.current) {
       gameSkip.current.setAttribute('style', 'opacity: 1;');
     }
   };
 
+  // prettier-ignore
   const classMap: { [key: string]: string } = {
     '#': 'Regulator',
     '$': 'Banker',
