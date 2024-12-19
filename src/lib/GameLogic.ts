@@ -55,10 +55,14 @@ export function handleFlags(out: gameFlags, flags: blockFlags) {
 }
 
 export function checkCondition(
-  condition: blockCondition,
+  condition: blockCondition | undefined,
   localGameState: gameState,
   settings: userSettings,
 ) {
+  if (!condition) {
+    // if a video doesn't have a condition, then shortcircuit and return true
+    return true;
+  }
   switch (condition.type.toLowerCase()) {
     case 'and':
       // eslint-disable-next-line no-use-before-define
@@ -269,7 +273,6 @@ export function handleSelect(
     // if it is chance, make one chance calculation and run it against each video until it hits
     const rand = Math.random();
     console.log(rand);
-    // eslint-disable-next-line vars-on-top
     let sum = 0;
     let selectedVideo = block.videos[0];
     block.videos.some((video) => {
@@ -283,18 +286,13 @@ export function handleSelect(
     });
     return selectedVideo;
   } else {
-    // eslint-disable-next-line no-lonely-if
-    if (block.videos[0].conditions) {
+    if (block.videos[0].condition) {
       // this is now a flag check, watched check, time check, or location check
       let selectedVideo = block.videos[0];
       block.videos.some((video) => {
         // for every video, perform this check, stop once we hit true
         if (
-          checkConditions(
-            video.conditions as Array<blockCondition>,
-            gameState,
-            settings,
-          )
+          checkCondition(video.condition as blockCondition, gameState, settings)
         ) {
           selectedVideo = video;
           return true;

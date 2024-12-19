@@ -207,7 +207,7 @@ export default function Game(props: GameProps) {
       }
       // if music does not exist, or doesn't start at video start, send null so it plays nothing
       let nextMusic = '';
-      if (nextVideo.music || nextVideo.timing?.music) {
+      if (nextVideo.music || (nextVideo.timing?.music && nextVideo.music)) {
         nextMusic = localImpact.music[nextVideo.music].path;
       }
       // switch to new video
@@ -278,7 +278,7 @@ export default function Game(props: GameProps) {
       }
       // if music does not exist, or doesn't start at video start, send null so it plays nothing
       let nextMusic = '';
-      if (nextVideo.music || nextVideo.timing?.music) {
+      if (nextVideo.music || (nextVideo.timing?.music && nextVideo.music)) {
         nextMusic = localImpact.music[nextVideo.music].path;
       }
       // switch to new video
@@ -324,16 +324,16 @@ export default function Game(props: GameProps) {
     if (gamePlayer.current) {
       if (currentVideo.targets) {
         // this is inconsistent
-        console.log(`video loops at ${currentVideo.timing.loop}`);
+        console.log(`video loops at ${currentVideo.timing?.loop}`);
         gamePlayer.current.seekTo(0);
-        gamePlayer.current.seekTo(currentVideo.timing.loop as number);
+        gamePlayer.current.seekTo(currentVideo.timing?.loop as number);
       } else if (currentVideo.next) {
         nextBlock(currentVideo.next);
       } else if (localGameState.block.targets) {
         // this is inconsistent
-        console.log(`video loops at ${currentVideo.timing.loop}`);
+        console.log(`video loops at ${currentVideo.timing?.loop}`);
         gamePlayer.current.seekTo(0);
-        gamePlayer.current.seekTo(currentVideo.timing.loop as number);
+        gamePlayer.current.seekTo(currentVideo.timing?.loop as number);
       } else if (localGameState.block.next) {
         nextBlock(localGameState.block.next);
       }
@@ -353,12 +353,12 @@ export default function Game(props: GameProps) {
     // now if there are targets to be shown, skip to them. prioritize video-specific rules
     if (gamePlayer.current) {
       if (currentVideo.targets) {
-        gamePlayer.current.seekTo(currentVideo.timing.targets as number);
+        gamePlayer.current.seekTo(currentVideo.timing?.targets as number);
       } else if (currentVideo.next) {
         nextBlock(currentVideo.next);
       } else if (localGameState.block.targets) {
-        console.log(`seeking to ${currentVideo.timing.targets}`);
-        gamePlayer.current.seekTo(currentVideo.timing.targets as number);
+        console.log(`seeking to ${currentVideo.timing?.targets}`);
+        gamePlayer.current.seekTo(currentVideo.timing?.targets as number);
       } else if (localGameState.block.next) {
         nextBlock(localGameState.block.next);
       }
@@ -380,7 +380,7 @@ export default function Game(props: GameProps) {
     let currentVideoTiming: blockTiming = {};
     let currentVideoMusic: string = '';
     localGameState.block.videos.forEach((v) => {
-      if (v.path === localGameState.currentVideo && v.timing) {
+      if (v.path === localGameState.currentVideo && v.timing && v.music) {
         currentVideoTiming = v.timing;
         currentVideoMusic = v.music;
       }
