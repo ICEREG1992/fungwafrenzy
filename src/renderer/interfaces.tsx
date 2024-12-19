@@ -59,9 +59,9 @@ export interface blockVideo {
   path: string;
   title: string;
   chance?: number;
-  conditions?: Array<blockCondition>;
-  timing: blockTiming;
-  music: string;
+  condition?: blockCondition;
+  timing?: blockTiming;
+  music?: string;
   flags?: blockFlags;
   targets?: Array<blockTarget>;
   next?: string;
