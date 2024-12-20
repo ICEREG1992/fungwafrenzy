@@ -105,8 +105,8 @@ header #titlebar {
   text-shadow: goldenrod 0px 0px 10px;
 }
 
-.rfm-child {
-  padding-right: 9px;
+.rfm-child span {
+  padding-right: 10px;
 }
 
 #body {
