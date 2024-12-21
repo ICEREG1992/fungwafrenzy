@@ -58,7 +58,7 @@ export function checkCondition(
   condition: blockCondition | undefined,
   localGameState: gameState,
   settings: userSettings,
-) {
+): boolean {
   if (!condition) {
     // if a video doesn't have a condition, then shortcircuit and return true
     return true;
@@ -78,6 +78,12 @@ export function checkCondition(
         localGameState,
         settings,
         'OR',
+      );
+    case 'not':
+      return !checkCondition(
+        condition.value as blockCondition,
+        localGameState,
+        settings,
       );
     case 'seen':
       return localGameState.seen.includes(condition.value as string);
@@ -288,19 +294,17 @@ export function handleSelect(
   } else {
     if (block.videos[0].condition) {
       // this is now a flag check, watched check, time check, or location check
-      let selectedVideo = block.videos[0];
-      block.videos.some((video) => {
+      for (let i = 0; i < block.videos.length; i += 1) {
         // for every video, perform this check, stop once we hit true
+        const video = block.videos[i];
         if (
           checkCondition(video.condition as blockCondition, gameState, settings)
         ) {
-          selectedVideo = video;
-          return true;
+          return video;
         }
-        return false;
-      });
-      // todo: logic here
-      return selectedVideo;
+      }
+      // todo: return datafault instead of video 1
+      return block.videos[0];
       // eslint-disable-next-line no-else-return
     } else {
       // no chance or condition, return the first video in the set
