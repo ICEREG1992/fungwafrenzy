@@ -214,7 +214,7 @@ export default function Game(props: GameProps) {
       let storeMusic = '';
       if (nextVideo.music) {
         storeMusic = localImpact.music[nextVideo.music].path;
-        if (nextVideo.timing?.music) {
+        if (!nextVideo.timing?.music) {
           nextMusic = localImpact.music[nextVideo.music].path;
         }
       }
@@ -393,7 +393,7 @@ export default function Game(props: GameProps) {
   }
 
   const handleOnProgress = (e: progress) => {
-    // show targets
+    // show targets on time
     if (
       localGameState.currentTiming?.targets &&
       e.playedSeconds > localGameState.currentTiming.targets
@@ -405,7 +405,7 @@ export default function Game(props: GameProps) {
         });
       }
     }
-    // cut out music
+    // cut out music on time
     if (
       localGameState.currentTiming?.silence &&
       e.playedSeconds > localGameState.currentTiming.silence
@@ -420,7 +420,7 @@ export default function Game(props: GameProps) {
         }));
       }, 1000);
     }
-    // start and cut out music
+    // start and cut out music on time
     if (
       (localGameState.currentTiming?.music &&
         !localGameState.currentTiming.silence &&
