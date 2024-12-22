@@ -24,10 +24,7 @@ export default function GameControls(props: GameControlsProps) {
     >
       <div className="gameOverlayBorder"></div>
       <div className="gameButtons">
-        <Buttons
-          state={props.state}
-          setter={props.setter}
-        ></Buttons>
+        <Buttons state={props.state} setter={props.setter}></Buttons>
       </div>
     </div>
   );
