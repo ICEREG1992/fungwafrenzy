@@ -100,10 +100,8 @@ interface impactSong {
 
 export interface gameState {
   block: impactBlock;
-  currentVideo: string;
-  currentTiming?: blockTiming;
-  currentMusic: string;
-  storedMusic: string;
+  currentVideo: blockVideo;
+  playingMusic: string;
   flags: gameFlags;
   seen: Array<string>;
 }

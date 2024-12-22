@@ -13,7 +13,8 @@ export default function GameControls(props: GameControlsProps) {
     <div
       className="gameOverlay"
       style={
-        props.show && props.state.block.targets
+        props.show &&
+        (props.state.block.targets || props.state.currentVideo.targets)
           ? {
               height: document
                 .getElementsByClassName('gameButtons')[0]
@@ -39,7 +40,7 @@ function Buttons(props: ButtonsProps) {
   // get current video data
   let currentVideoTargets: Array<blockTarget> = [];
   props.state.block.videos.forEach((v) => {
-    if (v.path === props.state.currentVideo && v.targets) {
+    if (v.path === props.state.currentVideo.path && v.targets) {
       currentVideoTargets = v.targets;
     }
   });

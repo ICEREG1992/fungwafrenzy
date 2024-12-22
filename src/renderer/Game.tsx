@@ -66,10 +66,11 @@ export default function Game(props: GameProps) {
       title: '',
       videos: [],
     },
-    currentVideo: '',
-    currentTiming: {},
-    currentMusic: '',
-    storedMusic: '',
+    currentVideo: {
+      title: '',
+      path: '',
+    },
+    playingMusic: '',
     flags: {},
     seen: [],
   });
@@ -127,10 +128,8 @@ export default function Game(props: GameProps) {
         ...prev,
         seen: [res.meta.start, `${res.meta.start}_${firstVideo.path}`],
         block: res.blocks[res.meta.start],
-        currentVideo: firstVideo.path,
-        currentTiming: firstVideo.timing,
-        currentMusic: initialMusic,
-        storedMusic: initialMusic,
+        currentVideo: firstVideo,
+        playingMusic: initialMusic,
         flags,
       }));
     } catch (error) {
@@ -198,9 +197,9 @@ export default function Game(props: GameProps) {
     // if the music changes, fade out audio
     if (
       nextVideo.music &&
-      localGameState.currentMusic !== localImpact.music[nextVideo.music].path
+      localGameState.playingMusic !== localImpact.music[nextVideo.music].path
     ) {
-      console.log(`${localGameState.currentMusic} ${nextVideo.music}`);
+      console.log(`${localGameState.playingMusic} ${nextVideo.music}`);
       fadeAudio(fader, setFader, false);
     }
     // wait 500 ms then change video
@@ -229,10 +228,8 @@ export default function Game(props: GameProps) {
         ],
         flags: newFlags,
         block: localImpact.blocks[target.target],
-        currentVideo: nextVideo.path,
-        currentTiming: nextVideo.timing,
-        currentMusic: nextMusic,
-        storedMusic: storeMusic,
+        currentVideo: nextVideo,
+        playingMusic: nextMusic,
       }));
       console.log(localGameState.seen);
       setShowControls({
@@ -244,7 +241,7 @@ export default function Game(props: GameProps) {
       // if the music changes, fade in audio
       if (
         nextVideo.music &&
-        localGameState.currentMusic !== localImpact.music[nextVideo.music].path
+        localGameState.playingMusic !== localImpact.music[nextVideo.music].path
       ) {
         console.log('fading in audio');
         // this works as intended due to state weirdness with setTimeout
@@ -274,9 +271,9 @@ export default function Game(props: GameProps) {
     // if the music changes, fade out audio
     if (
       nextVideo.music &&
-      localGameState.currentMusic !== localImpact.music[nextVideo.music].path
+      localGameState.playingMusic !== localImpact.music[nextVideo.music].path
     ) {
-      console.log(`${localGameState.currentMusic} ${nextVideo.music}`);
+      console.log(`${localGameState.playingMusic} ${nextVideo.music}`);
       fadeAudio(fader, setFader, false);
     }
 
@@ -306,10 +303,8 @@ export default function Game(props: GameProps) {
         ],
         flags: newFlags,
         block: localImpact.blocks[target],
-        currentVideo: nextVideo.path,
-        currentTiming: nextVideo.timing,
-        currentMusic: nextMusic,
-        storedMusic: storeMusic,
+        currentVideo: nextVideo,
+        playingMusic: nextMusic,
       }));
       console.log(localGameState.seen);
       setShowControls({
@@ -321,7 +316,7 @@ export default function Game(props: GameProps) {
       // if the music changes, fade in audio
       if (
         nextVideo.music &&
-        localGameState.currentMusic !== localImpact.music[nextVideo.music].path
+        localGameState.playingMusic !== localImpact.music[nextVideo.music].path
       ) {
         // this works as intended due to state weirdness with setTimeout
         fadeAudio(fader, setFader, true);
@@ -333,7 +328,7 @@ export default function Game(props: GameProps) {
     // get current video
     let currentVideo: blockVideo = localGameState.block.videos[0]; // placeholder value to prevent typing issues
     localGameState.block.videos.forEach((v) => {
-      if (v.path === localGameState.currentVideo) {
+      if (v.path === localGameState.currentVideo.path) {
         currentVideo = v;
       }
     });
@@ -362,7 +357,7 @@ export default function Game(props: GameProps) {
     // get current video
     let currentVideo: blockVideo = localGameState.block.videos[0]; // placeholder value to prevent typing issues
     localGameState.block.videos.forEach((v) => {
-      if (v.path === localGameState.currentVideo) {
+      if (v.path === localGameState.currentVideo.path) {
         currentVideo = v;
       }
     });
@@ -395,8 +390,8 @@ export default function Game(props: GameProps) {
   const handleOnProgress = (e: progress) => {
     // show targets on time
     if (
-      localGameState.currentTiming?.targets &&
-      e.playedSeconds > localGameState.currentTiming.targets
+      localGameState.currentVideo.timing?.targets &&
+      e.playedSeconds > localGameState.currentVideo.timing?.targets
     ) {
       if (!showControls.lock) {
         setShowControls({
@@ -407,8 +402,8 @@ export default function Game(props: GameProps) {
     }
     // cut out music on time
     if (
-      localGameState.currentTiming?.silence &&
-      e.playedSeconds > localGameState.currentTiming.silence
+      localGameState.currentVideo.timing?.silence &&
+      e.playedSeconds > localGameState.currentVideo.timing.silence
     ) {
       // fade out audio gracefully
       fadeAudio(fader, setFader, false);
@@ -416,23 +411,24 @@ export default function Game(props: GameProps) {
       setTimeout(() => {
         setLocalGameState((prev) => ({
           ...prev,
-          currentMusic: '',
+          playingMusic: '',
         }));
       }, 1000);
     }
     // start and cut out music on time
     if (
-      (localGameState.currentTiming?.music &&
-        !localGameState.currentTiming.silence &&
-        e.playedSeconds > localGameState.currentTiming.music) ||
-      (localGameState.currentTiming?.music &&
-        localGameState.currentTiming.silence &&
-        e.playedSeconds > localGameState.currentTiming.music &&
-        e.playedSeconds < localGameState.currentTiming.silence)
+      (localGameState.currentVideo.timing?.music &&
+        !localGameState.currentVideo.timing.silence &&
+        e.playedSeconds > localGameState.currentVideo.timing.music) ||
+      (localGameState.currentVideo.timing?.music &&
+        localGameState.currentVideo.timing.silence &&
+        e.playedSeconds > localGameState.currentVideo.timing.music &&
+        e.playedSeconds < localGameState.currentVideo.timing.silence)
     ) {
       setLocalGameState((prev) => ({
         ...prev,
-        currentMusic: localGameState.storedMusic,
+        playingMusic:
+          localImpact.music[localGameState.currentVideo.music as string].path,
       }));
       fadeAudio(fader, setFader, true);
     }
@@ -492,7 +488,7 @@ export default function Game(props: GameProps) {
                   volume={
                     (settings.volume_video * settings.volume_master) / 10000
                   }
-                  url={`impact://${encodeURIComponent(localGameState.currentVideo)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
+                  url={`impact://${encodeURIComponent(localGameState.currentVideo.path)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                 />
                 <ReactPlayer
                   width="0px"
@@ -504,7 +500,7 @@ export default function Game(props: GameProps) {
                     ((settings.volume_music * settings.volume_master) / 10000) *
                     (fader / 100)
                   }
-                  url={`impact://${localGameState.currentMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
+                  url={`impact://${localGameState.playingMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                 ></ReactPlayer>
                 <div
                   className="gameSkip"
