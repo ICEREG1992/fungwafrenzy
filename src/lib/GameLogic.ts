@@ -87,8 +87,6 @@ export function checkCondition(
       );
     case 'seen':
       return localGameState.seen.includes(condition.value as string);
-    case 'notseen':
-      return !localGameState.seen.includes(condition.value as string);
     case 'time':
       const now = new Date();
       const h = now.getHours();

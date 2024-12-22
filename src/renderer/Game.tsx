@@ -69,6 +69,7 @@ export default function Game(props: GameProps) {
     currentVideo: '',
     currentTiming: {},
     currentMusic: '',
+    storedMusic: '',
     flags: {},
     seen: [],
   });
@@ -129,6 +130,7 @@ export default function Game(props: GameProps) {
         currentVideo: firstVideo.path,
         currentTiming: firstVideo.timing,
         currentMusic: initialMusic,
+        storedMusic: initialMusic,
         flags,
       }));
     } catch (error) {
@@ -209,8 +211,12 @@ export default function Game(props: GameProps) {
       }
       // if music does not exist, or doesn't start at video start, send null so it plays nothing
       let nextMusic = '';
-      if (nextVideo.music || (nextVideo.timing?.music && nextVideo.music)) {
-        nextMusic = localImpact.music[nextVideo.music].path;
+      let storeMusic = '';
+      if (nextVideo.music) {
+        storeMusic = localImpact.music[nextVideo.music].path;
+        if (nextVideo.timing?.music) {
+          nextMusic = localImpact.music[nextVideo.music].path;
+        }
       }
       // switch to new video
       console.log(newFlags);
@@ -226,6 +232,7 @@ export default function Game(props: GameProps) {
         currentVideo: nextVideo.path,
         currentTiming: nextVideo.timing,
         currentMusic: nextMusic,
+        storedMusic: storeMusic,
       }));
       console.log(localGameState.seen);
       setShowControls({
@@ -281,8 +288,12 @@ export default function Game(props: GameProps) {
       }
       // if music does not exist, or doesn't start at video start, send null so it plays nothing
       let nextMusic = '';
-      if (nextVideo.music || (nextVideo.timing?.music && nextVideo.music)) {
-        nextMusic = localImpact.music[nextVideo.music].path;
+      let storeMusic = '';
+      if (nextVideo.music) {
+        storeMusic = localImpact.music[nextVideo.music].path;
+        if (!nextVideo.timing?.music) {
+          nextMusic = localImpact.music[nextVideo.music].path;
+        }
       }
       // switch to new video
       console.log(newFlags);
@@ -298,6 +309,7 @@ export default function Game(props: GameProps) {
         currentVideo: nextVideo.path,
         currentTiming: nextVideo.timing,
         currentMusic: nextMusic,
+        storedMusic: storeMusic,
       }));
       console.log(localGameState.seen);
       setShowControls({
@@ -408,18 +420,6 @@ export default function Game(props: GameProps) {
         }));
       }, 1000);
     }
-    // start music
-    if (
-      localGameState.currentTiming?.music &&
-      e.playedSeconds < localGameState.currentTiming.music
-    ) {
-      // no audio should be playing, set audio to blank and fader to off
-      setLocalGameState((prev) => ({
-        ...prev,
-        currentMusic: '',
-      }));
-      fadeAudio(fader, setFader, false);
-    }
     // start and cut out music
     if (
       (localGameState.currentTiming?.music &&
@@ -432,7 +432,7 @@ export default function Game(props: GameProps) {
     ) {
       setLocalGameState((prev) => ({
         ...prev,
-        currentMusic: localImpact.music[localGameState.currentMusic].path,
+        currentMusic: localGameState.storedMusic,
       }));
       fadeAudio(fader, setFader, true);
     }

@@ -103,6 +103,7 @@ export interface gameState {
   currentVideo: string;
   currentTiming?: blockTiming;
   currentMusic: string;
+  storedMusic: string;
   flags: gameFlags;
   seen: Array<string>;
 }
