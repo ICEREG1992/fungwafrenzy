@@ -63,6 +63,7 @@ export interface blockVideo {
   timing?: blockTiming;
   music?: string;
   flags?: blockFlags;
+  question?: string;
   targets?: Array<blockTarget>;
   next?: string;
 }

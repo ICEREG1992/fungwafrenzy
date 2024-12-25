@@ -168,69 +168,85 @@ export function checkCondition(
           }
         case 'number':
           const c = splitCondition(condition.value as string); // assert this is a string because it's not an array
-          switch (c[0]) {
-            case '==':
-              if (parseInt(c[1])) {
-                // compare to a const
-                return localGameState.flags[condition.type] === parseInt(c[1]);
-              } else {
-                // compare to another flag
-                return (
-                  localGameState.flags[condition.type] ===
-                  localGameState.flags[condition.value as string]
-                );
-              }
-            case '<=':
-              if (parseInt(c[1])) {
-                return (
-                  (localGameState.flags[condition.type] as number) <=
-                  parseInt(c[1])
-                );
-              } else {
-                return (
-                  localGameState.flags[condition.type] <=
-                  localGameState.flags[condition.value as string]
-                );
-              }
-            case '>=':
-              if (parseInt(c[1])) {
-                return (
-                  (localGameState.flags[condition.type] as number) >=
-                  parseInt(c[1])
-                );
-              } else {
-                return (
-                  localGameState.flags[condition.type] >=
-                  localGameState.flags[condition.value as string]
-                );
-              }
-            case '<':
-              if (parseInt(c[1])) {
-                return (
-                  (localGameState.flags[condition.type] as number) <
-                  parseInt(c[1])
-                );
-              } else {
-                return (
-                  localGameState.flags[condition.type] <
-                  localGameState.flags[condition.value as string]
-                );
-              }
-            case '>':
-              if (parseInt(c[1])) {
-                return (
-                  (localGameState.flags[condition.type] as number) >
-                  parseInt(c[1])
-                );
-              } else {
-                return (
-                  localGameState.flags[condition.type] >
-                  localGameState.flags[condition.value as string]
-                );
-              }
-            default:
-              // unknown operator, return false
-              return false;
+          if (c[0]) {
+            switch (c[0]) {
+              case '==':
+                if (parseInt(c[1])) {
+                  // compare to a const
+                  return (
+                    localGameState.flags[condition.type] === parseInt(c[1])
+                  );
+                } else {
+                  // compare to another flag
+                  return (
+                    localGameState.flags[condition.type] ===
+                    localGameState.flags[condition.value as string]
+                  );
+                }
+              case '<=':
+                if (parseInt(c[1])) {
+                  return (
+                    (localGameState.flags[condition.type] as number) <=
+                    parseInt(c[1])
+                  );
+                } else {
+                  return (
+                    localGameState.flags[condition.type] <=
+                    localGameState.flags[condition.value as string]
+                  );
+                }
+              case '>=':
+                if (parseInt(c[1])) {
+                  return (
+                    (localGameState.flags[condition.type] as number) >=
+                    parseInt(c[1])
+                  );
+                } else {
+                  return (
+                    localGameState.flags[condition.type] >=
+                    localGameState.flags[condition.value as string]
+                  );
+                }
+              case '<':
+                if (parseInt(c[1])) {
+                  return (
+                    (localGameState.flags[condition.type] as number) <
+                    parseInt(c[1])
+                  );
+                } else {
+                  return (
+                    localGameState.flags[condition.type] <
+                    localGameState.flags[condition.value as string]
+                  );
+                }
+              case '>':
+                if (parseInt(c[1])) {
+                  return (
+                    (localGameState.flags[condition.type] as number) >
+                    parseInt(c[1])
+                  );
+                } else {
+                  return (
+                    localGameState.flags[condition.type] >
+                    localGameState.flags[condition.value as string]
+                  );
+                }
+              default:
+                // unknown operator, return false
+                return false;
+            }
+          } else {
+            // interpret this as an == check
+            if (parseInt(c[1])) {
+              // compare to a const
+              return localGameState.flags[condition.type] === parseInt(c[1]);
+            } else {
+              // compare to another flag
+              return (
+                localGameState.flags[condition.type] ===
+                localGameState.flags[condition.value as string]
+              );
+            }
           }
         default:
           return false;
@@ -313,7 +329,7 @@ export function handleSelect(
 
 function splitCondition(c: string) {
   // use regex to split a comparison out from the string
-  const match = /^(==|<=|>=|<|>)(.*)/.exec(c);
+  const match = /^(==|<=|>=|<|>)?(.*)/.exec(c);
   // eslint-disable-next-line spaced-comment
   return (match as RegExpExecArray).slice(1); //assert this has a result
 }

@@ -37,15 +37,17 @@ interface ButtonsProps {
 }
 function Buttons(props: ButtonsProps) {
   const arr: Array<React.JSX.Element> = [];
-  // get current video data
-  let currentVideoTargets: Array<blockTarget> = [];
-  props.state.block.videos.forEach((v) => {
-    if (v.path === props.state.currentVideo.path && v.targets) {
-      currentVideoTargets = v.targets;
-    }
-  });
-  if (currentVideoTargets.length !== 0) {
-    currentVideoTargets.forEach((t) => {
+  // add question
+  if (props.state.currentVideo.question) {
+    arr.push(
+      <div className="gameQuestion">
+        {parse(props.state.currentVideo.question)}
+      </div>,
+    );
+  }
+  // add targets
+  if (props.state.currentVideo.targets) {
+    props.state.currentVideo.targets.forEach((t) => {
       arr.push(
         <button
           className="gameButton"
