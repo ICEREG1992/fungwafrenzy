@@ -444,6 +444,7 @@ a.purple {
 
 .gameQuestion {
   color: white;
+  font-size: 12px;
   line-height: 16px;
   padding-bottom: 8px;
   pointer-events: none;
