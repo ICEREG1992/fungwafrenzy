@@ -455,6 +455,7 @@ a.purple {
   background: linear-gradient(180deg, #fcfcfccd, #dadddecd);
   border: 1px solid black;
   border-radius: 4px;
+  font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
   padding: 12px 15px;
   margin-top: 9px;
   width: 100%;

@@ -438,6 +438,22 @@ export default function Game(props: GameProps) {
     }
   };
 
+  const calculateVolume = () => {
+    if (localGameState.currentVideo.music) {
+      return (
+        ((settings.volume_music * settings.volume_master) / 10000) *
+        (fader / 100) *
+        (localImpact.music[localGameState.currentVideo.music as string].volume /
+          100)
+      );
+    } else {
+      return (
+        ((settings.volume_music * settings.volume_master) / 10000) *
+        (fader / 100)
+      );
+    }
+  };
+
   // prettier-ignore
   const classMap: { [key: string]: string } = {
     '#': 'Regulator',
@@ -496,10 +512,7 @@ export default function Game(props: GameProps) {
                   playing={playing}
                   loop
                   controls={false}
-                  volume={
-                    ((settings.volume_music * settings.volume_master) / 10000) *
-                    (fader / 100)
-                  }
+                  volume={calculateVolume()}
                   url={`impact://${localGameState.playingMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                 ></ReactPlayer>
                 <div

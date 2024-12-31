@@ -97,6 +97,7 @@ interface impactMusic {
 interface impactSong {
   title: string;
   path: string;
+  volume: number;
 }
 
 export interface gameState {
