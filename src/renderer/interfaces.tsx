@@ -3,6 +3,8 @@ export interface userSettings {
   player_theme: string;
   impact_folder_path: string;
   save_folder_path: string;
+  skip_button: boolean;
+  skip_timer: number;
   username: string;
   class: string;
   location: string;

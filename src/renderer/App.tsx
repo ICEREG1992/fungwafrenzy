@@ -86,15 +86,17 @@ export default function App() {
           player_theme: 'classic',
           impact_folder_path: defaultPaths[0],
           save_folder_path: defaultPaths[1],
+          skip_button: true,
+          skip_timer: 3,
           username: '',
           class: '',
           location: '',
           resolution_x: 1024,
           resolution_y: 728,
           fullscreen: false,
-          volume_master: 100,
+          volume_master: 80,
           volume_video: 100,
-          volume_music: 80,
+          volume_music: 100,
         });
       } catch (err) {
         console.error('Failed to load settings:', err);

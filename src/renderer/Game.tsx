@@ -354,29 +354,32 @@ export default function Game(props: GameProps) {
   };
 
   const skipVideo = () => {
-    // get current video
-    let currentVideo: blockVideo = localGameState.block.videos[0]; // placeholder value to prevent typing issues
-    localGameState.block.videos.forEach((v) => {
-      if (v.path === localGameState.currentVideo.path) {
-        currentVideo = v;
+    // only run if the skip button should be visible
+    if (gameSkip.current?.hasAttribute('style')) {
+      // get current video
+      let currentVideo: blockVideo = localGameState.block.videos[0]; // placeholder value to prevent typing issues
+      localGameState.block.videos.forEach((v) => {
+        if (v.path === localGameState.currentVideo.path) {
+          currentVideo = v;
+        }
+      });
+      // now if there are targets to be shown, skip to them. prioritize video-specific rules
+      if (gamePlayer.current) {
+        if (currentVideo.targets) {
+          gamePlayer.current.seekTo(currentVideo.timing?.targets as number);
+        } else if (currentVideo.next) {
+          nextBlock(currentVideo.next);
+        } else if (localGameState.block.targets) {
+          console.log(`seeking to ${currentVideo.timing?.targets}`);
+          gamePlayer.current.seekTo(currentVideo.timing?.targets as number);
+        } else if (localGameState.block.next) {
+          nextBlock(localGameState.block.next);
+        }
       }
-    });
-    // now if there are targets to be shown, skip to them. prioritize video-specific rules
-    if (gamePlayer.current) {
-      if (currentVideo.targets) {
-        gamePlayer.current.seekTo(currentVideo.timing?.targets as number);
-      } else if (currentVideo.next) {
-        nextBlock(currentVideo.next);
-      } else if (localGameState.block.targets) {
-        console.log(`seeking to ${currentVideo.timing?.targets}`);
-        gamePlayer.current.seekTo(currentVideo.timing?.targets as number);
-      } else if (localGameState.block.next) {
-        nextBlock(localGameState.block.next);
+      // hide the skip button
+      if (settings.skip_button && gameSkip.current) {
+        gameSkip.current.removeAttribute('style');
       }
-    }
-    // hide the skip button
-    if (gameSkip.current) {
-      gameSkip.current.removeAttribute('style');
     }
   };
 
@@ -433,22 +436,26 @@ export default function Game(props: GameProps) {
       fadeAudio(fader, setFader, true);
     }
     // show and hide skip button
-    if (localGameState.currentVideo.timing?.targets) {
-      if (
-        e.playedSeconds > 3 &&
-        e.playedSeconds < localGameState.currentVideo.timing.targets &&
-        gameSkip.current
-      ) {
-        gameSkip.current.setAttribute('style', 'opacity: 1;');
-      } else if (
-        e.playedSeconds < localGameState.currentVideo.timing.targets &&
-        gameSkip.current
-      ) {
-        gameSkip.current.removeAttribute('style');
-      }
-    } else {
-      if (e.playedSeconds > 3 && gameSkip.current) {
-        gameSkip.current.setAttribute('style', 'opacity: 1;');
+    if (settings.skip_button) {
+      if (localGameState.currentVideo.timing?.targets) {
+        if (
+          e.playedSeconds > settings.skip_timer &&
+          e.playedSeconds < localGameState.currentVideo.timing.targets &&
+          gameSkip.current
+        ) {
+          gameSkip.current.setAttribute('style', 'opacity: 1;');
+        } else if (
+          e.playedSeconds < localGameState.currentVideo.timing.targets &&
+          gameSkip.current
+        ) {
+          gameSkip.current.removeAttribute('style');
+        }
+      } else {
+        if (e.playedSeconds > settings.skip_timer && gameSkip.current) {
+          gameSkip.current.setAttribute('style', 'opacity: 1;');
+        } else if (e.playedSeconds < settings.skip_timer && gameSkip.current) {
+          gameSkip.current.removeAttribute('style');
+        }
       }
     }
   };

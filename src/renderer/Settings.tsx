@@ -23,7 +23,7 @@ export default function Settings() {
     }));
   }
 
-  function changeSetting(s: string, v: string) {
+  function changeSetting(s: string, v: string | boolean) {
     updateSettings({
       ...settings,
       [s]: v,
@@ -94,6 +94,34 @@ export default function Settings() {
               <a
                 onClick={() =>
                   changePath('save_folder_path', settings.save_folder_path)
+                }
+              >
+                &lt;CHANGE&gt;
+              </a>
+            </div>
+            <div className="NETline">
+              <b>skip_button:</b>{' '}
+              {settings.skip_button ? 'ENABLED' : 'DISABLED'}{' '}
+              <a
+                onClick={() =>
+                  changeSetting('skip_button', !settings.skip_button)
+                }
+              >
+                &lt;CHANGE&gt;
+              </a>
+            </div>
+            <div className="NETline">
+              <b>skip_timer:</b> {settings.skip_timer}{' '}
+              <a
+                onClick={() =>
+                  setModalState({
+                    title: 'Change Skip Timer',
+                    desc: 'Set the duration that you need to wait until the skip button shows up.',
+                    input: 'number',
+                    button: '✓ CHANGE SKIP TIMER',
+                    value: 'skip_timer',
+                    visible: true,
+                  })
                 }
               >
                 &lt;CHANGE&gt;
@@ -390,9 +418,7 @@ interface dropdownOption {
   label: string;
 }
 
-const defaultDropdown: dropdownOption[] = [
-  { value: 'NONE', label: 'NONE' },
-];
+const defaultDropdown: dropdownOption[] = [{ value: 'NONE', label: 'NONE' }];
 
 const themeDropdown: dropdownOption[] = [
   { value: 'classic', label: 'classic' },
