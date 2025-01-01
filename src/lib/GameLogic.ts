@@ -70,14 +70,14 @@ export function checkCondition(
         condition.value as Array<blockCondition>,
         localGameState,
         settings,
-        'AND',
+        'and',
       );
     case 'or':
       return checkConditions(
         condition.value as Array<blockCondition>,
         localGameState,
         settings,
-        'OR',
+        'or',
       );
     case 'not':
       return !checkCondition(
@@ -258,23 +258,24 @@ export function checkConditions(
   conditions: Array<blockCondition>,
   localGameState: gameState,
   settings: userSettings,
-  mode?: string,
+  mode: string,
 ) {
   let out: boolean;
-  switch (mode) {
-    case 'AND':
+  switch (mode.toLowerCase()) {
+    case 'and':
       out = true;
       conditions.forEach((condition) => {
         out = out && checkCondition(condition, localGameState, settings);
       });
       break;
-    case 'OR':
+    case 'or':
       out = false;
       conditions.forEach((condition) => {
         out = out || checkCondition(condition, localGameState, settings);
       });
       break;
     default:
+      console.log(`unexpected mode: ${mode}`);
       out = true;
       conditions.forEach((condition) => {
         out = out && checkCondition(condition, localGameState, settings);
