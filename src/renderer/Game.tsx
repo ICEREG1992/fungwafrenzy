@@ -432,9 +432,24 @@ export default function Game(props: GameProps) {
       }));
       fadeAudio(fader, setFader, true);
     }
-    // show skip button
-    if (e.playedSeconds > 3 && gameSkip.current) {
-      gameSkip.current.setAttribute('style', 'opacity: 1;');
+    // show and hide skip button
+    if (localGameState.currentVideo.timing?.targets) {
+      if (
+        e.playedSeconds > 3 &&
+        e.playedSeconds < localGameState.currentVideo.timing.targets &&
+        gameSkip.current
+      ) {
+        gameSkip.current.setAttribute('style', 'opacity: 1;');
+      } else if (
+        e.playedSeconds < localGameState.currentVideo.timing.targets &&
+        gameSkip.current
+      ) {
+        gameSkip.current.removeAttribute('style');
+      }
+    } else {
+      if (e.playedSeconds > 3 && gameSkip.current) {
+        gameSkip.current.setAttribute('style', 'opacity: 1;');
+      }
     }
   };
 
