@@ -39,8 +39,6 @@ export default function FrenzyNETHeader(props: FrenzyNETHeaderProps) {
             transform: `translateX(-${Math.floor(Math.random() * 101)}%)`,
           }}
         >
-          {' '}
-          {/* TODO: get this to start at random location on render */}
           <span>
             Authorities warn of corruption within local utility companies:
             Water, Electric, etc. /

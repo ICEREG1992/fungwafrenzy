@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { Link } from 'react-router-dom';
 import FrenzyNETHeader from './FrenzyNETHeader';
@@ -23,13 +23,14 @@ export default function Settings() {
     }));
   }
 
-  function changeSetting(s: string, v: string) {
+  function changeSetting(s: string, v: string | boolean) {
     updateSettings({
       ...settings,
       [s]: v,
     });
     closeModal();
   }
+
   function changePath(v: string, p: string) {
     window.electron.ipcRenderer
       .invoke('select-path', p)
@@ -94,6 +95,34 @@ export default function Settings() {
               <a
                 onClick={() =>
                   changePath('save_folder_path', settings.save_folder_path)
+                }
+              >
+                &lt;CHANGE&gt;
+              </a>
+            </div>
+            <div className="NETline">
+              <b>skip_button:</b>{' '}
+              {settings.skip_button ? 'ENABLED' : 'DISABLED'}{' '}
+              <a
+                onClick={() =>
+                  changeSetting('skip_button', !settings.skip_button)
+                }
+              >
+                &lt;CHANGE&gt;
+              </a>
+            </div>
+            <div className="NETline">
+              <b>skip_timer:</b> {settings.skip_timer}{' '}
+              <a
+                onClick={() =>
+                  setModalState({
+                    title: 'Change Skip Timer',
+                    desc: 'Set the duration that you need to wait until the skip button shows up.',
+                    input: 'number',
+                    button: '✓ CHANGE SKIP TIMER',
+                    value: 'skip_timer',
+                    visible: true,
+                  })
                 }
               >
                 &lt;CHANGE&gt;
@@ -218,24 +247,46 @@ export default function Settings() {
           </div>
         </div>
       </div>
-      <NetModal
-        modalState={modalState}
-        setter={changeSetting}
-        close={closeModal}
-        curr={settings}
-      ></NetModal>
+      <NetModal modalState={modalState} setter={setModalState}></NetModal>
     </div>
   );
 }
 
 interface ModalProps {
   modalState: modalState;
-  curr: userSettings;
-  setter: (s: string, v: string) => void;
-  close: () => void;
+  setter: React.Dispatch<React.SetStateAction<modalState>>;
 }
 
 function NetModal(props: ModalProps) {
+  const { settings, updateSettings } = useSettingsStore();
+  const modalValue = useRef<HTMLInputElement>(null);
+  const selectValue = useRef<HTMLSelectElement>(null);
+  useEffect(() => {
+    if (modalValue.current) {
+      modalValue.current.value =
+        settings[props.modalState.value as keyof userSettings].toString();
+    }
+    if (selectValue.current) {
+      selectValue.current.value =
+        settings[props.modalState.value as keyof userSettings].toString();
+    }
+  }, [props.modalState.value]);
+
+  function closeModal() {
+    props.setter((prev) => ({
+      ...prev,
+      visible: false,
+    }));
+  }
+
+  function changeSetting(s: string, v: string | boolean) {
+    updateSettings({
+      ...settings,
+      [s]: v,
+    });
+    closeModal();
+  }
+
   switch (props.modalState.input) {
     case 'text':
       return (
@@ -252,15 +303,16 @@ function NetModal(props: ModalProps) {
               <input
                 type="text"
                 id="NETmodalvalue"
+                ref={modalValue}
                 defaultValue={
-                  props.curr[
+                  settings[
                     props.modalState.value as keyof userSettings
                   ] as string
                 }
               ></input>
             </div>
             <div className="NETmodalbuttons">
-              <a onClick={props.close}>
+              <a onClick={closeModal}>
                 <div>× CANCEL</div>
               </a>
               <a
@@ -269,7 +321,7 @@ function NetModal(props: ModalProps) {
                   const value = document.getElementById(
                     'NETmodalvalue',
                   ) as HTMLInputElement;
-                  props.setter(props.modalState.value, value.value);
+                  changeSetting(props.modalState.value, value.value);
                 }}
               >
                 <div>{props.modalState.button}</div>
@@ -293,15 +345,16 @@ function NetModal(props: ModalProps) {
               <input
                 type="number"
                 id="NETmodalvalue"
+                ref={modalValue}
                 defaultValue={
-                  props.curr[
+                  settings[
                     props.modalState.value as keyof userSettings
                   ] as string
                 }
               ></input>
             </div>
             <div className="NETmodalbuttons">
-              <a onClick={props.close}>
+              <a onClick={closeModal}>
                 <div>× CANCEL</div>
               </a>
               <a
@@ -310,7 +363,7 @@ function NetModal(props: ModalProps) {
                   const value = document.getElementById(
                     'NETmodalvalue',
                   ) as HTMLInputElement;
-                  props.setter(props.modalState.value, value.value);
+                  changeSetting(props.modalState.value, value.value);
                 }}
               >
                 <div>{props.modalState.button}</div>
@@ -348,8 +401,9 @@ function NetModal(props: ModalProps) {
             <div className="NETmodalinput">
               <select
                 id="NETmodalvalue"
+                ref={selectValue}
                 defaultValue={
-                  props.curr[
+                  settings[
                     props.modalState.value as keyof userSettings
                   ] as string
                 }
@@ -362,7 +416,7 @@ function NetModal(props: ModalProps) {
               </select>
             </div>
             <div className="NETmodalbuttons">
-              <a onClick={props.close}>
+              <a onClick={closeModal}>
                 <div>× CANCEL</div>
               </a>
               <a
@@ -371,7 +425,7 @@ function NetModal(props: ModalProps) {
                   const value = document.getElementById(
                     'NETmodalvalue',
                   ) as HTMLInputElement;
-                  props.setter(props.modalState.value, value.value);
+                  changeSetting(props.modalState.value, value.value);
                 }}
               >
                 <div>{props.modalState.button}</div>
@@ -390,9 +444,7 @@ interface dropdownOption {
   label: string;
 }
 
-const defaultDropdown: dropdownOption[] = [
-  { value: 'NONE', label: 'NONE' },
-];
+const defaultDropdown: dropdownOption[] = [{ value: 'NONE', label: 'NONE' }];
 
 const themeDropdown: dropdownOption[] = [
   { value: 'classic', label: 'classic' },

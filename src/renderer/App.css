@@ -105,8 +105,8 @@ header #titlebar {
   text-shadow: goldenrod 0px 0px 10px;
 }
 
-.rfm-child {
-  padding-right: 9px;
+.rfm-child span {
+  padding-right: 10px;
 }
 
 #body {
@@ -407,7 +407,7 @@ a.purple {
 .gameVideo {
   position: absolute;
   left: 160px;
-  z-index: 4;
+  z-index: 3;
 }
 
 .gameCurtain {
@@ -415,7 +415,7 @@ a.purple {
   left: 160px;
   width: 640px;
   height: 360px;
-  background-color: none;
+  background-color: transparent;
   transition: background-color 500ms ease-in-out;
   z-index: 4;
 }
@@ -442,16 +442,27 @@ a.purple {
   padding: 17px 19px;
 }
 
+.gameQuestion {
+  color: white;
+  font-size: 12px;
+  line-height: 16px;
+  padding-bottom: 8px;
+  pointer-events: none;
+  user-select: none;
+}
+
 .gameButton {
   background: linear-gradient(180deg, #fcfcfccd, #dadddecd);
   border: 1px solid black;
   border-radius: 4px;
+  font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
   padding: 12px 15px;
   margin-top: 9px;
   width: 100%;
   cursor: pointer;
   line-height: 16px;
   font-size: 12px;
+  text-wrap: balance;
 }
 
 .gameButton:hover {

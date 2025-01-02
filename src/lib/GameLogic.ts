@@ -6,6 +6,7 @@ import {
   impactBlock,
   userSettings,
 } from '../renderer/interfaces';
+import { useSettingsStore } from '../hooks/useSettingsStore';
 
 /*
         Alters the state of our gameFlags according to a certain object's (block, target, or video) flags
@@ -54,27 +55,38 @@ export function handleFlags(out: gameFlags, flags: blockFlags) {
 }
 
 export function checkCondition(
-  condition: blockCondition,
+  condition: blockCondition | undefined,
   localGameState: gameState,
-) {
+  settings: userSettings,
+): boolean {
+  if (!condition) {
+    // if a video doesn't have a condition, then shortcircuit and return true
+    return true;
+  }
   switch (condition.type.toLowerCase()) {
     case 'and':
       // eslint-disable-next-line no-use-before-define
       return checkConditions(
         condition.value as Array<blockCondition>,
         localGameState,
-        'AND',
+        settings,
+        'and',
       );
     case 'or':
       return checkConditions(
         condition.value as Array<blockCondition>,
         localGameState,
-        'OR',
+        settings,
+        'or',
+      );
+    case 'not':
+      return !checkCondition(
+        condition.value as blockCondition,
+        localGameState,
+        settings,
       );
     case 'seen':
       return localGameState.seen.includes(condition.value as string);
-    case 'notseen':
-      return !localGameState.seen.includes(condition.value as string);
     case 'time':
       const now = new Date();
       const h = now.getHours();
@@ -137,9 +149,7 @@ export function checkCondition(
           return false;
       }
     case 'state':
-      //TODO: Fix this
-      return false;
-    //return props.settings.location === condition.value;
+      return settings.location === condition.value;
     default:
       // interpret this as a flag check
       switch (typeof localGameState.flags[condition.type]) {
@@ -158,69 +168,85 @@ export function checkCondition(
           }
         case 'number':
           const c = splitCondition(condition.value as string); // assert this is a string because it's not an array
-          switch (c[0]) {
-            case '==':
-              if (parseInt(c[1])) {
-                // compare to a const
-                return localGameState.flags[condition.type] === parseInt(c[1]);
-              } else {
-                // compare to another flag
-                return (
-                  localGameState.flags[condition.type] ===
-                  localGameState.flags[condition.value as string]
-                );
-              }
-            case '<=':
-              if (parseInt(c[1])) {
-                return (
-                  (localGameState.flags[condition.type] as number) <=
-                  parseInt(c[1])
-                );
-              } else {
-                return (
-                  localGameState.flags[condition.type] <=
-                  localGameState.flags[condition.value as string]
-                );
-              }
-            case '>=':
-              if (parseInt(c[1])) {
-                return (
-                  (localGameState.flags[condition.type] as number) >=
-                  parseInt(c[1])
-                );
-              } else {
-                return (
-                  localGameState.flags[condition.type] >=
-                  localGameState.flags[condition.value as string]
-                );
-              }
-            case '<':
-              if (parseInt(c[1])) {
-                return (
-                  (localGameState.flags[condition.type] as number) <
-                  parseInt(c[1])
-                );
-              } else {
-                return (
-                  localGameState.flags[condition.type] <
-                  localGameState.flags[condition.value as string]
-                );
-              }
-            case '>':
-              if (parseInt(c[1])) {
-                return (
-                  (localGameState.flags[condition.type] as number) >
-                  parseInt(c[1])
-                );
-              } else {
-                return (
-                  localGameState.flags[condition.type] >
-                  localGameState.flags[condition.value as string]
-                );
-              }
-            default:
-              // unknown operator, return false
-              return false;
+          if (c[0]) {
+            switch (c[0]) {
+              case '==':
+                if (parseInt(c[1])) {
+                  // compare to a const
+                  return (
+                    localGameState.flags[condition.type] === parseInt(c[1])
+                  );
+                } else {
+                  // compare to another flag
+                  return (
+                    localGameState.flags[condition.type] ===
+                    localGameState.flags[condition.value as string]
+                  );
+                }
+              case '<=':
+                if (parseInt(c[1])) {
+                  return (
+                    (localGameState.flags[condition.type] as number) <=
+                    parseInt(c[1])
+                  );
+                } else {
+                  return (
+                    localGameState.flags[condition.type] <=
+                    localGameState.flags[condition.value as string]
+                  );
+                }
+              case '>=':
+                if (parseInt(c[1])) {
+                  return (
+                    (localGameState.flags[condition.type] as number) >=
+                    parseInt(c[1])
+                  );
+                } else {
+                  return (
+                    localGameState.flags[condition.type] >=
+                    localGameState.flags[condition.value as string]
+                  );
+                }
+              case '<':
+                if (parseInt(c[1])) {
+                  return (
+                    (localGameState.flags[condition.type] as number) <
+                    parseInt(c[1])
+                  );
+                } else {
+                  return (
+                    localGameState.flags[condition.type] <
+                    localGameState.flags[condition.value as string]
+                  );
+                }
+              case '>':
+                if (parseInt(c[1])) {
+                  return (
+                    (localGameState.flags[condition.type] as number) >
+                    parseInt(c[1])
+                  );
+                } else {
+                  return (
+                    localGameState.flags[condition.type] >
+                    localGameState.flags[condition.value as string]
+                  );
+                }
+              default:
+                // unknown operator, return false
+                return false;
+            }
+          } else {
+            // interpret this as an == check
+            if (parseInt(c[1])) {
+              // compare to a const
+              return localGameState.flags[condition.type] === parseInt(c[1]);
+            } else {
+              // compare to another flag
+              return (
+                localGameState.flags[condition.type] ===
+                localGameState.flags[condition.value as string]
+              );
+            }
           }
         default:
           return false;
@@ -231,38 +257,43 @@ export function checkCondition(
 export function checkConditions(
   conditions: Array<blockCondition>,
   localGameState: gameState,
-  mode?: string,
+  settings: userSettings,
+  mode: string,
 ) {
   let out: boolean;
-  switch (mode) {
-    case 'AND':
+  switch (mode.toLowerCase()) {
+    case 'and':
       out = true;
       conditions.forEach((condition) => {
-        out = out && checkCondition(condition, localGameState);
+        out = out && checkCondition(condition, localGameState, settings);
       });
       break;
-    case 'OR':
+    case 'or':
       out = false;
       conditions.forEach((condition) => {
-        out = out || checkCondition(condition, localGameState);
+        out = out || checkCondition(condition, localGameState, settings);
       });
       break;
     default:
+      console.log(`unexpected mode: ${mode}`);
       out = true;
       conditions.forEach((condition) => {
-        out = out && checkCondition(condition, localGameState);
+        out = out && checkCondition(condition, localGameState, settings);
       });
   }
   return out;
 }
 
-export function handleSelect(gameState: gameState, block: impactBlock) {
+export function handleSelect(
+  gameState: gameState,
+  block: impactBlock,
+  settings: userSettings,
+) {
   // figure out if this is a chance block or a condition block
   if (block.videos[0].chance) {
     // if it is chance, make one chance calculation and run it against each video until it hits
     const rand = Math.random();
     console.log(rand);
-    // eslint-disable-next-line vars-on-top
     let sum = 0;
     let selectedVideo = block.videos[0];
     block.videos.some((video) => {
@@ -276,22 +307,19 @@ export function handleSelect(gameState: gameState, block: impactBlock) {
     });
     return selectedVideo;
   } else {
-    // eslint-disable-next-line no-lonely-if
-    if (block.videos[0].conditions) {
+    if (block.videos[0].condition) {
       // this is now a flag check, watched check, time check, or location check
-      let selectedVideo = block.videos[0];
-      block.videos.some((video) => {
+      for (let i = 0; i < block.videos.length; i += 1) {
         // for every video, perform this check, stop once we hit true
+        const video = block.videos[i];
         if (
-          checkConditions(video.conditions as Array<blockCondition>, gameState)
+          checkCondition(video.condition as blockCondition, gameState, settings)
         ) {
-          selectedVideo = video;
-          return true;
+          return video;
         }
-        return false;
-      });
-      // todo: logic here
-      return selectedVideo;
+      }
+      // todo: return datafault instead of video 1
+      return block.videos[0];
       // eslint-disable-next-line no-else-return
     } else {
       // no chance or condition, return the first video in the set
@@ -302,7 +330,7 @@ export function handleSelect(gameState: gameState, block: impactBlock) {
 
 function splitCondition(c: string) {
   // use regex to split a comparison out from the string
-  const match = /^(==|<=|>=|<|>)(.*)/.exec(c);
+  const match = /^(==|<=|>=|<|>)?(.*)/.exec(c);
   // eslint-disable-next-line spaced-comment
   return (match as RegExpExecArray).slice(1); //assert this has a result
 }

@@ -3,6 +3,8 @@ export interface userSettings {
   player_theme: string;
   impact_folder_path: string;
   save_folder_path: string;
+  skip_button: boolean;
+  skip_timer: number;
   username: string;
   class: string;
   location: string;
@@ -59,22 +61,25 @@ export interface blockVideo {
   path: string;
   title: string;
   chance?: number;
-  conditions?: Array<blockCondition>;
-  timing: blockTiming;
-  music: string;
+  condition?: blockCondition;
+  timing?: blockTiming;
+  music?: string;
   flags?: blockFlags;
+  question?: string;
   targets?: Array<blockTarget>;
   next?: string;
 }
 
 export interface blockCondition {
   type: string;
-  value: string | Array<blockCondition>;
+  value: string | blockCondition | Array<blockCondition>;
 }
 
 export interface blockTiming {
-  targets: number;
-  loop: number;
+  targets?: number;
+  loop?: number;
+  music?: number;
+  silence?: number;
 }
 
 export interface blockTarget {
@@ -94,12 +99,13 @@ interface impactMusic {
 interface impactSong {
   title: string;
   path: string;
+  volume: number;
 }
 
 export interface gameState {
   block: impactBlock;
-  currentVideo: string;
-  currentMusic: string;
+  currentVideo: blockVideo;
+  playingMusic: string;
   flags: gameFlags;
   seen: Array<string>;
 }
