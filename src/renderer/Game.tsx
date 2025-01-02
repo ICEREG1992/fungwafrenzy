@@ -217,6 +217,10 @@ export default function Game(props: GameProps) {
           nextMusic = localImpact.music[nextVideo.music].path;
         }
       }
+      // if video doesn't change, seek back to the beginning so it can play again
+      if (nextVideo.path === localGameState.currentVideo.path) {
+        gamePlayer.current?.seekTo(0);
+      }
       // switch to new video
       console.log(newFlags);
       setLocalGameState((prev) => ({
@@ -292,6 +296,10 @@ export default function Game(props: GameProps) {
           nextMusic = localImpact.music[nextVideo.music].path;
         }
       }
+      // if video doesn't change, seek back to the beginning so it can play again
+      if (nextVideo.path === localGameState.currentVideo.path) {
+        gamePlayer.current?.seekTo(0);
+      }
       // switch to new video
       console.log(newFlags);
       setLocalGameState((prev) => ({
@@ -325,26 +333,27 @@ export default function Game(props: GameProps) {
   };
 
   const handleOnEnded = () => {
-    // get current video
-    let currentVideo: blockVideo = localGameState.block.videos[0]; // placeholder value to prevent typing issues
-    localGameState.block.videos.forEach((v) => {
-      if (v.path === localGameState.currentVideo.path) {
-        currentVideo = v;
-      }
-    });
     if (gamePlayer.current) {
-      if (currentVideo.targets) {
+      if (localGameState.currentVideo.targets) {
         // this is inconsistent
-        console.log(`video loops at ${currentVideo.timing?.loop}`);
+        console.log(
+          `video loops at ${localGameState.currentVideo.timing?.loop}`,
+        );
         gamePlayer.current.seekTo(0);
-        gamePlayer.current.seekTo(currentVideo.timing?.loop as number);
-      } else if (currentVideo.next) {
-        nextBlock(currentVideo.next);
+        gamePlayer.current.seekTo(
+          localGameState.currentVideo.timing?.loop as number,
+        );
+      } else if (localGameState.currentVideo.next) {
+        nextBlock(localGameState.currentVideo.next);
       } else if (localGameState.block.targets) {
         // this is inconsistent
-        console.log(`video loops at ${currentVideo.timing?.loop}`);
+        console.log(
+          `video loops at ${localGameState.currentVideo.timing?.loop}`,
+        );
         gamePlayer.current.seekTo(0);
-        gamePlayer.current.seekTo(currentVideo.timing?.loop as number);
+        gamePlayer.current.seekTo(
+          localGameState.currentVideo.timing?.loop as number,
+        );
       } else if (localGameState.block.next) {
         nextBlock(localGameState.block.next);
       }
@@ -356,22 +365,21 @@ export default function Game(props: GameProps) {
   const skipVideo = () => {
     // only run if the skip button should be visible
     if (gameSkip.current?.hasAttribute('style')) {
-      // get current video
-      let currentVideo: blockVideo = localGameState.block.videos[0]; // placeholder value to prevent typing issues
-      localGameState.block.videos.forEach((v) => {
-        if (v.path === localGameState.currentVideo.path) {
-          currentVideo = v;
-        }
-      });
       // now if there are targets to be shown, skip to them. prioritize video-specific rules
       if (gamePlayer.current) {
-        if (currentVideo.targets) {
-          gamePlayer.current.seekTo(currentVideo.timing?.targets as number);
-        } else if (currentVideo.next) {
-          nextBlock(currentVideo.next);
+        if (localGameState.currentVideo.targets) {
+          gamePlayer.current.seekTo(
+            localGameState.currentVideo.timing?.targets as number,
+          );
+        } else if (localGameState.currentVideo.next) {
+          nextBlock(localGameState.currentVideo.next);
         } else if (localGameState.block.targets) {
-          console.log(`seeking to ${currentVideo.timing?.targets}`);
-          gamePlayer.current.seekTo(currentVideo.timing?.targets as number);
+          console.log(
+            `seeking to ${localGameState.currentVideo.timing?.targets}`,
+          );
+          gamePlayer.current.seekTo(
+            localGameState.currentVideo.timing?.targets as number,
+          );
         } else if (localGameState.block.next) {
           nextBlock(localGameState.block.next);
         }
