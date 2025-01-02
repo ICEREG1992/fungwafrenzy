@@ -250,98 +250,97 @@ app
     ensureAppDataDir();
     // create custom file protocol to serve videos
 
-    protocol.handle("impact", async (request) => {
-
+    protocol.handle('impact', async (request) => {
       const url = new URL(request.url);
-      const searchParams = url.searchParams;
+      const { searchParams } = url;
       const videoName = decodeURIComponent(url.hostname);
-      const rootPath = searchParams.get("path");
-      const impactName = searchParams.get("impact");
-      
+      const rootPath = searchParams.get('path');
+      const impactName = searchParams.get('impact');
+
       if (rootPath && impactName) {
-        let basePath, filePath, contentType;
+        let basePath;
+        let filePath;
+        let contentType;
         console.log(videoName);
-        if (videoName.endsWith(".mp4")) {
-          basePath = path.join(rootPath, impactName, "video");
+        if (videoName.endsWith('.mp4')) {
+          basePath = path.join(rootPath, impactName, 'video');
           filePath = path.join(basePath, videoName);
-          contentType = "video/mp4";
+          contentType = 'video/mp4';
         } else {
-          basePath = path.join(rootPath, impactName, "music");
+          basePath = path.join(rootPath, impactName, 'music');
           filePath = path.join(basePath, videoName);
-          contentType = "audio/mpeg"; // Assuming audio is in MP3 format
+          contentType = 'audio/mpeg'; // Assuming audio is in MP3 format
         }
-    
+
         try {
           const stat = fs.statSync(filePath);
           const fileSize = stat.size;
-    
+
           // Retrieve the "range" header from the request
-          const range = request.headers.get("range");
-    
+          const range = request.headers.get('range');
+
           if (range) {
             // Parse the range header
-            const parts = range.replace(/bytes=/, "").split("-");
+            const parts = range.replace(/bytes=/, '').split('-');
             const start = parseInt(parts[0], 10);
             const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-    
+
             if (start >= fileSize || end >= fileSize) {
               // Return 416 if the range is not satisfiable
-              return new Response("Requested Range Not Satisfiable", {
+              return new Response('Requested Range Not Satisfiable', {
                 status: 416,
                 headers: {
-                  "Content-Range": `bytes */${fileSize}`,
+                  'Content-Range': `bytes */${fileSize}`,
                 },
               });
             }
-    
+
             const chunksize = end - start + 1;
-    
+
             // Use Node.js Buffer to read the file chunk manually
             const fileChunk = await new Promise<Buffer>((resolve, reject) => {
               const buffer = Buffer.alloc(chunksize);
               const fileStream = fs.createReadStream(filePath, { start, end });
               let bytesRead = 0;
-    
-              fileStream.on("data", (chunk:Buffer) => {
+
+              fileStream.on('data', (chunk: Buffer) => {
                 chunk.copy(buffer, bytesRead);
                 bytesRead += chunk.length;
               });
-    
-              fileStream.on("end", () => resolve(buffer));
-              fileStream.on("error", (err) => reject(err));
+
+              fileStream.on('end', () => resolve(buffer));
+              fileStream.on('error', (err) => reject(err));
             });
-    
+
             return new Response(fileChunk, {
               status: 206,
               headers: {
-                "Content-Range": `bytes ${start}-${end}/${fileSize}`,
-                "Accept-Ranges": "bytes",
-                "Content-Length": chunksize.toString(),
-                "Content-Type": contentType,
+                'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': chunksize.toString(),
+                'Content-Type': contentType,
               },
             });
           } else {
             // Serve the whole file
             const fileBuffer = fs.readFileSync(filePath);
-    
+
             return new Response(fileBuffer, {
               headers: {
-                "Content-Length": fileSize.toString(),
-                "Content-Type": contentType,
+                'Content-Length': fileSize.toString(),
+                'Content-Type': contentType,
               },
             });
           }
         } catch (err) {
-          console.error("Error reading file:", err);
-          return new Response("File not found", { status: 404 });
+          console.error('Error reading file:', err);
+          return new Response('File not found', { status: 404 });
         }
       } else {
-
         return net.fetch(''); // return junk idk fix this later
       }
     });
-    
-    
+
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
