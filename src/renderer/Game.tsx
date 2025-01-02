@@ -14,10 +14,12 @@ import {
   blockVideo,
   blockCondition,
   GameProps,
+  modalState,
 } from './interfaces';
 import { fadeAudio } from './util/util';
 import { handleFlags, handleSelect } from '../lib/GameLogic';
 import { useSettingsStore } from '../hooks/useSettingsStore';
+import NetModal from './NetModal';
 
 function getDefaultValue(t: string) {
   switch (t) {
@@ -73,6 +75,15 @@ export default function Game(props: GameProps) {
     playingMusic: '',
     flags: {},
     seen: [],
+  });
+
+  const [localModalState, setLocalModalState] = useState<modalState>({
+    title: 'Save before quitting?',
+    desc: 'Would you like to save your progress before closing?',
+    input: 'exit',
+    button: 'Cancel',
+    value: 'null',
+    visible: false,
   });
 
   const [playing, setPlaying] = useState<boolean>(true);
@@ -140,6 +151,15 @@ export default function Game(props: GameProps) {
   useEffect(() => {
     const { selected_impact, impact_folder_path } = settings;
     initializeGame(selected_impact, impact_folder_path);
+    // Create listener for exit confirmation
+    window.electron.ipcRenderer.on('show-exit-modal', () => {
+      setLocalModalState((prev) => ({
+        ...prev,
+        visible: true,
+      }));
+      // respond with true so the main process knows
+      window.electron.ipcRenderer.sendMessage('show-exit-modal-response', true);
+    });
   }, []);
 
   function restartGame() {
@@ -574,6 +594,10 @@ export default function Game(props: GameProps) {
               <div>·&nbsp;&nbsp;©1995 Synydyne </div>
             </div>
           </div>
+          <NetModal
+            modalState={localModalState}
+            setter={setLocalModalState}
+          ></NetModal>
         </div>
       );
     default:

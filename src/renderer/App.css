@@ -262,6 +262,7 @@ input[type='range'] {
   display: none;
   justify-content: center;
   align-items: center;
+  z-index: 3;
 }
 
 .NETmodalcontainer {

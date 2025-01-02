@@ -12,7 +12,9 @@ export type Channels =
   | 'get-impacts'
   | 'get-impact'
   | 'open-impacts-path'
-  | 'select-path';
+  | 'select-path'
+  | 'show-exit-modal'
+  | 'show-exit-modal-response';
 
 const electronHandler = {
   ipcRenderer: {
