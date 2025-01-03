@@ -8,13 +8,16 @@ export type Channels =
   | 'get-defaultappdatapaths'
   | 'load-usersettings'
   | 'save-usersettings'
+  | 'load-usersession'
+  | 'save-usersession'
   | 'load-saves'
   | 'get-impacts'
   | 'get-impact'
   | 'open-impacts-path'
   | 'select-path'
-  | 'show-exit-modal'
-  | 'show-exit-modal-response';
+  | 'ask-to-close'
+  | 'block-close'
+  | 'allow-close';
 
 const electronHandler = {
   ipcRenderer: {

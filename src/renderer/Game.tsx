@@ -151,14 +151,20 @@ export default function Game(props: GameProps) {
   useEffect(() => {
     const { selected_impact, impact_folder_path } = settings;
     initializeGame(selected_impact, impact_folder_path);
+    // tell main process to block exit
+    window.electron.ipcRenderer.sendMessage('block-close');
     // Create listener for exit confirmation
-    window.electron.ipcRenderer.on('show-exit-modal', () => {
+    window.electron.ipcRenderer.on('ask-to-close', () => {
+      // tell main process to allow exit
+      window.electron.ipcRenderer.sendMessage('allow-close');
+      if (localModalState.visible) {
+        // user is clicking again, go ahead and close
+        window.electron.ipcRenderer.sendMessage('close-app');
+      }
       setLocalModalState((prev) => ({
         ...prev,
         visible: true,
       }));
-      // respond with true so the main process knows
-      window.electron.ipcRenderer.sendMessage('show-exit-modal-response', true);
     });
   }, []);
 

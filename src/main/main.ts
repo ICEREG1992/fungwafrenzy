@@ -35,6 +35,14 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let readyToClose: boolean = true;
+ipcMain.on('block-close', () => {
+  readyToClose = false;
+});
+
+ipcMain.on('allow-close', () => {
+  readyToClose = true;
+});
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -204,6 +212,15 @@ const createWindow = async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  mainWindow.on('close', async (e) => {
+    if (!readyToClose) {
+      e.preventDefault(); // Prevent the default close action
+      console.log('exit intercepted');
+      // Send a message to the renderer and wait for a response
+      mainWindow?.webContents.send('ask-to-close');
+    }
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);

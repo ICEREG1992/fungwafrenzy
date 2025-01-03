@@ -65,7 +65,6 @@ function Title() {
 
 export default function App() {
   const { settings, setSettings } = useSettingsStore();
-
   useEffect(() => {
     const loadSettings = async () => {
       try {

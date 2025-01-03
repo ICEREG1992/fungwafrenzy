@@ -197,17 +197,27 @@ export default function NetModal(props: ModalProps) {
             <div className="NETmodaltitle">{props.modalState.title}</div>
             <div className="NETmodaldesc">{props.modalState.desc}</div>
             <div className="NETmodalinput"></div>
-            <div className="NETmodalbuttons">
-              <a onClick={closeModal}>
-                <div>× CANCEL</div>
+            <div className="NETmodalbuttons" style={{ justifyContent: 'end' }}>
+              <a
+                onClick={() => {
+                  window.electron.ipcRenderer.sendMessage('save-usersession');
+                  window.electron.ipcRenderer.sendMessage('close-app');
+                }}
+              >
+                <div>Save and Quit</div>
+              </a>
+              <a
+                onClick={() => {
+                  window.electron.ipcRenderer.sendMessage('close-app');
+                }}
+              >
+                <div>Quit Without Saving</div>
               </a>
               <a
                 className="purple"
                 onClick={() => {
-                  const value = document.getElementById(
-                    'NETmodalvalue',
-                  ) as HTMLInputElement;
-                  changeSetting(props.modalState.value, value.value);
+                  closeModal();
+                  window.electron.ipcRenderer.sendMessage('block-close');
                 }}
               >
                 <div>{props.modalState.button}</div>
