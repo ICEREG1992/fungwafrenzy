@@ -15,6 +15,7 @@ import {
   blockCondition,
   GameProps,
   modalState,
+  SaveGame,
 } from './interfaces';
 import { fadeAudio } from './util/util';
 import { handleFlags, handleSelect } from '../lib/GameLogic';
@@ -46,21 +47,23 @@ ref gameSkip: ref to the skip button
 export default function Game(props: GameProps) {
   const navigate = useNavigate();
   const { settings } = useSettingsStore();
-  const [localImpact, setLocalImpact] = useState<impact>({
-    info: {
-      game: '',
-      title: '',
-      subtitle: '',
-      description: '',
-      length: '',
-      author: '',
-    },
-    meta: {
-      flags: {},
-      start: '',
-    },
-    blocks: {},
-    music: {},
+  const [localImpact, setLocalImpact] = useState<impact>(() => {
+    return {
+      info: {
+        game: '',
+        title: '',
+        subtitle: '',
+        description: '',
+        length: '',
+        author: '',
+      },
+      meta: {
+        flags: {},
+        start: '',
+      },
+      blocks: {},
+      music: {},
+    };
   });
 
   const [localGameState, setLocalGameState] = useState<gameState>({
@@ -105,40 +108,37 @@ export default function Game(props: GameProps) {
   const gameSkip = useRef<HTMLDivElement>(null);
   const gameControl = useRef<typeof GameControls | null>(null);
 
-  async function initializeGame(
-    selected_impact: string,
-    impact_folder_path: string,
-  ) {
+  async function initializeGame() {
     try {
-      const res: impact = await window.electron.ipcRenderer.invoke(
+      const imp: impact = await window.electron.ipcRenderer.invoke(
         'get-impact',
-        selected_impact,
-        impact_folder_path,
+        settings.selected_impact,
+        settings.impact_folder_path,
       );
-      setLocalImpact(res);
+      setLocalImpact(imp);
       // Initialize flags
       const flags: gameFlags = {};
-      Object.keys(res.meta.flags).forEach((f) => {
-        flags[f] = getDefaultValue(res.meta.flags[f]);
+      Object.keys(imp.meta.flags).forEach((f) => {
+        flags[f] = getDefaultValue(imp.meta.flags[f]);
       });
 
       // figure out first video given block and flags
       const firstVideo = handleSelect(
         localGameState,
-        res.blocks[res.meta.start],
+        imp.blocks[imp.meta.start],
         settings,
       );
 
       // if music does not exist, send null so it plays nothing
       let initialMusic = '';
       if (firstVideo.music) {
-        initialMusic = res.music[firstVideo.music].path;
+        initialMusic = imp.music[firstVideo.music].path;
       }
 
       setLocalGameState((prev: gameState) => ({
         ...prev,
-        seen: [res.meta.start, `${res.meta.start}_${firstVideo.path}`],
-        block: res.blocks[res.meta.start],
+        seen: [imp.meta.start, `${imp.meta.start}_${firstVideo.path}`],
+        block: imp.blocks[imp.meta.start],
         currentVideo: firstVideo,
         playingMusic: initialMusic,
         flags,
@@ -148,9 +148,34 @@ export default function Game(props: GameProps) {
     }
   }
 
+  async function loadFromSave() {
+    try {
+      // start by loading impact
+      const imp: impact = await window.electron.ipcRenderer.invoke(
+        'get-impact',
+        settings.selected_impact,
+        settings.impact_folder_path,
+      );
+      setLocalImpact(imp);
+      // now pull game state from save file
+      const sav: SaveGame = await window.electron.ipcRenderer.invoke(
+        'get-savedata',
+        settings.selected_save,
+        settings.save_folder_path,
+      );
+      setLocalGameState(sav.gameState);
+    } catch (error) {
+      console.error('Failed to initialize game from save:', error);
+    }
+  }
   useEffect(() => {
-    const { selected_impact, impact_folder_path } = settings;
-    initializeGame(selected_impact, impact_folder_path);
+    if (props.continue) {
+      const { impact_folder_path, selected_impact, selected_save } = settings;
+      loadFromSave();
+    } else {
+      const { selected_impact, impact_folder_path } = settings;
+      initializeGame();
+    }
     // tell main process to block exit
     window.electron.ipcRenderer.sendMessage('block-close');
     // Create listener for exit confirmation
@@ -169,7 +194,7 @@ export default function Game(props: GameProps) {
   }, []);
 
   function restartGame() {
-    initializeGame(settings.selected_impact, settings.impact_folder_path);
+    initializeGame();
     gamePlayer.current?.seekTo(0);
     setPlaying(true);
     // hide and unlock controls so they can show up later
@@ -177,6 +202,22 @@ export default function Game(props: GameProps) {
       show: false,
       lock: false,
     });
+  }
+
+  function saveGame() {
+    // build save game
+    const newDate = new Date();
+    const newSave: SaveGame = {
+      key: newDate.getUTCSeconds().toString(),
+      date: newDate,
+      impact: settings.selected_impact,
+      gameState: localGameState,
+    };
+    window.electron.ipcRenderer.invoke(
+      'save-savedata',
+      newSave,
+      settings.save_folder_path,
+    );
   }
 
   // determines how videos change when a user clicks a button

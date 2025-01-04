@@ -30,7 +30,7 @@ export default function NetModal(props: ModalProps) {
     }));
   }
 
-  function changeSetting(s: string, v: string | boolean) {
+  function changeSetting(s: string, v: string | number | boolean) {
     updateSettings({
       ...settings,
       [s]: v,
@@ -114,7 +114,7 @@ export default function NetModal(props: ModalProps) {
                   const value = document.getElementById(
                     'NETmodalvalue',
                   ) as HTMLInputElement;
-                  changeSetting(props.modalState.value, value.value);
+                  changeSetting(props.modalState.value, parseInt(value.value));
                 }}
               >
                 <div>{props.modalState.button}</div>
@@ -200,7 +200,7 @@ export default function NetModal(props: ModalProps) {
             <div className="NETmodalbuttons" style={{ justifyContent: 'end' }}>
               <a
                 onClick={() => {
-                  window.electron.ipcRenderer.sendMessage('save-usersession');
+                  window.electron.ipcRenderer.sendMessage('save-savedata');
                   window.electron.ipcRenderer.sendMessage('close-app');
                 }}
               >

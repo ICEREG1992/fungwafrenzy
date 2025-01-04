@@ -24,7 +24,7 @@ import { pathToFileURL } from 'url';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { userSettings } from '../renderer/interfaces';
+import { userSettings, SaveGame } from '../renderer/interfaces';
 
 class AppUpdater {
   constructor() {
@@ -44,17 +44,11 @@ ipcMain.on('allow-close', () => {
   readyToClose = true;
 });
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
-
 ipcMain.on('close-app', () => {
   app.quit();
 });
 
-ipcMain.on('open-impacts-path', (event, arg) => {
+ipcMain.on('open-path', (event, arg) => {
   shell.openPath(arg);
 });
 
@@ -75,6 +69,20 @@ ipcMain.handle('save-usersettings', (e, s: userSettings) => {
     // Convert the object to a JSON string
     const jsonData = JSON.stringify(s, null, 2); // The `null, 2` adds pretty printing to the JSON file
     // Write the JSON data to the file
+    fs.writeFileSync(filePath, jsonData, 'utf-8');
+    console.log(`Data successfully saved to ${filePath}`);
+  } catch (error) {
+    console.error(`Failed to save file: ${error}`);
+  }
+});
+
+ipcMain.handle('save-savedata', (e, s: SaveGame, p: string) => {
+  console.log('saving game...');
+  const filePath = path.join(p, s.key);
+  try {
+    // Convert the object to a JSON string
+    const jsonData = JSON.stringify(s, null, 2); // The `null, 2` adds pretty printing to the JSON file
+    // Write the JSON data to a new file
     fs.writeFileSync(filePath, jsonData, 'utf-8');
     console.log(`Data successfully saved to ${filePath}`);
   } catch (error) {
@@ -116,6 +124,23 @@ ipcMain.handle('get-impacts', (e, p: string) => {
     out.push({ key: i, image });
   });
   return out;
+});
+
+ipcMain.handle('get-saves', (e, p: string) => {
+  const saves = fs.readdirSync(p);
+  const out: Array<object> = [];
+  saves.forEach((save) => {
+    const saveBuffer = fs.readFileSync(path.join(p, save), 'utf-8');
+    const json = JSON.parse(saveBuffer);
+    out.push(json);
+  });
+  return out;
+});
+
+ipcMain.handle('get-savedata', (e, s: string, p: string) => {
+  const data = fs.readFileSync(path.join(p, s), 'utf-8');
+  const json = JSON.parse(data);
+  return json;
 });
 
 ipcMain.handle('get-impact', (e, i: string, p: string) => {
