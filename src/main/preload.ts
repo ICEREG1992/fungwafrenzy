@@ -3,16 +3,20 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels =
-  | 'ipc-example'
   | 'close-app'
   | 'get-defaultappdatapaths'
   | 'load-usersettings'
   | 'save-usersettings'
-  | 'load-saves'
   | 'get-impacts'
   | 'get-impact'
-  | 'open-impacts-path'
-  | 'select-path';
+  | 'get-saves'
+  | 'get-savedata'
+  | 'save-savedata'
+  | 'open-path'
+  | 'select-path'
+  | 'ask-to-close'
+  | 'block-close'
+  | 'allow-close';
 
 const electronHandler = {
   ipcRenderer: {

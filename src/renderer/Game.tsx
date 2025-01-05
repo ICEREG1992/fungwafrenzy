@@ -14,10 +14,14 @@ import {
   blockVideo,
   blockCondition,
   GameProps,
+  NetModalState,
+  SaveGame,
+  SaveModalState,
 } from './interfaces';
 import { fadeAudio } from './util/util';
 import { handleFlags, handleSelect } from '../lib/GameLogic';
 import { useSettingsStore } from '../hooks/useSettingsStore';
+import SaveModal from './SaveModal';
 
 function getDefaultValue(t: string) {
   switch (t) {
@@ -43,22 +47,24 @@ ref gameSkip: ref to the skip button
 */
 export default function Game(props: GameProps) {
   const navigate = useNavigate();
-  const { settings } = useSettingsStore();
-  const [localImpact, setLocalImpact] = useState<impact>({
-    info: {
-      game: '',
-      title: '',
-      subtitle: '',
-      description: '',
-      length: '',
-      author: '',
-    },
-    meta: {
-      flags: {},
-      start: '',
-    },
-    blocks: {},
-    music: {},
+  const { settings, setSettings } = useSettingsStore();
+  const [localImpact, setLocalImpact] = useState<impact>(() => {
+    return {
+      info: {
+        game: '',
+        title: '',
+        subtitle: '',
+        description: '',
+        length: '',
+        author: '',
+      },
+      meta: {
+        flags: {},
+        start: '',
+      },
+      blocks: {},
+      music: {},
+    };
   });
 
   const [localGameState, setLocalGameState] = useState<gameState>({
@@ -73,6 +79,11 @@ export default function Game(props: GameProps) {
     playingMusic: '',
     flags: {},
     seen: [],
+  });
+
+  const [localModalState, setLocalModalState] = useState<SaveModalState>({
+    type: 'quit',
+    visible: false,
   });
 
   const [playing, setPlaying] = useState<boolean>(true);
@@ -94,40 +105,37 @@ export default function Game(props: GameProps) {
   const gameSkip = useRef<HTMLDivElement>(null);
   const gameControl = useRef<typeof GameControls | null>(null);
 
-  async function initializeGame(
-    selected_impact: string,
-    impact_folder_path: string,
-  ) {
+  async function initializeGame() {
     try {
-      const res: impact = await window.electron.ipcRenderer.invoke(
+      const imp: impact = await window.electron.ipcRenderer.invoke(
         'get-impact',
-        selected_impact,
-        impact_folder_path,
+        settings.selected_impact,
+        settings.impact_folder_path,
       );
-      setLocalImpact(res);
+      setLocalImpact(imp);
       // Initialize flags
       const flags: gameFlags = {};
-      Object.keys(res.meta.flags).forEach((f) => {
-        flags[f] = getDefaultValue(res.meta.flags[f]);
+      Object.keys(imp.meta.flags).forEach((f) => {
+        flags[f] = getDefaultValue(imp.meta.flags[f]);
       });
 
       // figure out first video given block and flags
       const firstVideo = handleSelect(
         localGameState,
-        res.blocks[res.meta.start],
+        imp.blocks[imp.meta.start],
         settings,
       );
 
       // if music does not exist, send null so it plays nothing
       let initialMusic = '';
       if (firstVideo.music) {
-        initialMusic = res.music[firstVideo.music].path;
+        initialMusic = imp.music[firstVideo.music].path;
       }
 
       setLocalGameState((prev: gameState) => ({
         ...prev,
-        seen: [res.meta.start, `${res.meta.start}_${firstVideo.path}`],
-        block: res.blocks[res.meta.start],
+        seen: [imp.meta.start, `${imp.meta.start}_${firstVideo.path}`],
+        block: imp.blocks[imp.meta.start],
         currentVideo: firstVideo,
         playingMusic: initialMusic,
         flags,
@@ -137,19 +145,136 @@ export default function Game(props: GameProps) {
     }
   }
 
+  async function loadFromSave() {
+    try {
+      // start by loading impact
+      const imp: impact = await window.electron.ipcRenderer.invoke(
+        'get-impact',
+        settings.selected_impact,
+        settings.impact_folder_path,
+      );
+      setLocalImpact(imp);
+      // now pull game state from save file
+      const sav: SaveGame = await window.electron.ipcRenderer.invoke(
+        'get-savedata',
+        settings.selected_save,
+        settings.save_folder_path,
+      );
+      setLocalGameState(sav.gameState);
+    } catch (error) {
+      console.error('Failed to initialize game from save:', error);
+    }
+  }
   useEffect(() => {
-    const { selected_impact, impact_folder_path } = settings;
-    initializeGame(selected_impact, impact_folder_path);
+    if (props.continue) {
+      const { impact_folder_path, selected_impact, selected_save } = settings;
+      loadFromSave();
+    } else {
+      const { selected_impact, impact_folder_path } = settings;
+      initializeGame();
+    }
+    // tell main process to block exit
+    window.electron.ipcRenderer.sendMessage('block-close');
+    // Create listener for exit confirmation
+    window.electron.ipcRenderer.on('ask-to-close', () => {
+      // tell main process to allow exit
+      window.electron.ipcRenderer.sendMessage('allow-close');
+      if (localModalState.visible) {
+        // user is clicking again, go ahead and close
+        window.electron.ipcRenderer.sendMessage('close-app');
+      }
+      setLocalModalState((prev) => ({
+        ...prev,
+        visible: true,
+      }));
+    });
   }, []);
 
+  async function confirmMenu() {
+    if (settings.selected_save) {
+      // start by checking if gamestate differs from saved gamestate
+      const sav: SaveGame = await window.electron.ipcRenderer.invoke(
+        'get-savedata',
+        settings.selected_save,
+        settings.save_folder_path,
+      );
+      if (
+        sav.gameState.currentVideo.path === localGameState.currentVideo.path
+      ) {
+        navigate('/');
+      } else {
+        setLocalModalState((prev) => ({
+          type: 'menu',
+          visible: true,
+        }));
+      }
+    } else {
+      if (
+        localGameState.block.title ===
+        localImpact.blocks[localImpact.meta.start].title
+      ) {
+        navigate('/');
+      } else {
+        setLocalModalState((prev) => ({
+          type: 'menu',
+          visible: true,
+        }));
+      }
+    }
+  }
+
+  function confirmRestart() {
+    if (settings.selected_save) {
+      setLocalModalState((prev) => ({
+        type: 'restart',
+        visible: true,
+      }));
+    } else {
+      if (
+        localGameState.block.title ===
+        localImpact.blocks[localImpact.meta.start].title
+      ) {
+        restartGame()
+      } else {
+        setLocalModalState((prev) => ({
+          type: 'restart',
+          visible: true,
+        }));
+      }
+    }
+  }
+
   function restartGame() {
-    initializeGame(settings.selected_impact, settings.impact_folder_path);
+    initializeGame();
     gamePlayer.current?.seekTo(0);
     setPlaying(true);
     // hide and unlock controls so they can show up later
     setShowControls({
       show: false,
       lock: false,
+    });
+  }
+
+  function saveGame() {
+    // build save game
+    const newDate = new Date();
+    const filename = newDate.getTime().toString();
+    const newSave: SaveGame = {
+      key: newDate.toLocaleString(),
+      filename,
+      date: newDate,
+      impact: settings.selected_impact,
+      gameState: localGameState,
+    };
+    window.electron.ipcRenderer.invoke(
+      'save-savedata',
+      newSave,
+      settings.save_folder_path,
+    );
+    // set newly created save as currently selected
+    setSettings({
+      ...settings,
+      selected_save: filename,
     });
   }
 
@@ -504,7 +629,7 @@ export default function Game(props: GameProps) {
                 </div>
                 <div className="gameSubtitle">{localImpact.info.subtitle}</div>
               </div>
-              <Link to="/">
+              <a onClick={confirmMenu}>
                 <div className="gameUser">
                   <div className="gameUsername">
                     {settings.username ? settings.username : 'MAIN MENU'}
@@ -513,7 +638,7 @@ export default function Game(props: GameProps) {
                     {settings.class ? classMap[settings.class] : ''}
                   </div>
                 </div>
-              </Link>
+              </a>
             </div>
             <div className="gameBody">
               <div className="gamePlayer">
@@ -560,8 +685,9 @@ export default function Game(props: GameProps) {
               >
                 {playing ? 'Pause' : 'Play'}
               </a>{' '}
-              · <a onClick={restartGame}>Restart</a> · Video playback problems?
-              You won&apos;t lose your place.
+              · <a onClick={confirmRestart}>Restart</a> ·{' '}
+              <a onClick={saveGame}>Save</a> · Video playback problems? Just
+              refresh the page. You won&apos;t lose your place.
             </div>
           </div>
           <div className="gameFooter">
@@ -574,6 +700,15 @@ export default function Game(props: GameProps) {
               <div>·&nbsp;&nbsp;©1995 Synydyne </div>
             </div>
           </div>
+          <SaveModal
+            modalState={localModalState}
+            setter={setLocalModalState}
+            save={saveGame}
+            restart={restartGame}
+            exit={() => {
+              navigate('/');
+            }}
+          ></SaveModal>
         </div>
       );
     default:

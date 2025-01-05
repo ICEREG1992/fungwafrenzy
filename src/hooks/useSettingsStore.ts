@@ -10,6 +10,7 @@ interface SettingsStore {
 export const useSettingsStore = create<SettingsStore>((set) => ({
   settings: {
     selected_impact: '',
+    selected_save: '',
     player_theme: 'classic',
     impact_folder_path: 'x',
     save_folder_path: 'y',
@@ -19,9 +20,11 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     resolution_x: 1024,
     resolution_y: 728,
     fullscreen: false,
-    volume_master: 100,
+    volume_master: 80,
     volume_video: 100,
-    volume_music: 80,
+    volume_music: 100,
+    skip_button: true,
+    skip_timer: 3,
   },
   setSettings: (settings) => set({ settings }),
   updateSettings: (partial) =>

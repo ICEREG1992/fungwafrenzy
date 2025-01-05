@@ -28,7 +28,14 @@ export default function FrenzyNETHeader(props: FrenzyNETHeaderProps) {
             </div>
           )}
           <div id="separator">/</div>
-          <div id="exit" onClick={closeApp}>
+          <div
+            id="exit"
+            onClick={() => {
+              // tell main process to allow exit
+              window.electron.ipcRenderer.sendMessage('allow-close');
+              closeApp();
+            }}
+          >
             <Link to="./">EXIT</Link>
           </div>
         </div>

@@ -24,7 +24,7 @@ import { pathToFileURL } from 'url';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { userSettings } from '../renderer/interfaces';
+import { userSettings, SaveGame } from '../renderer/interfaces';
 
 class AppUpdater {
   constructor() {
@@ -35,18 +35,20 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let readyToClose: boolean = true;
+ipcMain.on('block-close', () => {
+  readyToClose = false;
+});
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+ipcMain.on('allow-close', () => {
+  readyToClose = true;
 });
 
 ipcMain.on('close-app', () => {
   app.quit();
 });
 
-ipcMain.on('open-impacts-path', (event, arg) => {
+ipcMain.on('open-path', (event, arg) => {
   shell.openPath(arg);
 });
 
@@ -67,6 +69,20 @@ ipcMain.handle('save-usersettings', (e, s: userSettings) => {
     // Convert the object to a JSON string
     const jsonData = JSON.stringify(s, null, 2); // The `null, 2` adds pretty printing to the JSON file
     // Write the JSON data to the file
+    fs.writeFileSync(filePath, jsonData, 'utf-8');
+    console.log(`Data successfully saved to ${filePath}`);
+  } catch (error) {
+    console.error(`Failed to save file: ${error}`);
+  }
+});
+
+ipcMain.handle('save-savedata', (e, s: SaveGame, p: string) => {
+  console.log('saving game...');
+  const filePath = path.join(p, `${s.date.getTime()}.json`);
+  try {
+    // Convert the object to a JSON string
+    const jsonData = JSON.stringify(s, null, 2); // The `null, 2` adds pretty printing to the JSON file
+    // Write the JSON data to a new file
     fs.writeFileSync(filePath, jsonData, 'utf-8');
     console.log(`Data successfully saved to ${filePath}`);
   } catch (error) {
@@ -108,6 +124,23 @@ ipcMain.handle('get-impacts', (e, p: string) => {
     out.push({ key: i, image });
   });
   return out;
+});
+
+ipcMain.handle('get-saves', (e, p: string) => {
+  const saves = fs.readdirSync(p);
+  const out: Array<object> = [];
+  saves.forEach((save) => {
+    const saveBuffer = fs.readFileSync(path.join(p, save), 'utf-8');
+    const json = JSON.parse(saveBuffer);
+    out.push(json);
+  });
+  return out;
+});
+
+ipcMain.handle('get-savedata', (e, s: string, p: string) => {
+  const data = fs.readFileSync(path.join(p, `${s}.json`), 'utf-8');
+  const json = JSON.parse(data);
+  return json;
 });
 
 ipcMain.handle('get-impact', (e, i: string, p: string) => {
@@ -206,6 +239,15 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
+  mainWindow.on('close', async (e) => {
+    if (!readyToClose) {
+      e.preventDefault(); // Prevent the default close action
+      console.log('exit intercepted');
+      // Send a message to the renderer and wait for a response
+      mainWindow?.webContents.send('ask-to-close');
+    }
+  });
+
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 
@@ -250,98 +292,97 @@ app
     ensureAppDataDir();
     // create custom file protocol to serve videos
 
-    protocol.handle("impact", async (request) => {
-
+    protocol.handle('impact', async (request) => {
       const url = new URL(request.url);
-      const searchParams = url.searchParams;
+      const { searchParams } = url;
       const videoName = decodeURIComponent(url.hostname);
-      const rootPath = searchParams.get("path");
-      const impactName = searchParams.get("impact");
-      
+      const rootPath = searchParams.get('path');
+      const impactName = searchParams.get('impact');
+
       if (rootPath && impactName) {
-        let basePath, filePath, contentType;
+        let basePath;
+        let filePath;
+        let contentType;
         console.log(videoName);
-        if (videoName.endsWith(".mp4")) {
-          basePath = path.join(rootPath, impactName, "video");
+        if (videoName.endsWith('.mp4')) {
+          basePath = path.join(rootPath, impactName, 'video');
           filePath = path.join(basePath, videoName);
-          contentType = "video/mp4";
+          contentType = 'video/mp4';
         } else {
-          basePath = path.join(rootPath, impactName, "music");
+          basePath = path.join(rootPath, impactName, 'music');
           filePath = path.join(basePath, videoName);
-          contentType = "audio/mpeg"; // Assuming audio is in MP3 format
+          contentType = 'audio/mpeg'; // Assuming audio is in MP3 format
         }
-    
+
         try {
           const stat = fs.statSync(filePath);
           const fileSize = stat.size;
-    
+
           // Retrieve the "range" header from the request
-          const range = request.headers.get("range");
-    
+          const range = request.headers.get('range');
+
           if (range) {
             // Parse the range header
-            const parts = range.replace(/bytes=/, "").split("-");
+            const parts = range.replace(/bytes=/, '').split('-');
             const start = parseInt(parts[0], 10);
             const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-    
+
             if (start >= fileSize || end >= fileSize) {
               // Return 416 if the range is not satisfiable
-              return new Response("Requested Range Not Satisfiable", {
+              return new Response('Requested Range Not Satisfiable', {
                 status: 416,
                 headers: {
-                  "Content-Range": `bytes */${fileSize}`,
+                  'Content-Range': `bytes */${fileSize}`,
                 },
               });
             }
-    
+
             const chunksize = end - start + 1;
-    
+
             // Use Node.js Buffer to read the file chunk manually
             const fileChunk = await new Promise<Buffer>((resolve, reject) => {
               const buffer = Buffer.alloc(chunksize);
               const fileStream = fs.createReadStream(filePath, { start, end });
               let bytesRead = 0;
-    
-              fileStream.on("data", (chunk:Buffer) => {
+
+              fileStream.on('data', (chunk: Buffer) => {
                 chunk.copy(buffer, bytesRead);
                 bytesRead += chunk.length;
               });
-    
-              fileStream.on("end", () => resolve(buffer));
-              fileStream.on("error", (err) => reject(err));
+
+              fileStream.on('end', () => resolve(buffer));
+              fileStream.on('error', (err) => reject(err));
             });
-    
+
             return new Response(fileChunk, {
               status: 206,
               headers: {
-                "Content-Range": `bytes ${start}-${end}/${fileSize}`,
-                "Accept-Ranges": "bytes",
-                "Content-Length": chunksize.toString(),
-                "Content-Type": contentType,
+                'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': chunksize.toString(),
+                'Content-Type': contentType,
               },
             });
           } else {
             // Serve the whole file
             const fileBuffer = fs.readFileSync(filePath);
-    
+
             return new Response(fileBuffer, {
               headers: {
-                "Content-Length": fileSize.toString(),
-                "Content-Type": contentType,
+                'Content-Length': fileSize.toString(),
+                'Content-Type': contentType,
               },
             });
           }
         } catch (err) {
-          console.error("Error reading file:", err);
-          return new Response("File not found", { status: 404 });
+          console.error('Error reading file:', err);
+          return new Response('File not found', { status: 404 });
         }
       } else {
-
         return net.fetch(''); // return junk idk fix this later
       }
     });
-    
-    
+
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the

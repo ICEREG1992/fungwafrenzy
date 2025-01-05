@@ -1,5 +1,6 @@
 export interface userSettings {
   selected_impact: string;
+  selected_save: string;
   player_theme: string;
   impact_folder_path: string;
   save_folder_path: string;
@@ -110,7 +111,7 @@ export interface gameState {
   seen: Array<string>;
 }
 
-export interface modalState {
+export interface NetModalState {
   title: string;
   desc?: string;
   default?: string;
@@ -120,6 +121,19 @@ export interface modalState {
   visible: boolean;
 }
 
+export interface SaveModalState {
+  type: string;
+  visible: boolean;
+}
+
 export interface GameProps {
-  save?: gameState;
+  continue?: boolean;
+}
+
+export interface SaveGame {
+  key: string;
+  filename: string;
+  date: Date;
+  impact: string;
+  gameState: gameState;
 }
