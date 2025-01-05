@@ -208,7 +208,8 @@ export default function Game(props: GameProps) {
     // build save game
     const newDate = new Date();
     const newSave: SaveGame = {
-      key: newDate.getUTCSeconds().toString(),
+      key: newDate.toLocaleString(),
+      filename: newDate.getTime().toString(),
       date: newDate,
       impact: settings.selected_impact,
       gameState: localGameState,
@@ -627,8 +628,9 @@ export default function Game(props: GameProps) {
               >
                 {playing ? 'Pause' : 'Play'}
               </a>{' '}
-              · <a onClick={restartGame}>Restart</a> · Video playback problems?
-              You won&apos;t lose your place.
+              · <a onClick={restartGame}>Restart</a> ·{' '}
+              <a onClick={saveGame}>Save</a> · Video playback problems? Just
+              refresh the page. You won&apos;t lose your place.
             </div>
           </div>
           <div className="gameFooter">

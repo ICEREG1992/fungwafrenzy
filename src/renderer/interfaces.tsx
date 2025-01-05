@@ -127,7 +127,8 @@ export interface GameProps {
 
 export interface SaveGame {
   key: string;
-  impact: string;
+  filename: string;
   date: Date;
+  impact: string;
   gameState: gameState;
 }

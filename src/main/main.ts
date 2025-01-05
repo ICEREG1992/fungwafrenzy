@@ -78,7 +78,7 @@ ipcMain.handle('save-usersettings', (e, s: userSettings) => {
 
 ipcMain.handle('save-savedata', (e, s: SaveGame, p: string) => {
   console.log('saving game...');
-  const filePath = path.join(p, s.key);
+  const filePath = path.join(p, `${s.date.getTime()}.txt`);
   try {
     // Convert the object to a JSON string
     const jsonData = JSON.stringify(s, null, 2); // The `null, 2` adds pretty printing to the JSON file
@@ -138,7 +138,7 @@ ipcMain.handle('get-saves', (e, p: string) => {
 });
 
 ipcMain.handle('get-savedata', (e, s: string, p: string) => {
-  const data = fs.readFileSync(path.join(p, s), 'utf-8');
+  const data = fs.readFileSync(path.join(p, `${s}.txt`), 'utf-8');
   const json = JSON.parse(data);
   return json;
 });

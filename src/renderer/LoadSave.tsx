@@ -57,7 +57,7 @@ function Saves(props: SavesProps) {
   const arr: Array<React.JSX.Element> = [];
   props.saves.forEach((e: SaveGame) => {
     arr.push(
-      <a onClick={(event) => props.selectSave(e.key)}>
+      <a onClick={(event) => props.selectSave(e.filename)}>
         <div className="NETsave cursor fullwidth">
           <div>{e.key}</div>
           <div>{e.impact}</div>
