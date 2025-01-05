@@ -190,28 +190,58 @@ export default function Game(props: GameProps) {
     });
   }, []);
 
-  async function confirmExit() {
-    // start by checking if gamestate differs from saved gamestate
-    const sav: SaveGame = await window.electron.ipcRenderer.invoke(
-      'get-savedata',
-      settings.selected_save,
-      settings.save_folder_path,
-    );
-    if (sav.gameState.currentVideo.path === localGameState.currentVideo.path) {
-      navigate('/');
+  async function confirmMenu() {
+    if (settings.selected_save) {
+      // start by checking if gamestate differs from saved gamestate
+      const sav: SaveGame = await window.electron.ipcRenderer.invoke(
+        'get-savedata',
+        settings.selected_save,
+        settings.save_folder_path,
+      );
+      if (
+        sav.gameState.currentVideo.path === localGameState.currentVideo.path
+      ) {
+        navigate('/');
+      } else {
+        setLocalModalState((prev) => ({
+          type: 'menu',
+          visible: true,
+        }));
+      }
     } else {
-      setLocalModalState((prev) => ({
-        type: 'menu',
-        visible: true,
-      }));
+      if (
+        localGameState.block.title ===
+        localImpact.blocks[localImpact.meta.start].title
+      ) {
+        navigate('/');
+      } else {
+        setLocalModalState((prev) => ({
+          type: 'menu',
+          visible: true,
+        }));
+      }
     }
   }
 
   function confirmRestart() {
-    setLocalModalState((prev) => ({
-      type: 'restart',
-      visible: true,
-    }));
+    if (settings.selected_save) {
+      setLocalModalState((prev) => ({
+        type: 'restart',
+        visible: true,
+      }));
+    } else {
+      if (
+        localGameState.block.title ===
+        localImpact.blocks[localImpact.meta.start].title
+      ) {
+        restartGame()
+      } else {
+        setLocalModalState((prev) => ({
+          type: 'restart',
+          visible: true,
+        }));
+      }
+    }
   }
 
   function restartGame() {
@@ -599,7 +629,7 @@ export default function Game(props: GameProps) {
                 </div>
                 <div className="gameSubtitle">{localImpact.info.subtitle}</div>
               </div>
-              <a onClick={confirmExit}>
+              <a onClick={confirmMenu}>
                 <div className="gameUser">
                   <div className="gameUsername">
                     {settings.username ? settings.username : 'MAIN MENU'}

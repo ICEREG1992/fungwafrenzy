@@ -29,7 +29,7 @@ export default function NetModal(props: SaveModalProps) {
           }
         >
           <div className="SaveModalContainer">
-            <div className="SaveModalTitle">Save Before Leaving?</div>
+            <div className="SaveModalTitle">Return to Main Menu</div>
             <div className="SaveModalDesc">
               Would you like to save your progress?
             </div>
@@ -40,14 +40,14 @@ export default function NetModal(props: SaveModalProps) {
                   props.exit();
                 }}
               >
-                <div>Save and Quit</div>
+                <div>Save and Exit</div>
               </a>
               <a
                 onClick={() => {
                   props.exit();
                 }}
               >
-                <div>Quit Without Saving</div>
+                <div>Exit Without Saving</div>
               </a>
               <a
                 className="purple"
@@ -71,9 +71,10 @@ export default function NetModal(props: SaveModalProps) {
           }
         >
           <div className="SaveModalContainer">
-            <div className="SaveModalTitle">Save Before Restarting?</div>
+            <div className="SaveModalTitle">Restart Impact</div>
             <div className="SaveModalDesc">
-              Would you like to save your progress?
+              Would you like to save your progress before returning to the
+              beginning of the Impact?
             </div>
             <div className="SaveModalButtons" style={{ justifyContent: 'end' }}>
               <a
@@ -114,7 +115,7 @@ export default function NetModal(props: SaveModalProps) {
           }
         >
           <div className="SaveModalContainer">
-            <div className="SaveModalTitle">Save Before Quitting?</div>
+            <div className="SaveModalTitle">Quit Game</div>
             <div className="SaveModalDesc">
               Would you like to save your progress?
             </div>
