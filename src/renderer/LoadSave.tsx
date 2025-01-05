@@ -13,10 +13,11 @@ export default function LoadSave() {
     );
   };
 
-  const selectSave = (name: string) => {
+  const selectSave = (s: SaveGame) => {
     updateSettings({
       ...settings,
-      selected_save: name,
+      selected_save: s.filename,
+      selected_impact: s.impact,
     });
   };
 
@@ -57,10 +58,11 @@ function Saves(props: SavesProps) {
   const arr: Array<React.JSX.Element> = [];
   props.saves.forEach((e: SaveGame) => {
     arr.push(
-      <a onClick={(event) => props.selectSave(e.filename)}>
+      <a onClick={(event) => props.selectSave(e)}>
         <div className="NETsave cursor fullwidth">
-          <div>{e.key}</div>
-          <div>{e.impact}</div>
+          <div className="NETsaveTitle">{e.gameState.currentVideo.title}</div>
+          <div className="NETsaveDate">{e.key}</div>
+          <div className="NETsaveImpact">{e.impact}</div>
         </div>
       </a>,
     );

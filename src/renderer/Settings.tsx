@@ -65,13 +65,6 @@ export default function Settings() {
               </Link>
             </div>
             <div className="NETline">
-              <b>selected_save:</b>{' '}
-              {settings.selected_save ? settings.selected_save : 'NONE'}{' '}
-              <Link to="/loadsave" tabIndex={-1}>
-                <a>&lt;CHANGE&gt;</a>
-              </Link>
-            </div>
-            <div className="NETline">
               <b>player_theme:</b> {settings.player_theme}{' '}
               <a
                 onClick={() =>

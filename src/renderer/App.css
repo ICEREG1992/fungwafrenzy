@@ -322,6 +322,21 @@ input[type='range'] {
   justify-content: space-between;
 }
 
+.NETsaveTitle {
+  width: 100%;
+  text-align: start;
+}
+
+.NETsaveDate {
+  min-width: 33%;
+  text-align: left;
+}
+
+.NETsaveImpact {
+  min-width: 120px;
+  text-align: end;
+}
+
 a.purple {
   background-color: rgb(129, 80, 178);
   border-top-color: rgb(136, 90, 183);
