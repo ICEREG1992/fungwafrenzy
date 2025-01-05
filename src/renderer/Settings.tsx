@@ -2,13 +2,13 @@ import { useState } from 'react';
 
 import { Link } from 'react-router-dom';
 import FrenzyNETHeader from './FrenzyNETHeader';
-import { modalState } from './interfaces';
+import { NetModalState } from './interfaces';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import NetModal from './NetModal';
 
 export default function Settings() {
   const { settings, updateSettings } = useSettingsStore();
-  const [localModalState, setLocalModalState] = useState<modalState>({
+  const [localModalState, setLocalModalState] = useState<NetModalState>({
     title: 'TEST',
     desc: 'Testing modal state.',
     input: 'textarea',

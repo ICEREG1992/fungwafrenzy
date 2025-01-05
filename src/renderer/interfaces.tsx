@@ -111,13 +111,18 @@ export interface gameState {
   seen: Array<string>;
 }
 
-export interface modalState {
+export interface NetModalState {
   title: string;
   desc?: string;
   default?: string;
   input: string;
   button: string;
   value: string;
+  visible: boolean;
+}
+
+export interface SaveModalState {
+  type: string;
   visible: boolean;
 }
 

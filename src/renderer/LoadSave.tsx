@@ -51,7 +51,7 @@ export default function LoadSave() {
 
 interface SavesProps {
   saves: Array<SaveGame>;
-  selectSave: (name: string) => void;
+  selectSave: (save: SaveGame) => void;
 }
 
 function Saves(props: SavesProps) {

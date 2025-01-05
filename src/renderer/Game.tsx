@@ -14,13 +14,14 @@ import {
   blockVideo,
   blockCondition,
   GameProps,
-  modalState,
+  NetModalState,
   SaveGame,
+  SaveModalState,
 } from './interfaces';
 import { fadeAudio } from './util/util';
 import { handleFlags, handleSelect } from '../lib/GameLogic';
 import { useSettingsStore } from '../hooks/useSettingsStore';
-import NetModal from './NetModal';
+import SaveModal from './SaveModal';
 
 function getDefaultValue(t: string) {
   switch (t) {
@@ -46,7 +47,7 @@ ref gameSkip: ref to the skip button
 */
 export default function Game(props: GameProps) {
   const navigate = useNavigate();
-  const { settings } = useSettingsStore();
+  const { settings, setSettings } = useSettingsStore();
   const [localImpact, setLocalImpact] = useState<impact>(() => {
     return {
       info: {
@@ -80,12 +81,8 @@ export default function Game(props: GameProps) {
     seen: [],
   });
 
-  const [localModalState, setLocalModalState] = useState<modalState>({
-    title: 'Save before quitting?',
-    desc: 'Would you like to save your progress before closing?',
-    input: 'exit',
-    button: 'Cancel',
-    value: 'null',
+  const [localModalState, setLocalModalState] = useState<SaveModalState>({
+    type: 'quit',
     visible: false,
   });
 
@@ -193,6 +190,30 @@ export default function Game(props: GameProps) {
     });
   }, []);
 
+  async function confirmExit() {
+    // start by checking if gamestate differs from saved gamestate
+    const sav: SaveGame = await window.electron.ipcRenderer.invoke(
+      'get-savedata',
+      settings.selected_save,
+      settings.save_folder_path,
+    );
+    if (sav.gameState.currentVideo.path === localGameState.currentVideo.path) {
+      navigate('/');
+    } else {
+      setLocalModalState((prev) => ({
+        type: 'menu',
+        visible: true,
+      }));
+    }
+  }
+
+  function confirmRestart() {
+    setLocalModalState((prev) => ({
+      type: 'restart',
+      visible: true,
+    }));
+  }
+
   function restartGame() {
     initializeGame();
     gamePlayer.current?.seekTo(0);
@@ -207,9 +228,10 @@ export default function Game(props: GameProps) {
   function saveGame() {
     // build save game
     const newDate = new Date();
+    const filename = newDate.getTime().toString();
     const newSave: SaveGame = {
       key: newDate.toLocaleString(),
-      filename: newDate.getTime().toString(),
+      filename,
       date: newDate,
       impact: settings.selected_impact,
       gameState: localGameState,
@@ -219,6 +241,11 @@ export default function Game(props: GameProps) {
       newSave,
       settings.save_folder_path,
     );
+    // set newly created save as currently selected
+    setSettings({
+      ...settings,
+      selected_save: filename,
+    });
   }
 
   // determines how videos change when a user clicks a button
@@ -572,7 +599,7 @@ export default function Game(props: GameProps) {
                 </div>
                 <div className="gameSubtitle">{localImpact.info.subtitle}</div>
               </div>
-              <Link to="/">
+              <a onClick={confirmExit}>
                 <div className="gameUser">
                   <div className="gameUsername">
                     {settings.username ? settings.username : 'MAIN MENU'}
@@ -581,7 +608,7 @@ export default function Game(props: GameProps) {
                     {settings.class ? classMap[settings.class] : ''}
                   </div>
                 </div>
-              </Link>
+              </a>
             </div>
             <div className="gameBody">
               <div className="gamePlayer">
@@ -628,7 +655,7 @@ export default function Game(props: GameProps) {
               >
                 {playing ? 'Pause' : 'Play'}
               </a>{' '}
-              · <a onClick={restartGame}>Restart</a> ·{' '}
+              · <a onClick={confirmRestart}>Restart</a> ·{' '}
               <a onClick={saveGame}>Save</a> · Video playback problems? Just
               refresh the page. You won&apos;t lose your place.
             </div>
@@ -643,10 +670,15 @@ export default function Game(props: GameProps) {
               <div>·&nbsp;&nbsp;©1995 Synydyne </div>
             </div>
           </div>
-          <NetModal
+          <SaveModal
             modalState={localModalState}
             setter={setLocalModalState}
-          ></NetModal>
+            save={saveGame}
+            restart={restartGame}
+            exit={() => {
+              navigate('/');
+            }}
+          ></SaveModal>
         </div>
       );
     default:
