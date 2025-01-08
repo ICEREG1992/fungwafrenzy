@@ -337,6 +337,15 @@ input[type='range'] {
   text-align: end;
 }
 
+.NEToutput {
+  margin-top: 30px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid grey;
+  padding: 12px;
+  transition: height 1s ease-in-out;
+  min-height: 20px;
+}
+
 a.purple {
   background-color: rgb(129, 80, 178) !important;
   border-top-color: rgb(136, 90, 183) !important;

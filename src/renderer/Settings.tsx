@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import { Link } from 'react-router-dom';
 import FrenzyNETHeader from './FrenzyNETHeader';
 import { NetModalState } from './interfaces';

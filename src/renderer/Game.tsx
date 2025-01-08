@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import GameControls from './GameControls';
 import {
   userSettings,
-  impact,
+  Impact,
   impactBlock,
   gameState,
   blockTiming,
@@ -48,7 +48,7 @@ ref gameSkip: ref to the skip button
 export default function Game(props: GameProps) {
   const navigate = useNavigate();
   const { settings, setSettings } = useSettingsStore();
-  const [localImpact, setLocalImpact] = useState<impact>(() => {
+  const [localImpact, setLocalImpact] = useState<Impact>(() => {
     return {
       info: {
         game: '',
@@ -107,7 +107,7 @@ export default function Game(props: GameProps) {
 
   async function initializeGame() {
     try {
-      const imp: impact = await window.electron.ipcRenderer.invoke(
+      const imp: Impact = await window.electron.ipcRenderer.invoke(
         'get-impact',
         settings.selected_impact,
         settings.impact_folder_path,
@@ -148,7 +148,7 @@ export default function Game(props: GameProps) {
   async function loadFromSave() {
     try {
       // start by loading impact
-      const imp: impact = await window.electron.ipcRenderer.invoke(
+      const imp: Impact = await window.electron.ipcRenderer.invoke(
         'get-impact',
         settings.selected_impact,
         settings.impact_folder_path,
@@ -234,7 +234,7 @@ export default function Game(props: GameProps) {
         localGameState.block.title ===
         localImpact.blocks[localImpact.meta.start].title
       ) {
-        restartGame()
+        restartGame();
       } else {
         setLocalModalState((prev) => ({
           type: 'restart',

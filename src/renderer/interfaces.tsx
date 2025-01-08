@@ -17,7 +17,7 @@ export interface userSettings {
   volume_music: number;
 }
 
-export interface impact {
+export interface Impact {
   info: impactInfo;
   meta: impactMeta;
   blocks: impactBlocks;

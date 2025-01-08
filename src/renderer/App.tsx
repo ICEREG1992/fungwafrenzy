@@ -9,6 +9,7 @@ import LoadSave from './LoadSave';
 import './App.css';
 import Credits from './components/Credits';
 import { useSettingsStore } from '../hooks/useSettingsStore';
+import Tools from './Tools';
 
 function LoadImpact() {
   return (
@@ -42,9 +43,9 @@ function Title() {
           <Link to="/continue" tabIndex={-1}>
             <button type="button">Continue Game</button>
           </Link>
-          <button type="button" disabled>
-            ???
-          </button>
+          <Link to="/tools" tabIndex={-1}>
+            <button type="button">Tools</button>
+          </Link>
           <Link to="/credits" tabIndex={-1}>
             <button type="button">Credits</button>
           </Link>
@@ -115,6 +116,7 @@ export default function App() {
         <Route path="/credits" element={<Credits />} />
         <Route path="/newgame" element={<Game />} />
         <Route path="/continue" element={<Game continue />} />
+        <Route path="/tools" element={<Tools />} />
       </Routes>
     </Router>
   );
