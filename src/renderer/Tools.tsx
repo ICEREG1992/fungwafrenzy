@@ -81,7 +81,7 @@ export default function Tools() {
             for (let k = 0; k < block.videos[j].targets!.length; k += 1) {
               const tKeys = Object.keys(block.videos[j].targets![k]);
               for (let l = 0; l < tKeys.length; l += 1) {
-                if (!['target', 'text'].includes(tKeys[l])) {
+                if (!['target', 'text', 'flags'].includes(tKeys[l])) {
                   sendMessage(
                     `${key} Invalid target property "${tKeys[l]}"`,
                     'red',
@@ -102,6 +102,32 @@ export default function Tools() {
         }
       } else {
         sendMessage(`${key} No videos block`, 'red');
+      }
+      if (block.targets) {
+        // check each target
+        for (let j = 0; j < block.targets.length; j += 1) {
+          const tKeys = Object.keys(block.targets[j]);
+          for (let k = 0; k < tKeys.length; k += 1) {
+            if (!['target', 'text', 'flags'].includes(tKeys[k])) {
+              sendMessage(
+                `${key} Invalid target property "${tKeys[k]}"`,
+                'red',
+              );
+            }
+          }
+        }
+      }
+      if (block.flags) {
+        // check each flag
+        const fKeys = Object.keys(block.flags);
+        for (let j = 0; j < fKeys.length; j += 1) {
+          if (!Object.keys(imp.meta.flags).includes(fKeys[j])) {
+            sendMessage(`${key} Invalid flag name "${fKeys[j]}"`, 'red');
+          }
+        }
+      }
+      if (!block.title) {
+        sendMessage(`${key} Missing block title`, 'red');
       }
     });
     sendMessage('All blocks have a next target that exists?', 'white');
