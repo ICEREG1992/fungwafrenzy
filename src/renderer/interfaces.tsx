@@ -121,7 +121,7 @@ export interface NetModalState {
   visible: boolean;
 }
 
-export interface SaveModalState {
+export interface ModalState {
   type: string;
   visible: boolean;
 }

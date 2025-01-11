@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { MemoryRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import {
+  useNavigate,
+  MemoryRouter as Router,
+  Routes,
+  Route,
+  Link,
+} from 'react-router-dom';
 
 import FrenzyNETHeader from './FrenzyNETHeader';
 import Settings from './Settings';
@@ -10,8 +16,50 @@ import './App.css';
 import Credits from './components/Credits';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import Tools from './Tools';
+import SaveModal from './SaveModal';
+import MenuModal from './MenuModal';
+import { ModalState } from './interfaces';
 
 function Title() {
+  const navigate = useNavigate();
+  const { settings } = useSettingsStore();
+  const [localModalState, setLocalModalState] = useState<ModalState>({
+    type: 'start',
+    visible: false,
+  });
+
+  const startGame = () => {
+    if (settings.selected_impact) {
+      navigate('/newgame');
+    } else {
+      setLocalModalState((prev) => ({
+        ...prev,
+        type: 'start',
+        visible: true,
+      }));
+    }
+  };
+
+  const continueGame = () => {
+    if (settings.selected_save) {
+      navigate('/continue');
+    } else {
+      setLocalModalState((prev) => ({
+        ...prev,
+        type: 'continue',
+        visible: true,
+      }));
+    }
+  };
+
+  const loadImpact = () => {
+    navigate('/browse');
+  };
+
+  const loadSave = () => {
+    navigate('/loadsave');
+  };
+
   return (
     <div className="menuroot">
       <FrenzyNETHeader page="mainmenu" />
@@ -29,12 +77,12 @@ function Title() {
           <Link to="/loadsave" tabIndex={-1}>
             <button type="button">Load Save</button>
           </Link>
-          <Link to="/newgame" tabIndex={-1}>
-            <button type="button">Start New Game</button>
-          </Link>
-          <Link to="/continue" tabIndex={-1}>
-            <button type="button">Continue Game</button>
-          </Link>
+          <button type="button" onClick={startGame}>
+            Start New Game
+          </button>
+          <button type="button" onClick={continueGame}>
+            Continue Game
+          </button>
           <Link to="/tools" tabIndex={-1}>
             <button type="button">Tools</button>
           </Link>
@@ -46,6 +94,18 @@ function Title() {
           </button>
         </div>
       </div>
+      <MenuModal
+        modalState={localModalState}
+        setter={setLocalModalState}
+        loadImpact={loadImpact}
+        loadSave={loadSave}
+        start={() => {
+          navigate('/newgame');
+        }}
+        continue={() => {
+          navigate('/continue');
+        }}
+      ></MenuModal>
     </div>
   );
 }

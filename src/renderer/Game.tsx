@@ -16,7 +16,7 @@ import {
   GameProps,
   NetModalState,
   SaveGame,
-  SaveModalState,
+  ModalState,
 } from './interfaces';
 import { fadeAudio } from './util/util';
 import { handleFlags, handleSelect } from '../lib/GameLogic';
