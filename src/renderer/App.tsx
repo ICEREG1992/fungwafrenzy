@@ -11,14 +11,6 @@ import Credits from './components/Credits';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import Tools from './Tools';
 
-function LoadImpact() {
-  return (
-    <div className="menuroot">
-      <FrenzyNETHeader nav page="load custom impact" />
-    </div>
-  );
-}
-
 function Title() {
   return (
     <div className="menuroot">
@@ -111,7 +103,6 @@ export default function App() {
         <Route path="/" element={<Title />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/browse" element={<Browse />} />
-        <Route path="/loadimpact" element={<LoadImpact />} />
         <Route path="/loadsave" element={<LoadSave />} />
         <Route path="/credits" element={<Credits />} />
         <Route path="/newgame" element={<Game />} />
