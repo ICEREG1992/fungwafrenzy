@@ -51,9 +51,9 @@ export default function Game(props: GameProps) {
   const [localImpact, setLocalImpact] = useState<Impact>(() => {
     return {
       info: {
-        game: '',
-        title: '',
-        subtitle: '',
+        game: 'Fung-Wa Frenzy',
+        title: 'DATAFAULT!',
+        subtitle: 'DATAFAULT!',
         description: '',
         length: '',
         author: '',
@@ -81,7 +81,7 @@ export default function Game(props: GameProps) {
     seen: [],
   });
 
-  const [localModalState, setLocalModalState] = useState<SaveModalState>({
+  const [localModalState, setLocalModalState] = useState<ModalState>({
     type: 'quit',
     visible: false,
   });
