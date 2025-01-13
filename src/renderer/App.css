@@ -379,6 +379,8 @@ a.purple {
   font-family: 'ITC Lubalin Graph Std Bold', 'Rokkitt', 'Serif';
   float: left;
   margin: 28px 0px 0px 160px;
+  pointer-events: none;
+  user-select: none;
 }
 
 .gameTitle {
