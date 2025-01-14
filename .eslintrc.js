@@ -1,6 +1,6 @@
 module.exports = {
-  extends: 'erb',
-  plugins: ['@typescript-eslint'],
+  extends: 'erb', ["plugin:emotion/recommended"],
+  plugins: ['@typescript-eslint'], ['emotion'],
   rules: {
     // A temporary hack related to IDE not resolving correct package.json
     'import/no-extraneous-dependencies': 'off',

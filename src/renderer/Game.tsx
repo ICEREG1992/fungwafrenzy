@@ -1,3 +1,4 @@
+import { css } from '@emotion/react';
 import React, { useState, useEffect, useRef } from 'react';
 import ReactPlayer from 'react-player';
 import { Link, useNavigate } from 'react-router-dom';
@@ -616,107 +617,117 @@ export default function Game(props: GameProps) {
     '*': 'Senator',
   };
 
-  switch (settings.player_theme) {
-    case 'classic':
-      return (
-        <div className="gameRoot">
-          <div className="gameHeader">
-            <div className="gameTitlebar">
-              <div className="gameTitling">
-                <div className="gameTitle">
-                  {localImpact.info.game.toUpperCase()} /{' '}
-                  {localImpact.info.title.toUpperCase()}
-                </div>
-                <div className="gameSubtitle">{localImpact.info.subtitle}</div>
-              </div>
-              <a onClick={confirmMenu}>
-                <div className="gameUser">
-                  <div className="gameUsername">
-                    {settings.username ? settings.username : 'MAIN MENU'}
-                  </div>
-                  <div className="gameUserclass">
-                    {settings.class ? classMap[settings.class] : ''}
-                  </div>
-                </div>
-              </a>
+  const gameBodyStyle = css`
+    height: ${(settings.player_theme === "large") ? "719px" : ""};
+  `;
+
+  const gamePlayerStyle = css`
+    width: ${settings.player_theme === "large" ? "1280px" : ""};
+    height: ${(settings.player_theme === "large") ? "720px" : ""};
+  `;
+
+  const gameVideoStyle = css`
+    width: ${settings.player_theme === "large" ? "1280px" : ""};
+    height: ${(settings.player_theme === "large") ? "720px" : ""};
+  `
+
+  const gameCurtainStyle = css`
+    width: ${settings.player_theme === "large" ? "1280px" : ""};
+    height: ${(settings.player_theme === "large") ? "720px" : ""};
+  `
+
+  const gameSkipStyle = css`
+    top: ${settings.player_theme === "large" ? "342px" : ""};
+  `
+
+  return (
+    <div className="gameRoot">
+      <div className="gameHeader">
+        <div className="gameTitlebar">
+          <div className="gameTitling">
+            <div className="gameTitle">
+              {localImpact.info.game.toUpperCase()} /{' '}
+              {localImpact.info.title.toUpperCase()}
             </div>
-            <div className="gameBody">
-              <div className="gamePlayer">
-                <div className="gameCurtain" ref={gameCurtain}></div>
-                <GameControls
-                  state={localGameState}
-                  show={showControls.show}
-                  setter={selectBlock}
-                ></GameControls>
-                <ReactPlayer
-                  className="gameVideo"
-                  ref={gamePlayer}
-                  onEnded={handleOnEnded}
-                  onProgress={handleOnProgress}
-                  progressInterval={250}
-                  controls={false}
-                  playing={playing}
-                  volume={
-                    (settings.volume_video * settings.volume_master) / 10000
-                  }
-                  url={`impact://${encodeURIComponent(localGameState.currentVideo.path)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
-                />
-                <ReactPlayer
-                  width="0px"
-                  height="0px"
-                  playing={playing}
-                  loop
-                  controls={false}
-                  volume={calculateVolume()}
-                  url={`impact://${localGameState.playingMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
-                ></ReactPlayer>
-                <div
-                  className="gameSkip"
-                  ref={gameSkip}
-                  onClick={skipVideo}
-                ></div>
+            <div className="gameSubtitle">{localImpact.info.subtitle}</div>
+          </div>
+          <a onClick={confirmMenu}>
+            <div className="gameUser">
+              <div className="gameUsername">
+                {settings.username ? settings.username : 'MAIN MENU'}
+              </div>
+              <div className="gameUserclass">
+                {settings.class ? classMap[settings.class] : ''}
               </div>
             </div>
-            <div className="gameControls">
-              <a
-                onClick={() => {
-                  setPlaying(!playing);
-                }}
-              >
-                {playing ? 'Pause' : 'Play'}
-              </a>{' '}
-              · <a onClick={confirmRestart}>Restart</a> ·{' '}
-              <a onClick={saveGame}>Save</a> · Video playback problems? Just
-              refresh the page. You won&apos;t lose your place.
-            </div>
+          </a>
+        </div>
+        <div className="gameBody" css={gameBodyStyle}>
+          <div className="gamePlayer" css={gamePlayerStyle}>
+            <div className="gameCurtain" css={gameCurtainStyle} ref={gameCurtain}></div>
+            <GameControls
+              state={localGameState}
+              show={showControls.show}
+              setter={selectBlock}
+            ></GameControls>
+            <ReactPlayer
+              className="gameVideo"
+              css={gameVideoStyle}
+              ref={gamePlayer}
+              onEnded={handleOnEnded}
+              onProgress={handleOnProgress}
+              progressInterval={250}
+              controls={false}
+              playing={playing}
+              height={settings.player_theme === "large" ? "720px": "360px"}
+              width={settings.player_theme === "large" ? "1280px": "640px"}
+              volume={(settings.volume_video * settings.volume_master) / 10000}
+              url={`impact://${encodeURIComponent(localGameState.currentVideo.path)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
+            />
+            <ReactPlayer
+              width="0px"
+              height="0px"
+              playing={playing}
+              loop
+              controls={false}
+              volume={calculateVolume()}
+              url={`impact://${localGameState.playingMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
+            ></ReactPlayer>
+            <div className="gameSkip" css={gameSkipStyle} ref={gameSkip} onClick={skipVideo}></div>
           </div>
-          <div className="gameFooter">
-            <div className="gameFooterLeft">
-              <div className="cdgLogo"></div>
-              <div className="synydyneLogo"></div>
-            </div>
-            <div className="gameFooterRight">
-              <div className="gameTaC">Terms & Conditions&nbsp;&nbsp;</div>
-              <div>·&nbsp;&nbsp;©1995 Synydyne </div>
-            </div>
-          </div>
-          <SaveModal
-            modalState={localModalState}
-            setter={setLocalModalState}
-            save={saveGame}
-            restart={restartGame}
-            exit={() => {
-              navigate('/');
+        </div>
+        <div className="gameControls">
+          <a
+            onClick={() => {
+              setPlaying(!playing);
             }}
-          ></SaveModal>
+          >
+            {playing ? 'Pause' : 'Play'}
+          </a>{' '}
+          · <a onClick={confirmRestart}>Restart</a> ·{' '}
+          <a onClick={saveGame}>Save</a> · Video playback problems? Just refresh
+          the page. You won&apos;t lose your place.
         </div>
-      );
-    default:
-      return (
-        <div>
-          No theme selected. Click <Link to="/">HERE</Link> to return to main
-          menu.
+      </div>
+      <div className="gameFooter">
+        <div className="gameFooterLeft">
+          <div className="cdgLogo"></div>
+          <div className="synydyneLogo"></div>
         </div>
-      );
-  }
+        <div className="gameFooterRight">
+          <div className="gameTaC">Terms & Conditions&nbsp;&nbsp;</div>
+          <div>·&nbsp;&nbsp;©1995 Synydyne </div>
+        </div>
+      </div>
+      <SaveModal
+        modalState={localModalState}
+        setter={setLocalModalState}
+        save={saveGame}
+        restart={restartGame}
+        exit={() => {
+          navigate('/');
+        }}
+      ></SaveModal>
+    </div>
+  );
 }

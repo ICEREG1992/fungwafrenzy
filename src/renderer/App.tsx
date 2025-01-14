@@ -27,6 +27,9 @@ function Title() {
     type: 'start',
     visible: false,
   });
+  useEffect(() => {
+    window.electron.ipcRenderer.sendMessage('allow-close');
+  }, []);
 
   const startGame = () => {
     if (settings.selected_impact) {

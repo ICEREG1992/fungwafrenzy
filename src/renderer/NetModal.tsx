@@ -199,6 +199,7 @@ const defaultDropdown: dropdownOption[] = [{ value: 'NONE', label: 'NONE' }];
 
 const themeDropdown: dropdownOption[] = [
   { value: 'classic', label: 'classic' },
+  { value: 'large', label: 'large' },
 ];
 
 const classDropdown: dropdownOption[] = [
