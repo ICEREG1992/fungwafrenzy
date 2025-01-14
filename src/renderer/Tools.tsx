@@ -27,6 +27,109 @@ export default function Tools() {
       settings.impact_folder_path,
     );
     sendMessage('Impact Successfully Loaded', 'lime');
+    sendMessage('All properties are valid?', 'white');
+    Object.keys(imp.blocks).forEach((key) => {
+      const block = imp.blocks[key];
+      // start by checking the base block
+      const keys = Object.keys(block);
+      for (let i = 0; i < keys.length; i += 1) {
+        if (
+          !['title', 'videos', 'targets', 'next', 'flags'].includes(keys[i])
+        ) {
+          sendMessage(`${key} Invalid block key "${keys[i]}"`, 'red');
+        }
+      }
+      if (block.videos) {
+        // check each video
+        for (let j = 0; j < block.videos.length; j += 1) {
+          const vKeys = Object.keys(block.videos[j]);
+          for (let k = 0; k < vKeys.length; k += 1) {
+            // check base video properties
+            if (
+              ![
+                'path',
+                'title',
+                'chance',
+                'timing',
+                'music',
+                'condition',
+                'next',
+                'targets',
+                'question',
+                'flags',
+              ].includes(vKeys[k])
+            ) {
+              sendMessage(`${key} Invalid video property "${vKeys[k]}"`, 'red');
+            }
+          }
+          // now check other properties deeper
+          // condition will be checked in a different block
+          // timing
+          if (block.videos[j].timing) {
+            const tKeys = Object.keys(block.videos[j].timing!);
+            for (let k = 0; k < tKeys.length; k += 1) {
+              if (!['targets', 'loop', 'music', 'silence'].includes(tKeys[k])) {
+                sendMessage(
+                  `${key} Invalid timing property "${tKeys[k]}"`,
+                  'red',
+                );
+              }
+            }
+          }
+          // targets
+          if (block.videos[j].targets) {
+            for (let k = 0; k < block.videos[j].targets!.length; k += 1) {
+              const tKeys = Object.keys(block.videos[j].targets![k]);
+              for (let l = 0; l < tKeys.length; l += 1) {
+                if (!['target', 'text', 'flags'].includes(tKeys[l])) {
+                  sendMessage(
+                    `${key} Invalid target property "${tKeys[l]}"`,
+                    'red',
+                  );
+                }
+              }
+            }
+          }
+          // flags
+          if (block.videos[j].flags) {
+            const fKeys = Object.keys(block.videos[j].flags!);
+            for (let k = 0; k < fKeys.length; k += 1) {
+              if (!Object.keys(imp.meta.flags).includes(fKeys[k])) {
+                sendMessage(`${key} Invalid flag name "${fKeys[k]}"`, 'red');
+              }
+            }
+          }
+        }
+      } else {
+        sendMessage(`${key} No videos block`, 'red');
+      }
+      if (block.targets) {
+        // check each target
+        for (let j = 0; j < block.targets.length; j += 1) {
+          const tKeys = Object.keys(block.targets[j]);
+          for (let k = 0; k < tKeys.length; k += 1) {
+            if (!['target', 'text', 'flags'].includes(tKeys[k])) {
+              sendMessage(
+                `${key} Invalid target property "${tKeys[k]}"`,
+                'red',
+              );
+            }
+          }
+        }
+      }
+      if (block.flags) {
+        // check each flag
+        const fKeys = Object.keys(block.flags);
+        for (let j = 0; j < fKeys.length; j += 1) {
+          if (!Object.keys(imp.meta.flags).includes(fKeys[j])) {
+            sendMessage(`${key} Invalid flag name "${fKeys[j]}"`, 'red');
+          }
+        }
+      }
+      if (!block.title) {
+        sendMessage(`${key} Missing block title`, 'red');
+      }
+    });
     sendMessage('All blocks have a next target that exists?', 'white');
     Object.keys(imp.blocks).forEach((key) => {
       const block = imp.blocks[key];

@@ -379,6 +379,8 @@ a.purple {
   font-family: 'ITC Lubalin Graph Std Bold', 'Rokkitt', 'Serif';
   float: left;
   margin: 28px 0px 0px 160px;
+  pointer-events: none;
+  user-select: none;
 }
 
 .gameTitle {
@@ -609,7 +611,7 @@ a.purple {
   color: #9ca0a3;
 }
 
-.SaveModal {
+.Modal {
   position: fixed;
   width: 100%;
   height: 100%;
@@ -621,7 +623,7 @@ a.purple {
   z-index: 3;
 }
 
-.SaveModalContainer {
+.ModalContainer {
   width: 736px;
   padding: 29px;
   background-color: rgba(255, 255, 255, 0.8);
@@ -629,25 +631,25 @@ a.purple {
   font-family: 'Source Code Pro', 'Courier New', 'Courier', monospace;
 }
 
-.SaveModalTitle {
+.ModalTitle {
   font-weight: bold;
   font-size: 16px;
   margin-bottom: 5px;
 }
 
-.SaveModalDesc {
+.ModalDesc {
   margin-bottom: 15px;
   font-size: 16px;
 }
 
-.SaveModalButtons {
+.ModalButtons {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   margin-top: 15px;
 }
 
-.SaveModalButtons a {
+.ModalButtons a {
   background-color: rgba(153, 153, 153, 0.6);
   border-top-color: rgba(255, 255, 255, 0.09);
   border-bottom-color: rgba(0, 0, 0, 0.04);
