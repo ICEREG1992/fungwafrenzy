@@ -191,7 +191,17 @@ export default function Settings() {
             </div>
             <div className="NETline">
               <b>fullscreen:</b> {settings.fullscreen ? 'ENABLED' : 'DISABLED'}{' '}
-              <a>&lt;CHANGE&gt;</a>
+              <a
+                onClick={() => {
+                  window.electron.ipcRenderer.sendMessage(
+                    'toggle-fullscreen',
+                    !settings.fullscreen,
+                  );
+                  changeSetting('fullscreen', !settings.fullscreen);
+                }}
+              >
+                &lt;CHANGE&gt;
+              </a>
             </div>
           </div>
           <div className="NETheader">AUDIO SETTINGS</div>

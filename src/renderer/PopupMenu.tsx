@@ -16,7 +16,7 @@ const GameSkip = forwardRef<HTMLDivElement, { skip: () => void }>(
   (props, ref) => {
     return (
       <div
-        className="gamePopupBottomButton"
+        className="gamePopupMiddleRightButton gamePopupButton"
         ref={ref}
         onClick={(e) => {
           e.stopPropagation();
@@ -82,7 +82,7 @@ export default function PopupMenu(props: PopupMenuProps) {
       <div className="gamePopupTop">
         <div className="gamePopupTopLeft">
           <div
-            className="gamePopupLeftButton"
+            className="gamePopupLeftButton gamePopupButton"
             onClick={(e) => {
               e.stopPropagation();
               props.exit();
@@ -107,7 +107,7 @@ export default function PopupMenu(props: PopupMenuProps) {
             </svg>
           </div>
           <div
-            className="gamePopupLeftButton"
+            className="gamePopupLeftButton gamePopupButton"
             onClick={(e) => {
               e.stopPropagation();
               props.restart();
@@ -130,7 +130,7 @@ export default function PopupMenu(props: PopupMenuProps) {
           </div>
         </div>
         <div
-          className="gamePopupRightButton"
+          className="gamePopupRightButton gamePopupButton"
           onClick={(e) => {
             e.stopPropagation();
             props.save();
@@ -149,24 +149,25 @@ export default function PopupMenu(props: PopupMenuProps) {
           </svg>
         </div>
       </div>
-      <div
-        className="gamePopupMiddle"
-        style={props.playing ? { opacity: 0 } : { opacity: 1 }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="112"
-          height="112"
-          fill="currentColor"
-          className="bi bi-pause"
-          viewBox="0 0 16 16"
+      <div className="gamePopupMiddle">
+        <div
+          className="gamePopupMiddleButton gamePopupButton"
+          style={props.playing ? { opacity: 0 } : { opacity: 1 }}
         >
-          <path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5" />
-        </svg>
-      </div>
-      <div className="gamePopupBottom">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="112"
+            height="112"
+            fill="currentColor"
+            className="bi bi-pause"
+            viewBox="0 0 16 16"
+          >
+            <path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5" />
+          </svg>
+        </div>
         <GameSkip ref={props.skipRef} skip={props.skip}></GameSkip>
       </div>
+      <div className="gamePopupBottom"></div>
     </div>
   );
 }

@@ -468,17 +468,28 @@ a.purple {
   margin-right: 20px;
 }
 
-.gamePopupLeftButton:hover, .gamePopupRightButton:hover, .gamePopupBottomButton:hover {
+.gamePopupButton:hover {
   cursor: pointer;
   color: grey;
+  transition:color .1s linear;
 }
 
 .gamePopupMiddle {
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  justify-self: center;
+  justify-content: center;
+  align-items: center;
   width: 100%;
+}
+
+.gamePopupMiddleButton {
+}
+
+.gamePopupMiddleRightButton {
+  margin-right: 36px;
+  position: absolute;
+  right: 0;
+  opacity: 0;
+  transition: opacity 1s ease-in-out
 }
 
 .gamePopupBottom {
@@ -486,11 +497,6 @@ a.purple {
   flex-direction: row;
   justify-content: center;
   padding: 32px;
-}
-
-.gamePopupBottomButton {
-  opacity: 0;
-  transition: opacity 1s ease-in-out
 }
 
 .gamePlayer {

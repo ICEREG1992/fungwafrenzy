@@ -52,6 +52,17 @@ ipcMain.on('open-path', (event, arg) => {
   shell.openPath(arg);
 });
 
+// Handle 'toggle-fullscreen' message from the renderer process
+ipcMain.on('toggle-fullscreen', (event, isFullscreen: boolean) => {
+  if (mainWindow) {
+    if (isFullscreen) {
+      mainWindow.setFullScreen(true); // Enter fullscreen
+    } else {
+      mainWindow.setFullScreen(false); // Exit fullscreen
+    }
+  }
+});
+
 ipcMain.handle('get-defaultappdatapaths', () => {
   return [
     path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts'),

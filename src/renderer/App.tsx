@@ -18,7 +18,7 @@ import { useSettingsStore } from '../hooks/useSettingsStore';
 import Tools from './Tools';
 import SaveModal from './SaveModal';
 import MenuModal from './MenuModal';
-import { ModalState } from './interfaces';
+import { ModalState, userSettings } from './interfaces';
 
 function Title() {
   const navigate = useNavigate();
@@ -114,7 +114,7 @@ function Title() {
 }
 
 export default function App() {
-  const { settings, setSettings } = useSettingsStore();
+  const { settings, setSettings, updateSettings } = useSettingsStore();
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -153,11 +153,31 @@ export default function App() {
       }
     };
     loadSettings();
+
     window.electron.ipcRenderer.sendMessage('allow-close');
   }, []);
 
   useEffect(() => {
     window.electron.ipcRenderer.invoke('save-usersettings', settings);
+
+    // F11 key listener for fullscreen toggle
+    const handleF11 = (event: KeyboardEvent) => {
+      if (event.key === 'F11') {
+        event.preventDefault();
+        window.electron.ipcRenderer.sendMessage(
+          'toggle-fullscreen',
+          !settings.fullscreen,
+        );
+        updateSettings({ fullscreen: !settings.fullscreen });
+      }
+    };
+
+    // Add event listener for F11
+    window.addEventListener('keydown', handleF11);
+    // Clean up listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleF11);
+    };
   }, [settings]);
 
   return (
