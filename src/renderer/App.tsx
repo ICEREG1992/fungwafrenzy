@@ -122,6 +122,11 @@ export default function App() {
           await window.electron.ipcRenderer.invoke('load-usersettings');
         if (res) {
           setSettings(res);
+          // if fullscreen, launch app fullscreen
+          window.electron.ipcRenderer.sendMessage(
+            'toggle-fullscreen',
+            (res as userSettings).fullscreen,
+          );
           return;
         }
 
