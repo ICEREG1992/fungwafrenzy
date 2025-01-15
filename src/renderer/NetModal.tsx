@@ -200,7 +200,7 @@ const defaultDropdown: dropdownOption[] = [{ value: 'NONE', label: 'NONE' }];
 const themeDropdown: dropdownOption[] = [
   { value: 'classic', label: 'classic' },
   { value: 'large', label: 'large' },
-  { value: 'fullscreen', label: 'fullscreen'},
+  { value: 'fullscreen', label: 'fullscreen' },
 ];
 
 const classDropdown: dropdownOption[] = [

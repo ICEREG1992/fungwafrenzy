@@ -1,6 +1,6 @@
-import { useSettingsStore } from '../hooks/useSettingsStore';
 import React, { useState } from 'react';
 import parse from 'html-react-parser';
+import { useSettingsStore } from '../hooks/useSettingsStore';
 import { impactBlock, gameState, blockTarget } from './interfaces';
 
 interface GameControlsProps {

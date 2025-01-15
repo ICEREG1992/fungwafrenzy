@@ -578,9 +578,7 @@ export default function Game(props: GameProps) {
           gameSkip.current
         ) {
           gameSkip.current.setAttribute('style', 'opacity: 1;');
-        } else if (
-          gameSkip.current
-        ) {
+        } else if (gameSkip.current) {
           gameSkip.current.removeAttribute('style');
         }
       } else {
@@ -616,7 +614,7 @@ export default function Game(props: GameProps) {
     '*': 'Senator',
   };
 
-  switch(settings.player_theme) {
+  switch (settings.player_theme) {
     case 'classic':
     case 'large':
       return (
@@ -641,9 +639,12 @@ export default function Game(props: GameProps) {
                 </div>
               </a>
             </div>
-            <div className={`gameBody ${settings.player_theme}`} >
+            <div className={`gameBody ${settings.player_theme}`}>
               <div className={`gamePlayer ${settings.player_theme}`}>
-                <div className={`gameCurtain ${settings.player_theme}`} ref={gameCurtain}></div>
+                <div
+                  className={`gameCurtain ${settings.player_theme}`}
+                  ref={gameCurtain}
+                ></div>
                 <GameControls
                   state={localGameState}
                   show={showControls.show}
@@ -657,9 +658,11 @@ export default function Game(props: GameProps) {
                   progressInterval={250}
                   controls={false}
                   playing={playing}
-                  height={settings.player_theme === "large" ? "720px": "360px"}
-                  width={settings.player_theme === "large" ? "1280px": "640px"}
-                  volume={(settings.volume_video * settings.volume_master) / 10000}
+                  height={settings.player_theme === 'large' ? '720px' : '360px'}
+                  width={settings.player_theme === 'large' ? '1280px' : '640px'}
+                  volume={
+                    (settings.volume_video * settings.volume_master) / 10000
+                  }
                   url={`impact://${encodeURIComponent(localGameState.currentVideo.path)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                 />
                 <ReactPlayer
@@ -671,7 +674,11 @@ export default function Game(props: GameProps) {
                   volume={calculateVolume()}
                   url={`impact://${localGameState.playingMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                 ></ReactPlayer>
-                <div className={`gameSkip ${settings.player_theme}`} ref={gameSkip} onClick={skipVideo}></div>
+                <div
+                  className={`gameSkip ${settings.player_theme}`}
+                  ref={gameSkip}
+                  onClick={skipVideo}
+                ></div>
               </div>
             </div>
             <div className="gameControls">
@@ -683,8 +690,8 @@ export default function Game(props: GameProps) {
                 {playing ? 'Pause' : 'Play'}
               </a>{' '}
               · <a onClick={confirmRestart}>Restart</a> ·{' '}
-              <a onClick={saveGame}>Save</a> · Video playback problems? Just refresh
-              the page. You won&apos;t lose your place.
+              <a onClick={saveGame}>Save</a> · Video playback problems? Just
+              refresh the page. You won&apos;t lose your place.
             </div>
           </div>
           <div className="gameFooter">
@@ -710,10 +717,22 @@ export default function Game(props: GameProps) {
       );
     case 'fullscreen':
       return (
-        <div className='gameRoot'>
-          <div className='gameBody fullscreen'>
-            <PopupMenu modalSetter={setLocalModalState} playing={playing} setPlaying={setPlaying} exit={confirmMenu} restart={confirmRestart} save={saveGame} skipRef={gameSkip} skip={skipVideo}></PopupMenu>
-            <div className={`gameCurtain ${settings.player_theme}`} ref={gameCurtain}></div>
+        <div className="gameRoot">
+          <div className="gameBody fullscreen">
+            <PopupMenu
+              modalSetter={setLocalModalState}
+              playing={playing}
+              setPlaying={setPlaying}
+              exit={confirmMenu}
+              restart={confirmRestart}
+              save={saveGame}
+              skipRef={gameSkip}
+              skip={skipVideo}
+            ></PopupMenu>
+            <div
+              className={`gameCurtain ${settings.player_theme}`}
+              ref={gameCurtain}
+            ></div>
             <GameControls
               state={localGameState}
               show={showControls.show}
@@ -727,8 +746,8 @@ export default function Game(props: GameProps) {
               progressInterval={250}
               controls={false}
               playing={playing}
-              height={"100%"}
-              width={"100%"}
+              height="100%"
+              width="100%"
               volume={(settings.volume_video * settings.volume_master) / 10000}
               url={`impact://${encodeURIComponent(localGameState.currentVideo.path)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
             />
@@ -752,6 +771,13 @@ export default function Game(props: GameProps) {
             }}
           ></SaveModal>
         </div>
-      )
+      );
+    default:
+      return (
+        <div>
+          You&aposve selected a bad theme somehow. Send this to ICEREG1992 along
+          with your settings.json please!
+        </div>
+      );
   }
 }
