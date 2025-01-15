@@ -13,7 +13,6 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "outDir": ".erb/dll",
-    "jsxImportSource": "@emotion/react",
   },
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
 }

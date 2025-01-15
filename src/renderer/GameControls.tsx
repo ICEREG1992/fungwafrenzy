@@ -1,4 +1,3 @@
-import { css } from '@emotion/react';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import React, { useState } from 'react';
 import parse from 'html-react-parser';
@@ -13,15 +12,9 @@ interface GameControlsProps {
 export default function GameControls(props: GameControlsProps) {
   const { settings, setSettings } = useSettingsStore();
 
-  const gameOverlayStyle = css`
-    left: ${settings.player_theme === "large" ? "320px" : ""};
-    border-radius: ${settings.player_theme === "large" ? "12px 12px 0px 0px" : ""};
-  `
-
   return (
     <div
-      className="gameOverlay"
-      css={gameOverlayStyle}
+      className={`gameOverlay ${settings.player_theme}`}
       style={
         props.show &&
         (props.state.block.targets || props.state.currentVideo.targets)
