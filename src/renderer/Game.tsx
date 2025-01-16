@@ -122,7 +122,7 @@ export default function Game(props: GameProps) {
       });
 
       // figure out first video given block and flags
-      const firstVideo = handleSelect(
+      const [firstBlock, firstVideo] = handleSelect(
         localGameState,
         imp.blocks[imp.meta.start],
         settings,
@@ -138,7 +138,7 @@ export default function Game(props: GameProps) {
       setLocalGameState((prev: gameState) => ({
         ...prev,
         seen: [imp.meta.start, `${imp.meta.start}_${firstVideo.path}`],
-        block: imp.blocks[imp.meta.start],
+        block: firstBlock,
         currentVideo: firstVideo,
         playingMusic: initialMusic,
         flags,
