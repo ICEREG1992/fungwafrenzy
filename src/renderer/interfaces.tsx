@@ -61,7 +61,7 @@ export interface impactBlock {
 }
 
 export interface blockVideo {
-  path: string;
+  path?: string;
   title: string;
   chance?: number;
   condition?: blockCondition;

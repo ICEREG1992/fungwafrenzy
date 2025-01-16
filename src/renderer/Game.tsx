@@ -126,6 +126,7 @@ export default function Game(props: GameProps) {
         localGameState,
         imp.blocks[imp.meta.start],
         settings,
+        imp,
       );
 
       // if music does not exist, send null so it plays nothing
@@ -304,21 +305,15 @@ export default function Game(props: GameProps) {
       return;
     }
 
-    // handle block flags
-    if (localImpact.blocks[target.target].flags) {
-      handleFlags(
-        newFlags,
-        localImpact.blocks[target.target].flags as blockFlags,
-      );
-    }
     // fade out video
     gameCurtain.current?.setAttribute('style', 'background-color: black;');
 
     // figure out next video given block and flags
-    const nextVideo = handleSelect(
+    const [nextBlock, nextVideo] = handleSelect(
       localGameState,
       localImpact.blocks[target.target],
       settings,
+      localImpact,
     );
 
     // if the music changes, fade out audio
@@ -331,7 +326,11 @@ export default function Game(props: GameProps) {
     }
     // wait 500 ms then change video
     setTimeout(() => {
-      // now that we know video, handle video flags
+      // now that we know block and video, handle block and video flags
+      // handle block flags
+      if (nextBlock.flags) {
+        handleFlags(newFlags, nextBlock.flags as blockFlags);
+      }
       if (nextVideo.flags) {
         handleFlags(newFlags, nextVideo.flags);
       }
@@ -358,7 +357,7 @@ export default function Game(props: GameProps) {
           `${target.target} ${nextVideo.path}`,
         ],
         flags: newFlags,
-        block: localImpact.blocks[target.target],
+        block: nextBlock,
         currentVideo: nextVideo,
         playingMusic: nextMusic,
       }));
@@ -382,21 +381,17 @@ export default function Game(props: GameProps) {
   };
 
   // determines how videos change when it ends and starts a new video
-  const nextBlock = (target: string) => {
+  const handleNextBlock = (target: string) => {
     // no need to lower/lock controls as they shouldn't be up
-    // no need to handle target flags because there are no targets
-    // handle block flags
-    const newFlags = localGameState.flags;
     // fade out video
     gameCurtain.current?.setAttribute('style', 'background-color: black;');
-    if (localImpact.blocks[target].flags) {
-      handleFlags(newFlags, localImpact.blocks[target].flags);
-    }
+
     // figure out next video given block and flags
-    const nextVideo = handleSelect(
+    const [nextBlock, nextVideo] = handleSelect(
       localGameState,
       localImpact.blocks[target],
       settings,
+      localImpact,
     );
 
     // if the music changes, fade out audio
@@ -410,7 +405,12 @@ export default function Game(props: GameProps) {
 
     // wait 500 ms then change video
     setTimeout(() => {
-      // now that we know video, handle video flags
+      // now that we know video and block, handle video and block flags
+      // no need to handle target flags because there are no targets
+      const newFlags = localGameState.flags;
+      if (nextBlock.flags) {
+        handleFlags(newFlags, nextBlock.flags);
+      }
       if (nextVideo.flags) {
         handleFlags(newFlags, nextVideo.flags);
       }
@@ -431,13 +431,9 @@ export default function Game(props: GameProps) {
       console.log(newFlags);
       setLocalGameState((prev) => ({
         ...prev,
-        seen: [
-          ...prev.seen,
-          target,
-          `${target} ${localImpact.blocks[target].videos[0].path}`,
-        ],
+        seen: [...prev.seen, target, `${target} ${nextVideo.path}`],
         flags: newFlags,
-        block: localImpact.blocks[target],
+        block: nextBlock,
         currentVideo: nextVideo,
         playingMusic: nextMusic,
       }));
@@ -471,7 +467,7 @@ export default function Game(props: GameProps) {
           localGameState.currentVideo.timing?.loop as number,
         );
       } else if (localGameState.currentVideo.next) {
-        nextBlock(localGameState.currentVideo.next);
+        handleNextBlock(localGameState.currentVideo.next);
       } else if (localGameState.block.targets) {
         // this is inconsistent
         console.log(
@@ -482,7 +478,7 @@ export default function Game(props: GameProps) {
           localGameState.currentVideo.timing?.loop as number,
         );
       } else if (localGameState.block.next) {
-        nextBlock(localGameState.block.next);
+        handleNextBlock(localGameState.block.next);
       }
     } else {
       console.log("can't get player ref");
@@ -499,7 +495,7 @@ export default function Game(props: GameProps) {
             localGameState.currentVideo.timing?.targets as number,
           );
         } else if (localGameState.currentVideo.next) {
-          nextBlock(localGameState.currentVideo.next);
+          handleNextBlock(localGameState.currentVideo.next);
         } else if (localGameState.block.targets) {
           console.log(
             `seeking to ${localGameState.currentVideo.timing?.targets}`,
@@ -508,7 +504,7 @@ export default function Game(props: GameProps) {
             localGameState.currentVideo.timing?.targets as number,
           );
         } else if (localGameState.block.next) {
-          nextBlock(localGameState.block.next);
+          handleNextBlock(localGameState.block.next);
         }
       }
       // hide the skip button
@@ -664,7 +660,7 @@ export default function Game(props: GameProps) {
                   volume={
                     (settings.volume_video * settings.volume_master) / 10000
                   }
-                  url={`impact://${encodeURIComponent(localGameState.currentVideo.path)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
+                  url={`impact://${encodeURIComponent(localGameState.currentVideo.path as string)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                 />
                 <ReactPlayer
                   width="0px"
