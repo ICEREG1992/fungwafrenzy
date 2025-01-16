@@ -23,6 +23,7 @@ import { handleFlags, handleSelect } from '../lib/GameLogic';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import SaveModal from './SaveModal';
 import PopupMenu from './PopupMenu';
+import DebugPane from './DebugPane';
 
 function getDefaultValue(t: string) {
   switch (t) {
@@ -713,6 +714,11 @@ export default function Game(props: GameProps) {
               navigate('/');
             }}
           ></SaveModal>
+          <DebugPane
+            impact={localImpact}
+            gameState={localGameState}
+            setGameState={setLocalGameState}
+          ></DebugPane>
         </div>
       );
     case 'fullscreen':
@@ -770,6 +776,11 @@ export default function Game(props: GameProps) {
               navigate('/');
             }}
           ></SaveModal>
+          <DebugPane
+            impact={localImpact}
+            gameState={localGameState}
+            setGameState={setLocalGameState}
+          ></DebugPane>
         </div>
       );
     default:

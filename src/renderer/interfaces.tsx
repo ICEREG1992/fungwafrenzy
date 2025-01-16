@@ -15,6 +15,7 @@ export interface userSettings {
   volume_master: number;
   volume_video: number;
   volume_music: number;
+  debug: boolean;
 }
 
 export interface Impact {
@@ -36,6 +37,7 @@ interface impactInfo {
 interface impactMeta {
   flags: metaFlags;
   start: string;
+  chapters?: string[];
 }
 
 interface metaFlags {
