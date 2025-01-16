@@ -751,7 +751,7 @@ export default function Game(props: GameProps) {
               height="100%"
               width="100%"
               volume={(settings.volume_video * settings.volume_master) / 10000}
-              url={`impact://${encodeURIComponent(localGameState.currentVideo.path)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
+              url={`impact://${encodeURIComponent(localGameState.currentVideo.path as string)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
             />
             <ReactPlayer
               width="0px"
