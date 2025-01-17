@@ -194,7 +194,7 @@ export default function Game(props: GameProps) {
   }, []);
 
   const confirmMenu = useCallback(async () => {
-    if (settings.selected_save) {
+    if (props.continue) {
       // start by checking if gamestate differs from saved gamestate
       const sav: SaveGame = await window.electron.ipcRenderer.invoke(
         'get-savedata',
