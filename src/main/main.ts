@@ -52,6 +52,17 @@ ipcMain.on('open-path', (event, arg) => {
   shell.openPath(arg);
 });
 
+// Handle 'toggle-fullscreen' message from the renderer process
+ipcMain.on('toggle-fullscreen', (event, isFullscreen: boolean) => {
+  if (mainWindow) {
+    if (isFullscreen) {
+      mainWindow.setFullScreen(true); // Enter fullscreen
+    } else {
+      mainWindow.setFullScreen(false); // Exit fullscreen
+    }
+  }
+});
+
 ipcMain.handle('get-defaultappdatapaths', () => {
   return [
     path.join(app.getPath('appData'), 'fungwafrenzy', 'impacts'),
@@ -344,10 +355,13 @@ app
               const buffer = Buffer.alloc(chunksize);
               const fileStream = fs.createReadStream(filePath, { start, end });
               let bytesRead = 0;
-
-              fileStream.on('data', (chunk: Buffer) => {
-                chunk.copy(buffer, bytesRead);
-                bytesRead += chunk.length;
+              fileStream.on('data', (chunk: string | Buffer) => {
+                if (Buffer.isBuffer(chunk)) {
+                  chunk.copy(buffer, bytesRead);
+                  bytesRead += chunk.length;
+                } else {
+                  throw new Error('Unexpected string data in binary stream');
+                }
               });
 
               fileStream.on('end', () => resolve(buffer));

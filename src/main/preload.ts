@@ -16,7 +16,8 @@ export type Channels =
   | 'select-path'
   | 'ask-to-close'
   | 'block-close'
-  | 'allow-close';
+  | 'allow-close'
+  | 'toggle-fullscreen';
 
 const electronHandler = {
   ipcRenderer: {

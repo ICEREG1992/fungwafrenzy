@@ -18,7 +18,7 @@ import { useSettingsStore } from '../hooks/useSettingsStore';
 import Tools from './Tools';
 import SaveModal from './SaveModal';
 import MenuModal from './MenuModal';
-import { ModalState } from './interfaces';
+import { ModalState, userSettings } from './interfaces';
 
 function Title() {
   const navigate = useNavigate();
@@ -27,6 +27,9 @@ function Title() {
     type: 'start',
     visible: false,
   });
+  useEffect(() => {
+    window.electron.ipcRenderer.sendMessage('allow-close');
+  }, []);
 
   const startGame = () => {
     if (settings.selected_impact) {
@@ -111,50 +114,82 @@ function Title() {
 }
 
 export default function App() {
-  const { settings, setSettings } = useSettingsStore();
+  const { settings, setSettings, updateSettings } = useSettingsStore();
   useEffect(() => {
     const loadSettings = async () => {
+      const defaultPaths = await window.electron.ipcRenderer.invoke(
+        'get-defaultappdatapaths',
+      );
+      const defaultSettings: userSettings = {
+        selected_impact: '',
+        selected_save: '',
+        player_theme: 'classic',
+        impact_folder_path: defaultPaths[0],
+        save_folder_path: defaultPaths[1],
+        skip_button: true,
+        skip_timer: 3,
+        username: '',
+        class: '',
+        location: '',
+        resolution_x: 1024,
+        resolution_y: 728,
+        fullscreen: false,
+        volume_master: 80,
+        volume_video: 100,
+        volume_music: 100,
+        debug: false,
+      };
       try {
-        const res =
+        const res: userSettings =
           await window.electron.ipcRenderer.invoke('load-usersettings');
         if (res) {
-          setSettings(res);
+          const out = { ...defaultSettings, ...res };
+          setSettings(out);
+          // if fullscreen, launch app fullscreen
+          window.electron.ipcRenderer.sendMessage(
+            'toggle-fullscreen',
+            (res as userSettings).fullscreen,
+          );
           return;
         }
-
         // data not successfully returned, fill with defaults
         console.log('filling settings with defaults');
-        const defaultPaths = await window.electron.ipcRenderer.invoke(
-          'get-defaultappdatapaths',
-        );
-        setSettings({
-          selected_impact: '',
-          selected_save: '',
-          player_theme: 'classic',
-          impact_folder_path: defaultPaths[0],
-          save_folder_path: defaultPaths[1],
-          skip_button: true,
-          skip_timer: 3,
-          username: '',
-          class: '',
-          location: '',
-          resolution_x: 1024,
-          resolution_y: 728,
-          fullscreen: false,
-          volume_master: 80,
-          volume_video: 100,
-          volume_music: 100,
-        });
+        setSettings(defaultSettings);
       } catch (err) {
         console.error('Failed to load settings:', err);
       }
     };
     loadSettings();
+
     window.electron.ipcRenderer.sendMessage('allow-close');
   }, []);
 
   useEffect(() => {
-    window.electron.ipcRenderer.invoke('save-usersettings', settings);
+    if (
+      settings.impact_folder_path !== 'x' &&
+      settings.save_folder_path !== 'y'
+    ) {
+      window.electron.ipcRenderer.invoke('save-usersettings', settings);
+    }
+
+    // F11 key listener for fullscreen toggle
+    const handleF11 = (event: KeyboardEvent) => {
+      if (event.key === 'F11') {
+        event.preventDefault();
+        window.electron.ipcRenderer.sendMessage(
+          'toggle-fullscreen',
+          !settings.fullscreen,
+        );
+        updateSettings({ fullscreen: !settings.fullscreen });
+      }
+    };
+
+    // Add event listener for F11
+    window.addEventListener('keydown', handleF11);
+    // Clean up listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleF11);
+    };
   }, [settings]);
 
   return (

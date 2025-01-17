@@ -1,8 +1,10 @@
 import {
   blockCondition,
   blockFlags,
+  blockVideo,
   gameFlags,
   gameState,
+  Impact,
   impactBlock,
   userSettings,
 } from '../renderer/interfaces';
@@ -288,14 +290,16 @@ export function handleSelect(
   gameState: gameState,
   block: impactBlock,
   settings: userSettings,
-) {
+  impact: Impact,
+): [impactBlock, blockVideo] {
+  let selectedVideo = block.videos[0];
+  let selectedBlock = block;
   // figure out if this is a chance block or a condition block
   if (block.videos[0].chance) {
     // if it is chance, make one chance calculation and run it against each video until it hits
     const rand = Math.random();
     console.log(rand);
     let sum = 0;
-    let selectedVideo = block.videos[0];
     block.videos.some((video) => {
       // for every video, perform this check, stop once we hit true
       sum += video.chance as number; // assert this exists always because the first video specifies chance
@@ -305,27 +309,52 @@ export function handleSelect(
       }
       return false;
     });
-    return selectedVideo;
+    return [block, selectedVideo];
   } else {
     if (block.videos[0].condition) {
-      // this is now a flag check, watched check, time check, or location check
+      // this is now a check of some kind
+      let chosen = false;
       for (let i = 0; i < block.videos.length; i += 1) {
         // for every video, perform this check, stop once we hit true
         const video = block.videos[i];
         if (
           checkCondition(video.condition as blockCondition, gameState, settings)
         ) {
-          return video;
+          selectedVideo = video;
+          chosen = true;
+          break;
         }
       }
       // todo: return datafault instead of video 1
-      return block.videos[0];
+      if (!chosen) {
+        [selectedVideo] = block.videos;
+      }
       // eslint-disable-next-line no-else-return
     } else {
       // no chance or condition, return the first video in the set
-      return block.videos[0];
+      [selectedVideo] = block.videos;
     }
   }
+  // as a final check, make sure selected video has a video
+  if (!selectedVideo.path) {
+    // no video! handle flags from this video then move to the next
+    if (selectedVideo.flags) {
+      handleFlags(gameState.flags, selectedVideo.flags);
+    }
+    console.log(selectedVideo);
+    // assert this blank block has a next in either video-scope or block-scope
+    [selectedBlock, selectedVideo] = handleSelect(
+      gameState,
+      impact.blocks[
+        (selectedVideo.next as string)
+          ? (selectedVideo.next as string)
+          : (block.next as string)
+      ],
+      settings,
+      impact,
+    );
+  }
+  return [selectedBlock, selectedVideo];
 }
 
 function splitCondition(c: string) {

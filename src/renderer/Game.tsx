@@ -22,6 +22,8 @@ import { fadeAudio } from './util/util';
 import { handleFlags, handleSelect } from '../lib/GameLogic';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import SaveModal from './SaveModal';
+import PopupMenu from './PopupMenu';
+import DebugPane from './DebugPane';
 
 function getDefaultValue(t: string) {
   switch (t) {
@@ -120,10 +122,11 @@ export default function Game(props: GameProps) {
       });
 
       // figure out first video given block and flags
-      const firstVideo = handleSelect(
+      const [firstBlock, firstVideo] = handleSelect(
         localGameState,
         imp.blocks[imp.meta.start],
         settings,
+        imp,
       );
 
       // if music does not exist, send null so it plays nothing
@@ -135,7 +138,7 @@ export default function Game(props: GameProps) {
       setLocalGameState((prev: gameState) => ({
         ...prev,
         seen: [imp.meta.start, `${imp.meta.start}_${firstVideo.path}`],
-        block: imp.blocks[imp.meta.start],
+        block: firstBlock,
         currentVideo: firstVideo,
         playingMusic: initialMusic,
         flags,
@@ -302,21 +305,15 @@ export default function Game(props: GameProps) {
       return;
     }
 
-    // handle block flags
-    if (localImpact.blocks[target.target].flags) {
-      handleFlags(
-        newFlags,
-        localImpact.blocks[target.target].flags as blockFlags,
-      );
-    }
     // fade out video
     gameCurtain.current?.setAttribute('style', 'background-color: black;');
 
     // figure out next video given block and flags
-    const nextVideo = handleSelect(
+    const [nextBlock, nextVideo] = handleSelect(
       localGameState,
       localImpact.blocks[target.target],
       settings,
+      localImpact,
     );
 
     // if the music changes, fade out audio
@@ -329,7 +326,11 @@ export default function Game(props: GameProps) {
     }
     // wait 500 ms then change video
     setTimeout(() => {
-      // now that we know video, handle video flags
+      // now that we know block and video, handle block and video flags
+      // handle block flags
+      if (nextBlock.flags) {
+        handleFlags(newFlags, nextBlock.flags as blockFlags);
+      }
       if (nextVideo.flags) {
         handleFlags(newFlags, nextVideo.flags);
       }
@@ -356,7 +357,7 @@ export default function Game(props: GameProps) {
           `${target.target} ${nextVideo.path}`,
         ],
         flags: newFlags,
-        block: localImpact.blocks[target.target],
+        block: nextBlock,
         currentVideo: nextVideo,
         playingMusic: nextMusic,
       }));
@@ -380,21 +381,17 @@ export default function Game(props: GameProps) {
   };
 
   // determines how videos change when it ends and starts a new video
-  const nextBlock = (target: string) => {
+  const handleNextBlock = (target: string) => {
     // no need to lower/lock controls as they shouldn't be up
-    // no need to handle target flags because there are no targets
-    // handle block flags
-    const newFlags = localGameState.flags;
     // fade out video
     gameCurtain.current?.setAttribute('style', 'background-color: black;');
-    if (localImpact.blocks[target].flags) {
-      handleFlags(newFlags, localImpact.blocks[target].flags);
-    }
+
     // figure out next video given block and flags
-    const nextVideo = handleSelect(
+    const [nextBlock, nextVideo] = handleSelect(
       localGameState,
       localImpact.blocks[target],
       settings,
+      localImpact,
     );
 
     // if the music changes, fade out audio
@@ -408,7 +405,12 @@ export default function Game(props: GameProps) {
 
     // wait 500 ms then change video
     setTimeout(() => {
-      // now that we know video, handle video flags
+      // now that we know video and block, handle video and block flags
+      // no need to handle target flags because there are no targets
+      const newFlags = localGameState.flags;
+      if (nextBlock.flags) {
+        handleFlags(newFlags, nextBlock.flags);
+      }
       if (nextVideo.flags) {
         handleFlags(newFlags, nextVideo.flags);
       }
@@ -429,13 +431,9 @@ export default function Game(props: GameProps) {
       console.log(newFlags);
       setLocalGameState((prev) => ({
         ...prev,
-        seen: [
-          ...prev.seen,
-          target,
-          `${target} ${localImpact.blocks[target].videos[0].path}`,
-        ],
+        seen: [...prev.seen, target, `${target} ${nextVideo.path}`],
         flags: newFlags,
-        block: localImpact.blocks[target],
+        block: nextBlock,
         currentVideo: nextVideo,
         playingMusic: nextMusic,
       }));
@@ -469,7 +467,7 @@ export default function Game(props: GameProps) {
           localGameState.currentVideo.timing?.loop as number,
         );
       } else if (localGameState.currentVideo.next) {
-        nextBlock(localGameState.currentVideo.next);
+        handleNextBlock(localGameState.currentVideo.next);
       } else if (localGameState.block.targets) {
         // this is inconsistent
         console.log(
@@ -480,7 +478,7 @@ export default function Game(props: GameProps) {
           localGameState.currentVideo.timing?.loop as number,
         );
       } else if (localGameState.block.next) {
-        nextBlock(localGameState.block.next);
+        handleNextBlock(localGameState.block.next);
       }
     } else {
       console.log("can't get player ref");
@@ -497,7 +495,7 @@ export default function Game(props: GameProps) {
             localGameState.currentVideo.timing?.targets as number,
           );
         } else if (localGameState.currentVideo.next) {
-          nextBlock(localGameState.currentVideo.next);
+          handleNextBlock(localGameState.currentVideo.next);
         } else if (localGameState.block.targets) {
           console.log(
             `seeking to ${localGameState.currentVideo.timing?.targets}`,
@@ -506,7 +504,7 @@ export default function Game(props: GameProps) {
             localGameState.currentVideo.timing?.targets as number,
           );
         } else if (localGameState.block.next) {
-          nextBlock(localGameState.block.next);
+          handleNextBlock(localGameState.block.next);
         }
       }
       // hide the skip button
@@ -577,10 +575,7 @@ export default function Game(props: GameProps) {
           gameSkip.current
         ) {
           gameSkip.current.setAttribute('style', 'opacity: 1;');
-        } else if (
-          e.playedSeconds < localGameState.currentVideo.timing.targets &&
-          gameSkip.current
-        ) {
+        } else if (gameSkip.current) {
           gameSkip.current.removeAttribute('style');
         }
       } else {
@@ -618,6 +613,7 @@ export default function Game(props: GameProps) {
 
   switch (settings.player_theme) {
     case 'classic':
+    case 'large':
       return (
         <div className="gameRoot">
           <div className="gameHeader">
@@ -640,9 +636,12 @@ export default function Game(props: GameProps) {
                 </div>
               </a>
             </div>
-            <div className="gameBody">
-              <div className="gamePlayer">
-                <div className="gameCurtain" ref={gameCurtain}></div>
+            <div className={`gameBody ${settings.player_theme}`}>
+              <div className={`gamePlayer ${settings.player_theme}`}>
+                <div
+                  className={`gameCurtain ${settings.player_theme}`}
+                  ref={gameCurtain}
+                ></div>
                 <GameControls
                   state={localGameState}
                   show={showControls.show}
@@ -656,10 +655,12 @@ export default function Game(props: GameProps) {
                   progressInterval={250}
                   controls={false}
                   playing={playing}
+                  height={settings.player_theme === 'large' ? '720px' : '360px'}
+                  width={settings.player_theme === 'large' ? '1280px' : '640px'}
                   volume={
                     (settings.volume_video * settings.volume_master) / 10000
                   }
-                  url={`impact://${encodeURIComponent(localGameState.currentVideo.path)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
+                  url={`impact://${encodeURIComponent(localGameState.currentVideo.path as string)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                 />
                 <ReactPlayer
                   width="0px"
@@ -671,7 +672,7 @@ export default function Game(props: GameProps) {
                   url={`impact://${localGameState.playingMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                 ></ReactPlayer>
                 <div
-                  className="gameSkip"
+                  className={`gameSkip ${settings.player_theme}`}
                   ref={gameSkip}
                   onClick={skipVideo}
                 ></div>
@@ -709,13 +710,80 @@ export default function Game(props: GameProps) {
               navigate('/');
             }}
           ></SaveModal>
+          <DebugPane
+            impact={localImpact}
+            gameState={localGameState}
+            setGameState={setLocalGameState}
+          ></DebugPane>
+        </div>
+      );
+    case 'fullscreen':
+      return (
+        <div className="gameRoot">
+          <div className="gameBody fullscreen">
+            <PopupMenu
+              modalSetter={setLocalModalState}
+              playing={playing}
+              setPlaying={setPlaying}
+              exit={confirmMenu}
+              restart={confirmRestart}
+              save={saveGame}
+              skipRef={gameSkip}
+              skip={skipVideo}
+            ></PopupMenu>
+            <div
+              className={`gameCurtain ${settings.player_theme}`}
+              ref={gameCurtain}
+            ></div>
+            <GameControls
+              state={localGameState}
+              show={showControls.show}
+              setter={selectBlock}
+            ></GameControls>
+            <ReactPlayer
+              className="gameVideo"
+              ref={gamePlayer}
+              onEnded={handleOnEnded}
+              onProgress={handleOnProgress}
+              progressInterval={250}
+              controls={false}
+              playing={playing}
+              height="100%"
+              width="100%"
+              volume={(settings.volume_video * settings.volume_master) / 10000}
+              url={`impact://${encodeURIComponent(localGameState.currentVideo.path as string)}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
+            />
+            <ReactPlayer
+              width="0px"
+              height="0px"
+              playing={playing}
+              loop
+              controls={false}
+              volume={calculateVolume()}
+              url={`impact://${localGameState.playingMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
+            ></ReactPlayer>
+          </div>
+          <SaveModal
+            modalState={localModalState}
+            setter={setLocalModalState}
+            save={saveGame}
+            restart={restartGame}
+            exit={() => {
+              navigate('/');
+            }}
+          ></SaveModal>
+          <DebugPane
+            impact={localImpact}
+            gameState={localGameState}
+            setGameState={setLocalGameState}
+          ></DebugPane>
         </div>
       );
     default:
       return (
         <div>
-          No theme selected. Click <Link to="/">HERE</Link> to return to main
-          menu.
+          You&aposve selected a bad theme somehow. Send this to ICEREG1992 along
+          with your settings.json please!
         </div>
       );
   }

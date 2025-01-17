@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import parse from 'html-react-parser';
+import { useSettingsStore } from '../hooks/useSettingsStore';
 import { impactBlock, gameState, blockTarget } from './interfaces';
 
 interface GameControlsProps {
@@ -9,9 +10,11 @@ interface GameControlsProps {
 }
 
 export default function GameControls(props: GameControlsProps) {
+  const { settings, setSettings } = useSettingsStore();
+
   return (
     <div
-      className="gameOverlay"
+      className={`gameOverlay ${settings.player_theme}`}
       style={
         props.show &&
         (props.state.block.targets || props.state.currentVideo.targets)
