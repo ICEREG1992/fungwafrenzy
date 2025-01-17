@@ -355,10 +355,13 @@ app
               const buffer = Buffer.alloc(chunksize);
               const fileStream = fs.createReadStream(filePath, { start, end });
               let bytesRead = 0;
-
-              fileStream.on('data', (chunk: Buffer) => {
-                chunk.copy(buffer, bytesRead);
-                bytesRead += chunk.length;
+              fileStream.on('data', (chunk: string | Buffer) => {
+                if (Buffer.isBuffer(chunk)) {
+                  chunk.copy(buffer, bytesRead);
+                  bytesRead += chunk.length;
+                } else {
+                  throw new Error('Unexpected string data in binary stream');
+                }
               });
 
               fileStream.on('end', () => resolve(buffer));
