@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactPlayer from 'react-player';
 import { Link, useNavigate } from 'react-router-dom';
 import GameControls from './GameControls';
@@ -193,7 +193,7 @@ export default function Game(props: GameProps) {
     });
   }, []);
 
-  async function confirmMenu() {
+  const confirmMenu = useCallback(async () => {
     if (settings.selected_save) {
       // start by checking if gamestate differs from saved gamestate
       const sav: SaveGame = await window.electron.ipcRenderer.invoke(
@@ -224,9 +224,20 @@ export default function Game(props: GameProps) {
         }));
       }
     }
-  }
+  }, [settings, localGameState, localImpact]);
 
-  function confirmRestart() {
+  const restartGame = useCallback(() => {
+    initializeGame();
+    gamePlayer.current?.seekTo(0);
+    setPlaying(true);
+    // hide and unlock controls so they can show up later
+    setShowControls({
+      show: false,
+      lock: false,
+    });
+  }, [initializeGame, gamePlayer]);
+
+  const confirmRestart = useCallback(() => {
     if (settings.selected_save) {
       setLocalModalState((prev) => ({
         type: 'restart',
@@ -245,20 +256,9 @@ export default function Game(props: GameProps) {
         }));
       }
     }
-  }
+  }, [settings, localGameState, restartGame, localImpact]);
 
-  function restartGame() {
-    initializeGame();
-    gamePlayer.current?.seekTo(0);
-    setPlaying(true);
-    // hide and unlock controls so they can show up later
-    setShowControls({
-      show: false,
-      lock: false,
-    });
-  }
-
-  function saveGame() {
+  const saveGame = useCallback(() => {
     // build save game
     const newDate = new Date();
     const filename = newDate.getTime().toString();
@@ -279,7 +279,7 @@ export default function Game(props: GameProps) {
       ...settings,
       selected_save: filename,
     });
-  }
+  }, [localGameState, settings]);
 
   // determines how videos change when a user clicks a button
   const selectBlock = (target: blockTarget) => {
