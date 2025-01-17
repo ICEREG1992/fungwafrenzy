@@ -79,6 +79,7 @@ export default function PopupMenu(props: PopupMenuProps) {
   return (
     <div
       className="gamePopupMenu"
+      // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
       onMouseOut={handleMouseOut}
       onMouseMove={handleMouseMove}
       style={{
