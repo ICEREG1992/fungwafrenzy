@@ -33,6 +33,12 @@ export default function FrenzyNETHeader(props: FrenzyNETHeaderProps) {
     'Also try Bear Stearns Bravo! / ',
     'Dark Netrider trashes entire city block playing Grand Theft Auto 3, still at large / ',
     'Weeeeeeeeeeeeeeeeeee! / ',
+    'Career Scientist Dr. Enron Lafayette publishes brand new research on Loud Quitting / ',
+    'Bear Stearns closes Bon Bon research branch; hundreds of dolphins left unemployed / ',
+    'Solarium Club game room announces new Dream Dice tables, opening next month / ',
+    'Bodybuilder with 5 lookalike twins seen around FTZ arrested on charges of racketeering / ',
+    'A Game by Rocko Di Pietro / ',
+    'Click and drag on the stock ticker to scroll! Just kidding!',
   ];
 
   return (

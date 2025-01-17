@@ -117,36 +117,33 @@ export default function App() {
   const { settings, setSettings, updateSettings } = useSettingsStore();
   useEffect(() => {
     const loadSettings = async () => {
+      const defaultPaths = await window.electron.ipcRenderer.invoke(
+        'get-defaultappdatapaths',
+      );
+      const defaultSettings: userSettings = {
+        selected_impact: '',
+        selected_save: '',
+        player_theme: 'classic',
+        impact_folder_path: defaultPaths[0],
+        save_folder_path: defaultPaths[1],
+        skip_button: true,
+        skip_timer: 3,
+        username: '',
+        class: '',
+        location: '',
+        resolution_x: 1024,
+        resolution_y: 728,
+        fullscreen: false,
+        volume_master: 80,
+        volume_video: 100,
+        volume_music: 100,
+        debug: false,
+      };
       try {
-        const defaultPaths = await window.electron.ipcRenderer.invoke(
-          'get-defaultappdatapaths',
-        );
-        const defaultSettings: userSettings = {
-          selected_impact: '',
-          selected_save: '',
-          player_theme: 'classic',
-          impact_folder_path: defaultPaths[0],
-          save_folder_path: defaultPaths[1],
-          skip_button: true,
-          skip_timer: 3,
-          username: '',
-          class: '',
-          location: '',
-          resolution_x: 1024,
-          resolution_y: 728,
-          fullscreen: false,
-          volume_master: 80,
-          volume_video: 100,
-          volume_music: 100,
-          debug: false,
-        };
-        const res =
+        const res: userSettings =
           await window.electron.ipcRenderer.invoke('load-usersettings');
         if (res) {
-          const out: userSettings = {
-            ...res,
-            ...defaultSettings,
-          };
+          const out = { ...defaultSettings, ...res };
           setSettings(out);
           // if fullscreen, launch app fullscreen
           window.electron.ipcRenderer.sendMessage(
@@ -155,7 +152,6 @@ export default function App() {
           );
           return;
         }
-
         // data not successfully returned, fill with defaults
         console.log('filling settings with defaults');
         setSettings(defaultSettings);
@@ -169,7 +165,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    window.electron.ipcRenderer.invoke('save-usersettings', settings);
+    if (
+      settings.impact_folder_path !== 'x' &&
+      settings.save_folder_path !== 'y'
+    ) {
+      window.electron.ipcRenderer.invoke('save-usersettings', settings);
+    }
 
     // F11 key listener for fullscreen toggle
     const handleF11 = (event: KeyboardEvent) => {

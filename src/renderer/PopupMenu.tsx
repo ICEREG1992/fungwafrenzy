@@ -43,26 +43,35 @@ const GameSkip = forwardRef<HTMLDivElement, { skip: () => void }>(
 
 export default function PopupMenu(props: PopupMenuProps) {
   const [visible, setVisible] = useState<boolean>(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [mouse, setMouse] = useState<boolean>(true);
+  const menuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mouseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleMouseMove = () => {
     // Clear the existing timeout to reset the timer
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+    if (menuTimeoutRef.current) {
+      clearTimeout(menuTimeoutRef.current);
+    }
+    if (mouseTimeoutRef.current) {
+      clearTimeout(mouseTimeoutRef.current);
     }
 
     // Set visible to true
     setVisible(true);
+    setMouse(true);
 
-    // Start a new timeout to set visible to false after 3 seconds
-    timeoutRef.current = setTimeout(() => {
+    // Start a new timeout to set visible to false after 2 seconds
+    menuTimeoutRef.current = setTimeout(() => {
       setVisible(false);
     }, 2000);
+    mouseTimeoutRef.current = setTimeout(() => {
+      setMouse(false);
+    }, 4000);
   };
 
   const handleMouseOut = () => {
-    if (timeoutRef.current && props.playing) {
-      clearTimeout(timeoutRef.current);
+    if (menuTimeoutRef.current && props.playing) {
+      clearTimeout(menuTimeoutRef.current);
       setVisible(false);
     }
   };
@@ -72,7 +81,10 @@ export default function PopupMenu(props: PopupMenuProps) {
       className="gamePopupMenu"
       onMouseOut={handleMouseOut}
       onMouseMove={handleMouseMove}
-      style={visible ? { opacity: 1 } : { opacity: 0 }}
+      style={{
+        opacity: visible ? 1 : 0,
+        cursor: mouse ? 'auto' : 'none',
+      }}
       onClick={() => {
         props.setPlaying((prev) => {
           return !prev;
