@@ -118,24 +118,10 @@ export default function App() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const res =
-          await window.electron.ipcRenderer.invoke('load-usersettings');
-        if (res) {
-          setSettings(res);
-          // if fullscreen, launch app fullscreen
-          window.electron.ipcRenderer.sendMessage(
-            'toggle-fullscreen',
-            (res as userSettings).fullscreen,
-          );
-          return;
-        }
-
-        // data not successfully returned, fill with defaults
-        console.log('filling settings with defaults');
         const defaultPaths = await window.electron.ipcRenderer.invoke(
           'get-defaultappdatapaths',
         );
-        setSettings({
+        const defaultSettings: userSettings = {
           selected_impact: '',
           selected_save: '',
           player_theme: 'classic',
@@ -153,7 +139,26 @@ export default function App() {
           volume_video: 100,
           volume_music: 100,
           debug: false,
-        });
+        };
+        const res =
+          await window.electron.ipcRenderer.invoke('load-usersettings');
+        if (res) {
+          const out: userSettings = {
+            ...res,
+            ...defaultSettings,
+          };
+          setSettings(out);
+          // if fullscreen, launch app fullscreen
+          window.electron.ipcRenderer.sendMessage(
+            'toggle-fullscreen',
+            (res as userSettings).fullscreen,
+          );
+          return;
+        }
+
+        // data not successfully returned, fill with defaults
+        console.log('filling settings with defaults');
+        setSettings(defaultSettings);
       } catch (err) {
         console.error('Failed to load settings:', err);
       }

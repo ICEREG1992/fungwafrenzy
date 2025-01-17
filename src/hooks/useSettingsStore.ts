@@ -25,6 +25,7 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     volume_music: 100,
     skip_button: true,
     skip_timer: 3,
+    debug: false,
   },
   setSettings: (settings) => set({ settings }),
   updateSettings: (partial) =>
