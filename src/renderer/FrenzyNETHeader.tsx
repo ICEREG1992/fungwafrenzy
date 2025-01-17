@@ -38,7 +38,7 @@ export default function FrenzyNETHeader(props: FrenzyNETHeaderProps) {
     'Solarium Club game room announces new Dream Dice tables, opening next month / ',
     'Bodybuilder with 5 lookalike twins seen around FTZ arrested on charges of racketeering / ',
     'A Game by Rocko Di Pietro / ',
-    'Click and drag on the stock ticker to scroll! Just kidding!',
+    'Click and drag on the stock ticker to scroll! Just kidding! / ',
   ];
 
   return (
