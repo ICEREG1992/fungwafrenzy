@@ -131,7 +131,7 @@ export default function Game(props: GameProps) {
 
       // if music does not exist, send null so it plays nothing
       let initialMusic = '';
-      if (firstVideo.music) {
+      if (firstVideo.music && !firstVideo.timing?.music) {
         initialMusic = imp.music[firstVideo.music].path;
       }
 
@@ -336,12 +336,8 @@ export default function Game(props: GameProps) {
       }
       // if music does not exist, or doesn't start at video start, send null so it plays nothing
       let nextMusic = '';
-      let storeMusic = '';
-      if (nextVideo.music) {
-        storeMusic = localImpact.music[nextVideo.music].path;
-        if (!nextVideo.timing?.music) {
-          nextMusic = localImpact.music[nextVideo.music].path;
-        }
+      if (nextVideo.music && !nextVideo.timing?.music) {
+        nextMusic = localImpact.music[nextVideo.music].path;
       }
       // if video doesn't change, seek back to the beginning so it can play again
       if (nextVideo.path === localGameState.currentVideo.path) {
@@ -416,12 +412,8 @@ export default function Game(props: GameProps) {
       }
       // if music does not exist, or doesn't start at video start, send null so it plays nothing
       let nextMusic = '';
-      let storeMusic = '';
-      if (nextVideo.music) {
-        storeMusic = localImpact.music[nextVideo.music].path;
-        if (!nextVideo.timing?.music) {
-          nextMusic = localImpact.music[nextVideo.music].path;
-        }
+      if (nextVideo.music && !nextVideo.timing?.music) {
+        nextMusic = localImpact.music[nextVideo.music].path;
       }
       // if video doesn't change, seek back to the beginning so it can play again
       if (nextVideo.path === localGameState.currentVideo.path) {
