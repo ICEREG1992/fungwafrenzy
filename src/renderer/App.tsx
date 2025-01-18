@@ -18,7 +18,7 @@ import { useSettingsStore } from '../hooks/useSettingsStore';
 import Tools from './Tools';
 import SaveModal from './SaveModal';
 import MenuModal from './MenuModal';
-import { ModalState, userSettings } from './interfaces';
+import { ModalState, SaveGame, userSettings } from './interfaces';
 
 function Title() {
   const navigate = useNavigate();
@@ -43,9 +43,30 @@ function Title() {
     }
   };
 
-  const continueGame = () => {
+  const continueGame = async () => {
     if (settings.selected_save) {
-      navigate('/continue');
+      try {
+        const sav: SaveGame = await window.electron.ipcRenderer.invoke(
+          'get-savedata',
+          settings.selected_save,
+          settings.save_folder_path,
+        );
+        if (sav.impact === settings.selected_impact) {
+          navigate('/continue');
+        } else {
+          setLocalModalState((prev) => ({
+            ...prev,
+            type: 'mismatch',
+            visible: true,
+          }));
+        }
+      } catch {
+        setLocalModalState((prev) => ({
+          ...prev,
+          type: 'error',
+          visible: true,
+        }));
+      }
     } else {
       setLocalModalState((prev) => ({
         ...prev,

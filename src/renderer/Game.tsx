@@ -168,12 +168,11 @@ export default function Game(props: GameProps) {
       console.error('Failed to initialize game from save:', error);
     }
   }
+
   useEffect(() => {
     if (props.continue) {
-      const { impact_folder_path, selected_impact, selected_save } = settings;
       loadFromSave();
     } else {
-      const { selected_impact, impact_folder_path } = settings;
       initializeGame();
     }
     // tell main process to block exit
@@ -238,7 +237,7 @@ export default function Game(props: GameProps) {
   }, [initializeGame, gamePlayer]);
 
   const confirmRestart = useCallback(() => {
-    if (settings.selected_save) {
+    if (props.continue) {
       setLocalModalState((prev) => ({
         type: 'restart',
         visible: true,
