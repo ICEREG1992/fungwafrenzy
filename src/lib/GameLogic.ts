@@ -91,7 +91,7 @@ export function checkCondition(
       return localGameState.seen.includes(condition.value as string);
     case 'time':
       const now = new Date();
-      const h = now.getHours();
+      const h = now.getUTCHours();
       const c = splitCondition(condition.value as string); // assert this is a string because it's not an array
       switch (c[0]) {
         case '==':
