@@ -95,7 +95,7 @@ export function checkCondition(
       const c = splitCondition(condition.value as string); // assert this is a string because it's not an array
       switch (c[0]) {
         case '==':
-          if (parseInt(c[1])) {
+          if (!Number.isNaN(parseInt(c[1]))) {
             // compare to a const
             return h === parseInt(c[1]);
           } else {
@@ -103,7 +103,7 @@ export function checkCondition(
             return h === localGameState.flags[condition.value as string];
           }
         case '<=':
-          if (parseInt(c[1])) {
+          if (!Number.isNaN(parseInt(c[1]))) {
             return h <= parseInt(c[1]);
           } else {
             return (
@@ -114,7 +114,7 @@ export function checkCondition(
             );
           }
         case '>=':
-          if (parseInt(c[1])) {
+          if (!Number.isNaN(parseInt(c[1]))) {
             return h >= parseInt(c[1]);
           } else {
             return (
@@ -125,7 +125,7 @@ export function checkCondition(
             );
           }
         case '<':
-          if (parseInt(c[1])) {
+          if (!Number.isNaN(parseInt(c[1]))) {
             return h < parseInt(c[1]);
           } else {
             return (
@@ -136,7 +136,7 @@ export function checkCondition(
             );
           }
         case '>':
-          if (parseInt(c[1])) {
+          if (!Number.isNaN(parseInt(c[1]))) {
             return h > parseInt(c[1]);
           } else {
             return (
@@ -173,7 +173,7 @@ export function checkCondition(
           if (c[0]) {
             switch (c[0]) {
               case '==':
-                if (parseInt(c[1])) {
+                if (!Number.isNaN(parseInt(c[1]))) {
                   // compare to a const
                   return (
                     localGameState.flags[condition.type] === parseInt(c[1])
@@ -186,7 +186,7 @@ export function checkCondition(
                   );
                 }
               case '<=':
-                if (parseInt(c[1])) {
+                if (!Number.isNaN(parseInt(c[1]))) {
                   return (
                     (localGameState.flags[condition.type] as number) <=
                     parseInt(c[1])
@@ -198,7 +198,7 @@ export function checkCondition(
                   );
                 }
               case '>=':
-                if (parseInt(c[1])) {
+                if (!Number.isNaN(parseInt(c[1]))) {
                   return (
                     (localGameState.flags[condition.type] as number) >=
                     parseInt(c[1])
@@ -210,7 +210,7 @@ export function checkCondition(
                   );
                 }
               case '<':
-                if (parseInt(c[1])) {
+                if (!Number.isNaN(parseInt(c[1]))) {
                   return (
                     (localGameState.flags[condition.type] as number) <
                     parseInt(c[1])
@@ -222,7 +222,7 @@ export function checkCondition(
                   );
                 }
               case '>':
-                if (parseInt(c[1])) {
+                if (!Number.isNaN(parseInt(c[1]))) {
                   return (
                     (localGameState.flags[condition.type] as number) >
                     parseInt(c[1])
@@ -239,7 +239,7 @@ export function checkCondition(
             }
           } else {
             // interpret this as an == check
-            if (parseInt(c[1])) {
+            if (!Number.isNaN(parseInt(c[1]))) {
               // compare to a const
               return localGameState.flags[condition.type] === parseInt(c[1]);
             } else {
@@ -292,7 +292,10 @@ export function handleSelect(
   settings: userSettings,
   impact: Impact,
 ): [impactBlock, blockVideo] {
-  let selectedVideo = block.videos[0];
+  let selectedVideo = {
+    title: 'Datafault!',
+    path: impact.meta.datafault,
+  } as blockVideo;
   let selectedBlock = block;
   // figure out if this is a chance block or a condition block
   if (block.videos[0].chance) {
@@ -313,7 +316,6 @@ export function handleSelect(
   } else {
     if (block.videos[0].condition) {
       // this is now a check of some kind
-      let chosen = false;
       for (let i = 0; i < block.videos.length; i += 1) {
         // for every video, perform this check, stop once we hit true
         const video = block.videos[i];
@@ -321,13 +323,8 @@ export function handleSelect(
           checkCondition(video.condition as blockCondition, gameState, settings)
         ) {
           selectedVideo = video;
-          chosen = true;
           break;
         }
-      }
-      // todo: return datafault instead of video 1
-      if (!chosen) {
-        [selectedVideo] = block.videos;
       }
       // eslint-disable-next-line no-else-return
     } else {
