@@ -358,7 +358,7 @@ export default function Game(props: GameProps) {
       }));
       console.log(localGameState.seen);
       setShowControls({
-        show: false,
+        show: nextVideo.timing?.targets === 0,
         lock: false,
       });
       // fade in video
@@ -430,7 +430,7 @@ export default function Game(props: GameProps) {
       }));
       console.log(localGameState.seen);
       setShowControls({
-        show: false,
+        show: nextVideo.timing?.targets === 0,
         lock: false,
       });
       // fade in video
