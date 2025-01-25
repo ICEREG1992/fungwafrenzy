@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import parse from 'html-react-parser';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import { impactBlock, gameState, blockTarget } from './interfaces';
@@ -11,23 +11,23 @@ interface GameControlsProps {
 
 export default function GameControls(props: GameControlsProps) {
   const { settings, setSettings } = useSettingsStore();
-
+  const gameButtons = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number>(0);
+  useEffect(() => {
+    if (
+      gameButtons.current &&
+      props.show &&
+      (props.state.block.targets || props.state.currentVideo.targets)
+    ) {
+      setHeight(gameButtons.current.getBoundingClientRect().height);
+    } else {
+      setHeight(0);
+    }
+  }, [props]);
   return (
-    <div
-      className={`gameOverlay ${settings.player_theme}`}
-      style={
-        props.show &&
-        (props.state.block.targets || props.state.currentVideo.targets)
-          ? {
-              height: document
-                .getElementsByClassName('gameButtons')[0]
-                .getBoundingClientRect().height,
-            }
-          : { height: 0 }
-      }
-    >
+    <div className={`gameOverlay ${settings.player_theme}`} style={{ height }}>
       <div className="gameOverlayBorder"></div>
-      <div className="gameButtons">
+      <div className="gameButtons" ref={gameButtons}>
         <Buttons state={props.state} setter={props.setter}></Buttons>
       </div>
     </div>

@@ -105,6 +105,92 @@ export default function MenuModal(props: MenuModalProps) {
           </div>
         </div>
       );
+    case 'mismatch':
+      return (
+        <div
+          className="Modal"
+          style={
+            props.modalState.visible ? { opacity: '100%', display: 'flex' } : {}
+          }
+        >
+          <div className="ModalContainer">
+            <div className="ModalTitle">Save Doesn&apos;t Match Impact</div>
+            <div className="ModalDesc">
+              The save you&apos;ve selected isn&apos;t for the Impact
+              you&apos;ve selected. Would you like to select a different save
+              file?
+            </div>
+            <div className="ModalButtons" style={{ justifyContent: 'end' }}>
+              <a
+                onClick={() => {
+                  props.loadSave();
+                }}
+              >
+                <div>Select Save</div>
+              </a>
+              <a
+                onClick={() => {
+                  props.continue();
+                }}
+              >
+                <div>Continue Anyway</div>
+              </a>
+              <a
+                className="purple"
+                onClick={() => {
+                  closeModal();
+                  window.electron.ipcRenderer.sendMessage('block-close');
+                }}
+              >
+                <div>Cancel</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    case 'error':
+      return (
+        <div
+          className="Modal"
+          style={
+            props.modalState.visible ? { opacity: '100%', display: 'flex' } : {}
+          }
+        >
+          <div className="ModalContainer">
+            <div className="ModalTitle">Couldn&apos;t Load Save File</div>
+            <div className="ModalDesc">
+              The save you&apos;ve selected couldn&apos;t be loaded. This may be
+              because the save file was deleted. Would you like to select a
+              different save file?
+            </div>
+            <div className="ModalButtons" style={{ justifyContent: 'end' }}>
+              <a
+                onClick={() => {
+                  props.loadSave();
+                }}
+              >
+                <div>Select Save</div>
+              </a>
+              <a
+                onClick={() => {
+                  props.continue();
+                }}
+              >
+                <div>Continue Anyway</div>
+              </a>
+              <a
+                className="purple"
+                onClick={() => {
+                  closeModal();
+                  window.electron.ipcRenderer.sendMessage('block-close');
+                }}
+              >
+                <div>Cancel</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      );
     default:
       return (
         <div

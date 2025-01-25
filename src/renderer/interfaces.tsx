@@ -38,6 +38,8 @@ interface impactMeta {
   flags: metaFlags;
   start: string;
   chapters?: string[];
+  datafault?: string;
+  diskfault?: string;
 }
 
 interface metaFlags {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import FrenzyNETHeader from './FrenzyNETHeader';
 import { NetModalState } from './interfaces';
@@ -15,6 +15,22 @@ export default function Settings() {
     value: 'null',
     visible: false,
   });
+
+  useEffect(() => {
+    const handleEnter = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && localModalState.visible) {
+        changeSetting(
+          localModalState.value,
+          (document.getElementById('NETmodalvalue') as HTMLInputElement).value,
+        );
+      }
+    };
+    if (localModalState.visible) {
+      window.addEventListener('keydown', handleEnter);
+    } else {
+      window.removeEventListener('keydown', handleEnter);
+    }
+  }, [localModalState]);
 
   function closeModal() {
     setLocalModalState((prev) => ({

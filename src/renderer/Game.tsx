@@ -131,7 +131,7 @@ export default function Game(props: GameProps) {
 
       // if music does not exist, send null so it plays nothing
       let initialMusic = '';
-      if (firstVideo.music) {
+      if (firstVideo.music && !firstVideo.timing?.music) {
         initialMusic = imp.music[firstVideo.music].path;
       }
 
@@ -168,12 +168,11 @@ export default function Game(props: GameProps) {
       console.error('Failed to initialize game from save:', error);
     }
   }
+
   useEffect(() => {
     if (props.continue) {
-      const { impact_folder_path, selected_impact, selected_save } = settings;
       loadFromSave();
     } else {
-      const { selected_impact, impact_folder_path } = settings;
       initializeGame();
     }
     // tell main process to block exit
@@ -238,7 +237,7 @@ export default function Game(props: GameProps) {
   }, [initializeGame, gamePlayer]);
 
   const confirmRestart = useCallback(() => {
-    if (settings.selected_save) {
+    if (props.continue) {
       setLocalModalState((prev) => ({
         type: 'restart',
         visible: true,
@@ -336,12 +335,8 @@ export default function Game(props: GameProps) {
       }
       // if music does not exist, or doesn't start at video start, send null so it plays nothing
       let nextMusic = '';
-      let storeMusic = '';
-      if (nextVideo.music) {
-        storeMusic = localImpact.music[nextVideo.music].path;
-        if (!nextVideo.timing?.music) {
-          nextMusic = localImpact.music[nextVideo.music].path;
-        }
+      if (nextVideo.music && !nextVideo.timing?.music) {
+        nextMusic = localImpact.music[nextVideo.music].path;
       }
       // if video doesn't change, seek back to the beginning so it can play again
       if (nextVideo.path === localGameState.currentVideo.path) {
@@ -363,7 +358,7 @@ export default function Game(props: GameProps) {
       }));
       console.log(localGameState.seen);
       setShowControls({
-        show: false,
+        show: nextVideo.timing?.targets === 0,
         lock: false,
       });
       // fade in video
@@ -416,12 +411,8 @@ export default function Game(props: GameProps) {
       }
       // if music does not exist, or doesn't start at video start, send null so it plays nothing
       let nextMusic = '';
-      let storeMusic = '';
-      if (nextVideo.music) {
-        storeMusic = localImpact.music[nextVideo.music].path;
-        if (!nextVideo.timing?.music) {
-          nextMusic = localImpact.music[nextVideo.music].path;
-        }
+      if (nextVideo.music && !nextVideo.timing?.music) {
+        nextMusic = localImpact.music[nextVideo.music].path;
       }
       // if video doesn't change, seek back to the beginning so it can play again
       if (nextVideo.path === localGameState.currentVideo.path) {
@@ -439,7 +430,7 @@ export default function Game(props: GameProps) {
       }));
       console.log(localGameState.seen);
       setShowControls({
-        show: false,
+        show: nextVideo.timing?.targets === 0,
         lock: false,
       });
       // fade in video
