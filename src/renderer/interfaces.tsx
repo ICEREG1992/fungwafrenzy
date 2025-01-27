@@ -40,6 +40,7 @@ interface impactMeta {
   chapters?: string[];
   datafault?: string;
   diskfault?: string;
+  color?: string;
 }
 
 interface metaFlags {

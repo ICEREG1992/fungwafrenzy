@@ -608,13 +608,15 @@ export default function Game(props: GameProps) {
       return (
         <div className="gameRoot">
           <div className="gameHeader">
-            <div className="gameTitlebar">
+            <div className={`gameTitlebar ${localImpact.meta.color}`}>
               <div className="gameTitling">
                 <div className="gameTitle">
                   {localImpact.info.game.toUpperCase()} /{' '}
                   {localImpact.info.title.toUpperCase()}
                 </div>
-                <div className="gameSubtitle">{localImpact.info.subtitle}</div>
+                <div className={`gameSubtitle ${localImpact.meta.color}`}>
+                  {localImpact.info.subtitle}
+                </div>
               </div>
               <a onClick={confirmMenu}>
                 <div className="gameUser">
@@ -663,7 +665,7 @@ export default function Game(props: GameProps) {
                   url={`impact://${localGameState.playingMusic}?path=${settings.impact_folder_path}&impact=${settings.selected_impact}`}
                 ></ReactPlayer>
                 <div
-                  className={`gameSkip ${settings.player_theme}`}
+                  className={`gameSkip ${settings.player_theme} ${localImpact.meta.color}`}
                   ref={gameSkip}
                   onClick={skipVideo}
                 ></div>

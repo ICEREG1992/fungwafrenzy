@@ -367,12 +367,20 @@ a.purple {
   position: relative;
   width: 960px;
   height: 200px;
-  background-image: url('../../assets/images/game/classic/i1beam.png');
+  background-image: url('../../assets/images/game/classic/bluebeam.png');
   background-repeat: no-repeat;
   background-size: cover;
   z-index: 2;
   margin-left: auto;
   margin-right: auto;
+}
+
+.gameTitlebar.green {
+  background-image: url('../../assets/images/game/classic/greenbeam.png');
+}
+
+.gameTitlebar.red {
+  background-image: url('../../assets/images/game/classic/redbeam.png');
 }
 
 .gameTitling {
@@ -393,6 +401,14 @@ a.purple {
   font-size: 18px;
   font-weight: bold;
   color: #66408c;
+}
+
+.gameSubtitle.green {
+  color: #008040;
+}
+
+.gameSubtitle.red {
+  color: #8a0000;
 }
 
 .gameUser {
@@ -621,6 +637,14 @@ a.purple {
   transition: opacity 1s ease-in-out;
 }
 
+.gameSkip.green {
+  background-image: url('../../assets/images/game/classic/1skip2.png');
+}
+
+.gameSkip.red {
+  background-image: url('../../assets/images/game/classic/2skip2.png');
+}
+
 .gameSkip.large {
   top: 342px;
 }
@@ -629,8 +653,24 @@ a.purple {
   background-image: url('../../assets/images/game/classic/skip1.png');
 }
 
+.gameSkip.green:hover {
+  background-image: url('../../assets/images/game/classic/1skip1.png');
+}
+
+.gameSkip.red:hover {
+  background-image: url('../../assets/images/game/classic/2skip1.png');
+}
+
 .gameSkip:active {
   background-image: url('../../assets/images/game/classic/skip0.png');
+}
+
+.gameSkip.green:active {
+  background-image: url('../../assets/images/game/classic/1skip0.png');
+}
+
+.gameSkip.red:active {
+  background-image: url('../../assets/images/game/classic/2skip0.png');
 }
 
 .gameControls {
