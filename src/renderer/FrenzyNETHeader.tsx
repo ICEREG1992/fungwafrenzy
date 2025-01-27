@@ -36,9 +36,14 @@ export default function FrenzyNETHeader(props: FrenzyNETHeaderProps) {
     'Career Scientist Dr. Enron Lafayette publishes brand new research on Loud Quitting / ',
     'Bear Stearns closes Bon Bon research branch; hundreds of dolphins left unemployed / ',
     'Solarium Club game room announces new Dream Dice tables, opening next month / ',
-    'Bodybuilder with 5 lookalike twins seen around FTZ arrested on charges of racketeering / ',
+    'Bodybuilder with 4 lookalike twins seen around FTZ arrested on charges of racketeering / ',
     'A Game by Rocko Di Pietro / ',
     'Click and drag on the stock ticker to scroll! Just kidding! / ',
+    'Jerk Race 3 canceled amid netrider rumors. "Every single player was committing so much crime," says Chief of Police / ',
+    'Thanks, ! JACOB / ',
+    'Thanks, ! T / ',
+    '"Fishing Club" in Rocko Di Pietro\'s "Fung-Wa Frenzy" remains undiscovered. "It\'s probably just a fishing minigame," say fans / ',
+    'Beloved Twitter account "sheep_podcasts" revealed to be just ChatGPT / ',
   ];
 
   return (
