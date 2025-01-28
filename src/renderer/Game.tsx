@@ -24,6 +24,7 @@ import { useSettingsStore } from '../hooks/useSettingsStore';
 import SaveModal from './SaveModal';
 import PopupMenu from './PopupMenu';
 import DebugPane from './DebugPane';
+import UseMusicVolume from './MusicVolume';
 
 function getDefaultValue(t: string) {
   switch (t) {
@@ -91,6 +92,12 @@ export default function Game(props: GameProps) {
   const [playing, setPlaying] = useState<boolean>(true);
 
   const [fader, setFader] = useState<number>(100);
+
+  const musicVolume = UseMusicVolume({
+    targetVolume: localGameState.currentVideo.music
+      ? localImpact.music[localGameState.currentVideo.music as string].volume
+      : 0,
+  });
 
   interface ControlsLock {
     show: boolean;
@@ -584,8 +591,7 @@ export default function Game(props: GameProps) {
       return (
         ((settings.volume_music * settings.volume_master) / 10000) *
         (fader / 100) *
-        (localImpact.music[localGameState.currentVideo.music as string].volume /
-          100)
+        (musicVolume / 100)
       );
     } else {
       return (
