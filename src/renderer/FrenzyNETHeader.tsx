@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import Marquee from 'react-fast-marquee';
+import { useSettingsStore } from '../hooks/useSettingsStore';
 
 function closeApp() {
   window.electron.ipcRenderer.sendMessage('close-app');
@@ -21,6 +22,7 @@ function shuffle(arr: Array<String>) {
 }
 
 export default function FrenzyNETHeader(props: FrenzyNETHeaderProps) {
+  const { settings } = useSettingsStore();
   const tickerText = [
     'Authorities warn of corruption within local utility companies: Water, Electric, etc. / ',
     'Art collective Synydyne\'s "Bear Stearns Bravo" taken offline in unlisting scandal / ',
@@ -38,12 +40,17 @@ export default function FrenzyNETHeader(props: FrenzyNETHeaderProps) {
     'Solarium Club game room announces new Dream Dice tables, opening next month / ',
     'Bodybuilder with 4 lookalike twins seen around FTZ arrested on charges of racketeering / ',
     'A Game by Rocko Di Pietro / ',
-    'Click and drag on the stock ticker to scroll! Just kidding! / ',
+    'Click and drag on the stock ticker to scroll! Just kidding. / ',
     'Jerk Race 3 canceled amid netrider rumors. "Every single player was committing so much crime," says Chief of Police / ',
     'Thanks, ! JACOB / ',
     'Thanks, ! T / ',
     '"Fishing Club" in Rocko Di Pietro\'s "Fung-Wa Frenzy" remains undiscovered. "It\'s probably just a fishing minigame," say fans / ',
     'Beloved Twitter account "sheep_podcasts" revealed to be just ChatGPT / ',
+    'Bear Stearns secretary escapes Tyrant Dimension, caught purchasing propane / ',
+    'Tango Mendoza brutally injured in fall from helicopter / ',
+    `That's a fucked up problem, ${settings.username ? settings.username : 'Pegasus'}. / `,
+    'Rocko Di Pietro opens new restaurant, "Tacos by Rocko". To nobody\'s shocko, the food is not good. / ',
+    'Also try Impact Negative One! / ',
   ];
 
   return (

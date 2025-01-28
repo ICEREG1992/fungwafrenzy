@@ -76,8 +76,8 @@ export default function Game(props: GameProps) {
       videos: [],
     },
     currentVideo: {
-      title: '',
-      path: '',
+      title: 'Diskfault!',
+      path: localImpact.meta.diskfault,
     },
     playingMusic: '',
     flags: {},
