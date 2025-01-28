@@ -168,6 +168,16 @@ ipcMain.handle('select-path', async (e, p: string) => {
   return res.filePaths[0];
 });
 
+ipcMain.handle('file-exists', (e, i: string, p: string, v: string) => {
+  try {
+    console.log(path.join(p, i, v));
+    return fs.existsSync(path.join(p, i, 'video', v));
+  } catch (err) {
+    console.error('Error checking file existence:', err);
+    return false;
+  }
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();

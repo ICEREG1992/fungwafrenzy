@@ -17,7 +17,8 @@ export type Channels =
   | 'ask-to-close'
   | 'block-close'
   | 'allow-close'
-  | 'toggle-fullscreen';
+  | 'toggle-fullscreen'
+  | 'file-exists';
 
 const electronHandler = {
   ipcRenderer: {

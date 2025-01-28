@@ -254,6 +254,28 @@ export default function Tools() {
         }
       }
     });
+    sendMessage('All videos exist?', 'white');
+    Object.keys(imp.blocks).forEach(async (key) => {
+      const block = imp.blocks[key];
+      // start by checking each video
+      for (let i = 0; i < block.videos.length; i += 1) {
+        if (block.videos[i].path) {
+          // eslint-disable-next-line no-await-in-loop
+          const res: boolean = await window.electron.ipcRenderer.invoke(
+            'file-exists',
+            settings.selected_impact,
+            settings.impact_folder_path,
+            block.videos[i].path,
+          );
+          if (!res) {
+            sendMessage(
+              `${key} ${block.videos[i].title} does not exist`,
+              'red',
+            );
+          }
+        }
+      }
+    });
   };
 
   return (
