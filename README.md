@@ -10,7 +10,6 @@ Modern Offline Client for Indie FMV Hit "Fung-Wa Frenzy"
 Fung-Wa Frenzy relies on packages named "impacts" to determine what content is played and when that content is played. In this repo I have included a test impact (Impact -1) in `assets/impacts/Impact -1.zip`, but no official impacts are currently being distributed. To load an impact, unzip it into your impacts folder. If you don't know where that is, click 'Open Impacts Folder' on the Browse Impacts screen.
 
 # how to build
-In the future, installer builds will be offered through the "Releases" tab on the right. In the meantime, you can build and install the project by doing the following:
 1. clone the repo
 2. ensure npm is configured on your system
 3. `npm install`
