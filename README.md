@@ -108,7 +108,7 @@ The blocks section is the main data for your impact. It defines logical blocks o
 Blocks are identified by a string key, which can be whatever you like. Every block has a `title`, a `videos`, and either a `targets` or a `next`. Titles help you keep track of where things are in your impact, but they do not affect anything.
 
 ### Videos
-`Videos` is an array of video objects. Even if there is only one video, it should still be in an array. Every video object has a `title`, and usually has a `path`. Video titles are written alongside saved games to help players find out which save they want to choose. Video paths point to that video's file within the impact's /video folder. You can use subfolders by entering a double-backslash (\\) as a separator. Video objects also have some optional properties:
+`Videos` is an array of video objects. Even if there is only one video, it should still be in an array. Every video object has a `title`, and usually has a `path`. Video titles are written alongside saved games to help players find out which save they want to choose. Video paths point to that video's file within the impact's /video folder. You can use subfolders by entering a double-backslash (\\\\) as a separator. Video objects also have some optional properties:
 - `path`: this is optional in the case that you have a block that only plays a video under certain circumstances. flags are still updated if no video plays, but the player is immediately taken to the next block.
 - `chance`: a decimal value representing the percentage chance this video will be selected for this block. Does not work alongside `condition` videos.
 - `condition`: a video that only plays if certain conditions are met. More on this below. Does not work alongside `chance` videos.
