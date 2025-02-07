@@ -62,6 +62,15 @@ export default function Tools() {
               sendMessage(`${key} Invalid video property "${vKeys[k]}"`, 'red');
             }
           }
+          // make sure there's a target or a next
+          if (!block.videos[j].next && !block.videos[j].targets) {
+            if (!block.next && !block.targets) {
+              sendMessage(
+                `${key} ${block.videos[j].title} missing target or next`,
+                'red',
+              );
+            }
+          }
           // now check other properties deeper
           // condition will be checked in a different block
           // timing
