@@ -12,6 +12,7 @@ import Settings from './Settings';
 import Browse from './Browse';
 import Game from './Game';
 import LoadSave from './LoadSave';
+import Radio from './Radio';
 import './App.css';
 import Credits from './components/Credits';
 import { useSettingsStore } from '../hooks/useSettingsStore';
@@ -95,9 +96,9 @@ function Title() {
           <button type="button" disabled>
             ???
           </button>
-          <button type="button" disabled>
-            ???
-          </button>
+          <Link to="/radio" tabIndex={-1}>
+            <button type="button">Radio</button>
+          </Link>
           <Link to="/loadsave" tabIndex={-1}>
             <button type="button">Load Save</button>
           </Link>
@@ -224,6 +225,7 @@ export default function App() {
         <Route path="/newgame" element={<Game />} />
         <Route path="/continue" element={<Game continue />} />
         <Route path="/tools" element={<Tools />} />
+        <Route path="/radio" element={<Radio />} />
       </Routes>
     </Router>
   );

@@ -102,7 +102,7 @@ interface impactMusic {
   [key: string]: impactSong;
 }
 
-interface impactSong {
+export interface impactSong {
   title: string;
   path: string;
   volume: number;
