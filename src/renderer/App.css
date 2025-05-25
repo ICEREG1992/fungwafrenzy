@@ -838,3 +838,13 @@ a.purple {
   background-color: #666666ac;
   cursor: pointer;
 }
+
+.NETplayer {
+  margin-top: 32px;
+}
+
+.NETline select {
+  margin-right: 10px;
+  font-size: 16px;
+  font-family: 'Source Code Pro', 'Courier New', 'Courier', monospace;
+}

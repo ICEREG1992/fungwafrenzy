@@ -159,6 +159,8 @@ export default function App() {
         volume_master: 80,
         volume_video: 100,
         volume_music: 100,
+        selected_song: '',
+        play_mode: true,
         debug: false,
       };
       try {

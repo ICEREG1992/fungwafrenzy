@@ -21,6 +21,7 @@ export default function Browse() {
     updateSettings({
       ...settings,
       selected_impact: name,
+      selected_song: '',
     });
   };
 

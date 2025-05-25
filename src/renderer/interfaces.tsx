@@ -15,6 +15,8 @@ export interface userSettings {
   volume_master: number;
   volume_video: number;
   volume_music: number;
+  selected_song: string;
+  play_mode: boolean;
   debug: boolean;
 }
 
@@ -98,7 +100,7 @@ export interface blockFlags {
   [name: string]: string;
 }
 
-interface impactMusic {
+export interface impactMusic {
   [key: string]: impactSong;
 }
 
