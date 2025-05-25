@@ -312,7 +312,7 @@ export function handleSelect(
       }
       return false;
     });
-    return [block, selectedVideo];
+    selectedBlock = block;
   } else {
     if (block.videos[0].condition) {
       // this is now a check of some kind
