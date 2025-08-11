@@ -291,12 +291,13 @@ export function handleSelect(
   block: impactBlock,
   settings: userSettings,
   impact: Impact,
-): [impactBlock, blockVideo] {
+): [impactBlock, blockVideo, string | undefined] {
   let selectedVideo = {
     title: 'Datafault!',
     path: impact.meta.datafault,
   } as blockVideo;
   let selectedBlock = block;
+  let selected = undefined;
   // figure out if this is a chance block or a condition block
   if (block.videos[0].chance) {
     // if it is chance, make one chance calculation and run it against each video until it hits
@@ -339,8 +340,9 @@ export function handleSelect(
       handleFlags(gameState.flags, selectedVideo.flags);
     }
     console.log(selectedVideo);
+    selected = selectedVideo.next;
     // assert this blank block has a next in either video-scope or block-scope
-    [selectedBlock, selectedVideo] = handleSelect(
+    const [newBlock, newVideo, newSelected] = handleSelect(
       gameState,
       impact.blocks[
         (selectedVideo.next as string)
@@ -350,8 +352,13 @@ export function handleSelect(
       settings,
       impact,
     );
+    selectedBlock = newBlock;
+    selectedVideo = newVideo;
+    if (newSelected !== undefined) {
+      selected = newSelected;
+    }
   }
-  return [selectedBlock, selectedVideo];
+  return [selectedBlock, selectedVideo, selected];
 }
 
 function splitCondition(c: string) {

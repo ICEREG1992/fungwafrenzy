@@ -144,7 +144,7 @@ export default function Game(props: GameProps) {
 
       setLocalGameState((prev: gameState) => ({
         ...prev,
-        seen: [imp.meta.start, `${imp.meta.start}_${firstVideo.path}`],
+        seen: [imp.meta.start, `${imp.meta.start} ${firstVideo.path}`],
         block: firstBlock,
         currentVideo: firstVideo,
         playingMusic: initialMusic,
@@ -389,12 +389,14 @@ export default function Game(props: GameProps) {
     gameCurtain.current?.setAttribute('style', 'background-color: black;');
 
     // figure out next video given block and flags
-    const [nextBlock, nextVideo] = handleSelect(
+    const [nextBlock, nextVideo, nextTarget] = handleSelect(
       localGameState,
       localImpact.blocks[target],
       settings,
       localImpact,
     );
+
+    const seenTarget = nextTarget || target;
 
     // if the music changes, fade out audio
     if (
@@ -426,10 +428,9 @@ export default function Game(props: GameProps) {
         gamePlayer.current?.seekTo(0);
       }
       // switch to new video
-      console.log(newFlags);
       setLocalGameState((prev) => ({
         ...prev,
-        seen: [...prev.seen, target, `${target} ${nextVideo.path}`],
+        seen: [...prev.seen, seenTarget, `${seenTarget} ${nextVideo.path}`],
         flags: newFlags,
         block: nextBlock,
         currentVideo: nextVideo,
