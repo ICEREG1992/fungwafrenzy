@@ -5,6 +5,7 @@ import FrenzyNETHeader from './FrenzyNETHeader';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import { Impact, impactMusic, impactSong, NetModalState } from './interfaces';
 import NetModal from './NetModal';
+import MenuRoot from './MenuRoot';
 
 export default function Radio() {
   const { settings, updateSettings } = useSettingsStore();
@@ -63,7 +64,7 @@ export default function Radio() {
   }, [localImpactMusic, settings]);
 
   return (
-    <div className="menuroot">
+    <MenuRoot background={settings.background}>
       <FrenzyNETHeader nav page="radio" />
       <div id="body">
         <div className="NETcontainer">
@@ -114,7 +115,7 @@ export default function Radio() {
           </div>
         </div>
       </div>
-    </div>
+    </MenuRoot>
   );
 }
 

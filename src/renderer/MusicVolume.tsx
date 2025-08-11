@@ -23,7 +23,6 @@ export default function UseMusicVolume(props: MusicVolumeProps): number {
     fadeTimer.current = setInterval(() => {
       currentStep++;
       const newVolume = startVolume + volumeStep * currentStep;
-      console.log(`volume set: ${newVolume}`);
       setVolume(newVolume); // Update audio volume
 
       if (currentStep >= steps) {

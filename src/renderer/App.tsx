@@ -20,6 +20,7 @@ import Tools from './Tools';
 import SaveModal from './SaveModal';
 import MenuModal from './MenuModal';
 import { ModalState, SaveGame, userSettings } from './interfaces';
+import MenuRoot from './MenuRoot';
 
 function Title() {
   const navigate = useNavigate();
@@ -86,7 +87,7 @@ function Title() {
   };
 
   return (
-    <div className="menuroot">
+    <MenuRoot background={settings.background}>
       <FrenzyNETHeader page="mainmenu" />
       <div id="body">
         <div id="grid">
@@ -131,7 +132,7 @@ function Title() {
           navigate('/continue');
         }}
       ></MenuModal>
-    </div>
+    </MenuRoot>
   );
 }
 
@@ -162,6 +163,7 @@ export default function App() {
         selected_song: '',
         play_mode: true,
         debug: false,
+        background: 'bali-dusk.gif',
       };
       try {
         const res: userSettings =

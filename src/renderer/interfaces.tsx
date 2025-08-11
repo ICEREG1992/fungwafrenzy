@@ -6,6 +6,7 @@ export interface userSettings {
   save_folder_path: string;
   skip_button: boolean;
   skip_timer: number;
+  background: string;
   username: string;
   class: string;
   location: string;

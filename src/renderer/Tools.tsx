@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import FrenzyNETHeader from './FrenzyNETHeader';
 import { Impact } from './interfaces';
+import MenuRoot from './MenuRoot';
 
 export default function Tools() {
   const { settings, updateSettings } = useSettingsStore();
@@ -288,7 +289,7 @@ export default function Tools() {
   };
 
   return (
-    <div className="menuroot">
+    <MenuRoot background={settings.background}>
       <FrenzyNETHeader nav page="tools" />
       <div id="body">
         <div className="NETcontainer">
@@ -315,7 +316,7 @@ export default function Tools() {
           </div>
         </div>
       </div>
-    </div>
+    </MenuRoot>
   );
 }
 

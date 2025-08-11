@@ -135,6 +135,9 @@ export default function NetModal(props: NetModalProps) {
         case 'player_theme':
           dropdown = themeDropdown;
           break;
+        case 'background':
+          dropdown = backgroundDropdown;
+          break;
         default:
           dropdown = defaultDropdown;
           break;
@@ -196,6 +199,16 @@ interface dropdownOption {
 }
 
 const defaultDropdown: dropdownOption[] = [{ value: 'NONE', label: 'NONE' }];
+
+const backgroundDropdown: dropdownOption[] = [
+  { value: 'bali-dusk', label: 'Bali Dusk' },
+  { value: 'la-auto', label: 'LA Auto' },
+  { value: 'la-day', label: 'LA Day' },
+  { value: 'la-noon', label: 'LA Noon' },
+  { value: 'la-afternoon', label: 'LA Afternoon' },
+  { value: 'la-dusk', label: 'LA Dusk' },
+  { value: 'la-night', label: 'LA Night' },
+];
 
 const themeDropdown: dropdownOption[] = [
   { value: 'classic', label: 'classic' },

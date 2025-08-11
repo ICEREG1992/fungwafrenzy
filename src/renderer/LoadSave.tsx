@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import FrenzyNETHeader from './FrenzyNETHeader';
 import { gameState, SaveGame } from './interfaces';
+import MenuRoot from './MenuRoot';
 
 export default function LoadSave() {
   const { settings, updateSettings } = useSettingsStore();
@@ -35,7 +36,7 @@ export default function LoadSave() {
   }, []);
 
   return (
-    <div className="menuroot">
+    <MenuRoot background={settings.background}>
       <FrenzyNETHeader nav page="load save" />
       <div id="body">
         <div className="NETcontainer center">
@@ -45,7 +46,7 @@ export default function LoadSave() {
           </a>
         </div>
       </div>
-    </div>
+    </MenuRoot>
   );
 }
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import FrenzyNETHeader from './FrenzyNETHeader';
 import { userSettings } from './interfaces';
 import { useSettingsStore } from '../hooks/useSettingsStore';
+import MenuRoot from './MenuRoot';
 
 interface Impact {
   key: string;
@@ -39,7 +40,7 @@ export default function Browse() {
   }, []);
 
   return (
-    <div className="menuroot">
+    <MenuRoot background={settings.background}>
       <FrenzyNETHeader nav page="browse impacts" />
       <div id="body">
         <div className="NETcontainer center">
@@ -49,7 +50,7 @@ export default function Browse() {
           </a>
         </div>
       </div>
-    </div>
+    </MenuRoot>
   );
 }
 

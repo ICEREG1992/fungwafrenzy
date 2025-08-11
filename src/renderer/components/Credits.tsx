@@ -1,8 +1,11 @@
 import FrenzyNETHeader from '../FrenzyNETHeader';
+import { useSettingsStore } from '../../hooks/useSettingsStore';
+import MenuRoot from '../MenuRoot';
 
 export default function Credits() {
+  const { settings, updateSettings } = useSettingsStore();
   return (
-    <div className="menuroot">
+    <MenuRoot background={settings.background}>
       <FrenzyNETHeader nav page="credits" />
       <div id="body">
         <div className="NETcontainer">
@@ -61,6 +64,6 @@ export default function Credits() {
           </div>
         </div>
       </div>
-    </div>
+    </MenuRoot>
   );
 }

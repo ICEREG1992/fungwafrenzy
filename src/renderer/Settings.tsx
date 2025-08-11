@@ -4,6 +4,7 @@ import FrenzyNETHeader from './FrenzyNETHeader';
 import { NetModalState } from './interfaces';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import NetModal from './NetModal';
+import MenuRoot from './MenuRoot';
 
 export default function Settings() {
   const { settings, updateSettings } = useSettingsStore();
@@ -66,7 +67,7 @@ export default function Settings() {
 
   console.log(settings);
   return (
-    <div className="menuroot">
+    <MenuRoot background={settings.background}>
       <FrenzyNETHeader nav page="settings" />
       <div id="body">
         <div className="NETcontainer">
@@ -145,8 +146,26 @@ export default function Settings() {
               </a>
             </div>
           </div>
-          <div className="NETheader">USER SETTINGS</div>
+          <div className="NETheader">UI SETTINGS</div>
           <div className="NETbody">
+            <div className="NETline">
+              <b>background:</b>{' '}
+              {settings.background ? settings.background : 'DEFAULT'}{' '}
+              <a
+                onClick={() =>
+                  setLocalModalState({
+                    title: 'Change Background',
+                    desc: 'Change the FrenzyNET background GIF.',
+                    input: 'dropdown',
+                    button: '✓ CHANGE BACKGROUND',
+                    value: 'background',
+                    visible: true,
+                  })
+                }
+              >
+                &lt;CHANGE&gt;
+              </a>
+            </div>
             <div className="NETline">
               <b>username:</b> {settings.username ? settings.username : 'NONE'}{' '}
               <a
@@ -201,10 +220,6 @@ export default function Settings() {
           </div>
           <div className="NETheader">VIDEO SETTINGS</div>
           <div className="NETbody">
-            <div className="NETline">
-              <b>resolution:</b> {settings.resolution_x}x{settings.resolution_y}{' '}
-              <a>&lt;CHANGE&gt;</a>
-            </div>
             <div className="NETline">
               <b>fullscreen:</b> {settings.fullscreen ? 'ENABLED' : 'DISABLED'}{' '}
               <a
@@ -277,6 +292,6 @@ export default function Settings() {
         modalState={localModalState}
         setter={setLocalModalState}
       ></NetModal>
-    </div>
+    </MenuRoot>
   );
 }
