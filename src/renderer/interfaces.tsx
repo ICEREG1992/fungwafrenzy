@@ -28,6 +28,11 @@ export interface Impact {
   music: impactMusic;
 }
 
+export interface ImpactPreview {
+  key: string;
+  image: string;
+}
+
 interface impactInfo {
   game: string;
   title: string;

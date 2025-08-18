@@ -4,7 +4,6 @@ import ReactPlayer from 'react-player';
 import FrenzyNETHeader from './FrenzyNETHeader';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import { Impact, impactMusic, impactSong, NetModalState } from './interfaces';
-import NetModal from './NetModal';
 import MenuRoot from './MenuRoot';
 
 export default function Radio() {
