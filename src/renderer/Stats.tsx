@@ -69,7 +69,7 @@ interface ImpactStatsProps {
 
 function ImpactStats(props: ImpactStatsProps) {
   return (
-    <div>
+    <div key={props.impact.info.title.toLowerCase()}>
       <div className="NETheader">{props.impact.info.title.toUpperCase()}</div>
       <div className="NETbody">
         <div className="NETline">

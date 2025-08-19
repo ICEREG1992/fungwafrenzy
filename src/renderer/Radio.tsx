@@ -72,7 +72,7 @@ export default function Radio() {
             <div className="NETline">
               <b>selected_impact:</b>{' '}
               {settings.selected_impact ? settings.selected_impact : 'NONE'}{' '}
-              <Link to="/browse" tabIndex={-1}>
+              <Link to="/browse" state={{ prevPage: 'radio' }} tabIndex={-1}>
                 <a>&lt;CHANGE&gt;</a>
               </Link>
             </div>

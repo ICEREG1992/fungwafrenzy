@@ -171,7 +171,8 @@ header #titlebar {
 #mainbutton {
   font-family: 'Source Code Pro', 'Courier New', 'Courier', monospace;
   font-size: 16px;
-  width: 96px;
+  width: max-content;
+  min-width: 96px;
   height: 50px;
 }
 

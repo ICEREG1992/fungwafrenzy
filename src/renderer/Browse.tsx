@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import FrenzyNETHeader from './FrenzyNETHeader';
 import { Impact, ImpactPreview, userSettings } from './interfaces';
 import { useSettingsStore } from '../hooks/useSettingsStore';
@@ -21,6 +22,9 @@ export default function Browse() {
     });
   };
 
+  const location = useLocation();
+  const prevPage = location.state?.prevPage;
+
   const [impacts, setImpacts] = useState<Array<ImpactPreview>>([]);
   useEffect(() => {
     window.electron.ipcRenderer
@@ -36,7 +40,7 @@ export default function Browse() {
 
   return (
     <MenuRoot background={settings.background}>
-      <FrenzyNETHeader nav page="browse impacts" />
+      <FrenzyNETHeader nav page="browse impacts" prevPage={prevPage} />
       <div id="body">
         <div className="NETcontainer center">
           <Impacts impacts={impacts} selectImpact={selectImpact}></Impacts>
@@ -59,7 +63,10 @@ function Impacts(props: ImpactsProps) {
   if (props.impacts.length) {
     props.impacts.forEach((e: ImpactPreview) => {
       arr.push(
-        <a onClick={(event) => selectImpact(event, e.key, props.selectImpact)}>
+        <a
+          key={e.key}
+          onClick={(event) => selectImpact(event, e.key, props.selectImpact)}
+        >
           <div className="NETimpact">
             {e.image ? (
               <img src={e.image}></img>
