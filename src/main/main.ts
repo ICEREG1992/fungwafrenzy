@@ -209,12 +209,18 @@ const ensureAppDataDir = () => {
     'fungwafrenzy',
     'impacts',
   );
-  const savesPath = path.join(app.getPath('appData'), 'fungwafrenzy', 'saves');
   if (!fs.existsSync(appDataPath)) {
     fs.mkdirSync(appDataPath, { recursive: true });
   }
+
+  const savesPath = path.join(app.getPath('appData'), 'fungwafrenzy', 'saves');
   if (!fs.existsSync(savesPath)) {
     fs.mkdirSync(savesPath, { recursive: true });
+  }
+
+  const statsPath = path.join(app.getPath('appData'), 'fungwafrenzy', 'stats');
+  if (!fs.existsSync(statsPath)) {
+    fs.mkdirSync(statsPath, { recursive: true });
   }
 };
 
