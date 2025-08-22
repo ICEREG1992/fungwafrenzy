@@ -37,8 +37,10 @@ interface impactInfo {
   game: string;
   title: string;
   subtitle: string;
+  shortname: string;
   description: string;
   length: string;
+  videos?: number;
   author: string;
 }
 

@@ -288,6 +288,15 @@ export default function Tools() {
     });
   };
 
+  const resetStats = async () => {
+    await window.electron.ipcRenderer.invoke(
+      'post-stats',
+      settings.selected_impact,
+      -1,
+      '',
+    );
+  };
+
   return (
     <MenuRoot background={settings.background}>
       <FrenzyNETHeader nav page="tools" />
@@ -312,6 +321,22 @@ export default function Tools() {
               <ValidationOutput
                 messages={localValidationOutput}
               ></ValidationOutput>
+            </div>
+          </div>
+          <div className="NETheader">RESET STATS</div>
+          <div className="NETbody">
+            <div className="NETline">
+              <b>selected_impact:</b>{' '}
+              {settings.selected_impact ? settings.selected_impact : 'NONE'}{' '}
+              <Link to="/browse" state={{ prevPage: 'tools' }} tabIndex={-1}>
+                <a>&lt;CHANGE&gt;</a>
+              </Link>
+            </div>
+            <div className="NETline">
+              <b>reset_stats:</b>{' '}
+              <a onClick={resetStats} tabIndex={-1}>
+                &lt;RUN&gt;
+              </a>
             </div>
           </div>
         </div>

@@ -101,21 +101,54 @@ ipcMain.handle('save-savedata', (e, s: SaveGame, p: string) => {
   }
 });
 
+ipcMain.handle('post-stats', (e, i: string, time: number, s: string) => {
+  const statsDir = path.join(app.getPath('appData'), 'fungwafrenzy', 'stats');
+  const filePath = path.join(statsDir, `${i}.json`);
+
+  try {
+    let stats = { time: 0, seen: [] as string[] };
+
+    if (time !== -1 && fs.existsSync(filePath)) {
+      stats = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+      stats.time += time;
+      if (!stats.seen.includes(s)) stats.seen.push(s);
+    }
+    
+    fs.writeFileSync(filePath, JSON.stringify(stats, null, 2), 'utf-8');
+    console.log(`Stats saved for ${i}`);
+  } catch (err) {
+    console.error(`Failed to save stats for ${i}:`, err);
+  }
+});
+
+ipcMain.handle('get-stats', (e, i: string) => {
+  const statsDir = path.join(app.getPath('appData'), 'fungwafrenzy', 'stats');
+  const filePath = path.join(statsDir, `${i}.json`);
+
+  try {
+    const stats = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    return stats;
+  } catch (err) {
+    console.error(`Failed to load stats for ${i}:`, err);
+    return { time: 0, seen: [] as string[] };
+  }
+});
+
 ipcMain.handle('load-usersettings', () => {
-  const settingsFile = fs
-    .readdirSync(path.join(app.getPath('appData'), 'fungwafrenzy'))
-    .filter((file) => /^settings\.json/.test(file));
-  if (settingsFile.length) {
-    const userSettings = fs.readFileSync(
-      path.join(app.getPath('appData'), 'fungwafrenzy', 'settings.json'),
-      'utf-8',
-    );
-    const json = JSON.parse(userSettings);
-    return json;
-  } else {
+  const filePath = path.join(app.getPath('appData'), 'fungwafrenzy', 'settings.json');
+
+  if (!fs.existsSync(filePath)) return null;
+
+  try {
+    const data = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.error('Failed to load user settings:', err);
     return null;
   }
 });
+
 
 ipcMain.handle('get-impacts', (e, p: string) => {
   const impactFolders = fs.readdirSync(p);
