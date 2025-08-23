@@ -178,7 +178,7 @@ export default function Settings() {
               </a>
             </div>
           </div>
-          <div className="NETheader">GAME SETTINGS</div>
+          <div className="NETheader">USER SETTINGS</div>
           <div className="NETbody">
             <div className="NETline">
               <b>username:</b> {settings.username ? settings.username : 'NONE'}{' '}
