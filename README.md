@@ -1,6 +1,8 @@
 # fungwafrenzy
 Modern Offline Client for Indie FMV Hit "Fung-Wa Frenzy"
 
+![main menu screenshot](image.png)
+
 # installation
 1. download the installer from the "Releases" tab on the right.
 2. for Windows, run the installer and the game will open automatically.
