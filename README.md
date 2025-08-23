@@ -144,7 +144,7 @@ The base condition block looks like this:
 ```
 `type` here can be many things. here is a list of supported conditions and what they do, as well as what to provide for their `value`:
 - `SEEN`: returns whether a user has seen a particular block (by key). you can check if a user has seen a particular video variant by also including the video's path after the block's key (i.e. "0201 0201.mp4")
-- `TIME`: returns whether a user loaded that video within a particular hour (UTC 24hour time). use integer comparison symbols (==, >=, <=, >, <).
+- `TIME`: returns whether a user loaded that video within a particular hour (UTC 24hour time). use integer comparison symbols (==, >=, <=, >, <) followed by an integer number 0-23.
 - `STATE`: returns whether a user is in a certain U.S. state, as determined by their location setting for the game. use two-character state abbreviations.
 - `[flag name]`: allows you to compare a flag to an integer, or to another flag. use integer comparison symbols, or if the flag is a boolean, use "true" and "false".
 - `AND`: returns whether multiple conditions are true at once. expects an array of conditions as its value.
