@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import FrenzyNETHeader from './FrenzyNETHeader';
-import { ImpactPreview, Impact } from './interfaces';
+import { ImpactPreview, Impact, ImpactStats } from './interfaces';
 import MenuRoot from './MenuRoot';
 
 export default function Stats() {
@@ -67,14 +67,13 @@ interface ImpactStatsProps {
   impact: Impact;
 }
 
-interface ImpactStats {
-  time: number;
-  seen: String[];
-}
-
 function ImpactStatsView(props: ImpactStatsProps) {
   const { settings, updateSettings } = useSettingsStore();
-  const [stats, setStats] = useState<ImpactStats>({ time: 0, seen: [] });
+  const [stats, setStats] = useState<ImpactStats>({
+    time: 0,
+    seen: [],
+    achievements: [],
+  });
 
   useEffect(() => {
     const loadStats = async () => {
@@ -86,7 +85,7 @@ function ImpactStatsView(props: ImpactStatsProps) {
         setStats(res);
       } catch (err) {
         console.log('Failed to load stats', err);
-        setStats({ time: 0, seen: [] }); // Reset stats on error
+        setStats({ time: 0, seen: [], achievements: [] }); // Reset stats on error
       }
     };
     loadStats();
@@ -97,25 +96,30 @@ function ImpactStatsView(props: ImpactStatsProps) {
   return (
     <div key={props.impact.info.title.toLowerCase()}>
       <div className="NETheader">{props.impact.info.title.toUpperCase()}</div>
-      <div className="NETbody">
-        <div className="NETline">
-          <b>progress:</b>
+      <div className="NETstats">
+        <div className="NETprogress">
+          <div className="NETline">
+            <b>progress:</b>
+          </div>
+          <div className="NETline">
+            <b>&nbsp;&nbsp;space:</b>
+          </div>
+          <div className="NETline" title={`${stats.seen.length} videos seen`}>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            {getProgress(props.impact, stats.seen, settings.canonical)
+              .toFixed(4)
+              .replace(/\.?0+$/, '')}{' '}
+            %
+          </div>
+          <div className="NETline">
+            <b>&nbsp;&nbsp;time:</b>
+          </div>
+          <div className="NETline">
+            &nbsp;&nbsp;&nbsp;&nbsp;{secondsToText(stats.time)}
+          </div>
         </div>
-        <div className="NETline">
-          <b>&nbsp;&nbsp;space:</b>
-        </div>
-        <div className="NETline">
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          {getProgress(props.impact, stats.seen, settings.canonical)
-            .toFixed(4)
-            .replace(/\.?0+$/, '')}{' '}
-          %
-        </div>
-        <div className="NETline">
-          <b>&nbsp;&nbsp;time:</b>
-        </div>
-        <div className="NETline">
-          &nbsp;&nbsp;&nbsp;&nbsp;{secondsToText(stats.time)}
+        <div className="NETachievements">
+          <Achievements stats={stats} impact={props.impact} />
         </div>
       </div>
     </div>
@@ -160,4 +164,31 @@ function getProgress(
     // Return the percentage of seen videos
     return (seen.length / videos) * 100;
   }
+}
+
+interface AchievementsProps {
+  stats: ImpactStats;
+  impact: Impact;
+}
+
+function Achievements(props: AchievementsProps) {
+  const arr: Array<React.JSX.Element> = [];
+  if (props.impact.meta.achievements) {
+    props.impact.meta.achievements.forEach((achievement) => {
+      const achieved = props.stats.achievements.includes(achievement.title);
+      arr.push(
+        <div
+          key={`achievement-${achievement.title}`}
+          className="NETline"
+          style={{ color: achieved ? 'lime' : 'gray' }}
+          title={achievement.desc}
+        >
+          {achievement.title}
+        </div>,
+      );
+    });
+  } else {
+    return null;
+  }
+  return arr;
 }

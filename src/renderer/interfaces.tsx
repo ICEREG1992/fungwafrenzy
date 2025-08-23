@@ -52,6 +52,13 @@ interface impactMeta {
   datafault?: string;
   diskfault?: string;
   color?: string;
+  achievements?: achievement[];
+}
+
+interface achievement {
+  title: string;
+  desc: string;
+  condition: blockCondition;
 }
 
 interface metaFlags {
@@ -152,4 +159,10 @@ export interface SaveGame {
   date: Date;
   impact: string;
   gameState: gameState;
+}
+
+export interface ImpactStats {
+  time: number;
+  seen: String[];
+  achievements: String[];
 }

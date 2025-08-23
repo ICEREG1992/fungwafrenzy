@@ -19,7 +19,11 @@ import {
   ModalState,
 } from './interfaces';
 import { fadeAudio } from './util/util';
-import { handleFlags, handleSelect } from '../lib/GameLogic';
+import {
+  handleAchievements,
+  handleFlags,
+  handleSelect,
+} from '../lib/GameLogic';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import SaveModal from './SaveModal';
 import PopupMenu from './PopupMenu';
@@ -337,7 +341,22 @@ export default function Game(props: GameProps) {
       settings.selected_impact,
       gamePlayer.current?.getCurrentTime() || 0,
       `${target.target} ${nextVideo.path}`,
+      '',
     );
+
+    // IIFE nonsense for achievements
+    (async () => {
+      try {
+        const res = await window.electron.ipcRenderer.invoke(
+          'get-stats',
+          localImpact.info.shortname,
+        );
+
+        handleAchievements(localGameState, localImpact, res || []);
+      } catch (err) {
+        console.error('Failed to get stats for achievements:', err);
+      }
+    })();
 
     // if the music changes, fade out audio
     if (
@@ -422,7 +441,22 @@ export default function Game(props: GameProps) {
       settings.selected_impact,
       gamePlayer.current?.getCurrentTime() || 0,
       `${seenTarget} ${nextVideo.path}`,
+      '',
     );
+
+    // IIFE nonsense for achievements
+    (async () => {
+      try {
+        const res = await window.electron.ipcRenderer.invoke(
+          'get-stats',
+          localImpact.info.shortname,
+        );
+
+        handleAchievements(localGameState, localImpact, res || []);
+      } catch (err) {
+        console.error('Failed to get stats for achievements:', err);
+      }
+    })();
 
     // if the music changes, fade out audio
     if (

@@ -3,15 +3,26 @@
 		"game": "Fung-Wa Frenzy",
 		"title": "Test Impact",
 		"subtitle": "Fung-Wa Frenzy Test File",
+		"shortname": "Impact -1",
 		"description": "Test file that showcases branching, flags, and conditions",
 		"length": "3 minutes",
+		"videos": 10,
 		"author": "ICEREG1992"
 	},
 	"meta": {
 		"flags": {
 			"flag": "bool"
 		},
-		"start": "0101"
+		"start": "0101",
+		"color": "red",
+		"achievements": [{
+			"title": "Got the Key",
+			"desc": "Get the secret key from the Dark Blue video.",
+			"condition": {
+				"type": "flag",
+				"value": "true"
+			}
+		}]
 	},
 	"blocks": {
 		"0101": {
@@ -42,7 +53,7 @@
 			"title": "Red scene",
 			"videos": [{
 				"path": "0201.mp4",
-				"title": "Red scene"
+				"title": "Red scene",
 				"music": "01"
 			}],
 			"next": "0401"
@@ -87,7 +98,7 @@
 			"title": "Dark Blue scene",
 			"videos": [{
 				"path": "0301.mp4",
-				"title": "Dark Blue scene"
+				"title": "Dark Blue scene",
 				"music": "02"
 			}],
 			"flags": {
@@ -137,7 +148,7 @@
 				"condition": {
 					"type": "flag",
 					"value": "false"
-				}
+				},
 				"music": "03"
 			},{
 				"path": "0501b.mp4",
@@ -145,7 +156,7 @@
 				"condition": {
 					"type": "flag",
 					"value": "true"
-				}
+				},
 				"music": "03"
 			}],
 			"next": "0601"

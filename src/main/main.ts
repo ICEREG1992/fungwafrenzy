@@ -101,18 +101,19 @@ ipcMain.handle('save-savedata', (e, s: SaveGame, p: string) => {
   }
 });
 
-ipcMain.handle('post-stats', (e, i: string, time: number, s: string) => {
+ipcMain.handle('post-stats', (e, i: string, time: number, s?: string, a?: string) => {
   const statsDir = path.join(app.getPath('appData'), 'fungwafrenzy', 'stats');
   const filePath = path.join(statsDir, `${i}.json`);
 
   try {
-    let stats = { time: 0, seen: [] as string[] };
+    let stats = { time: 0, seen: [] as string[], achievements: [] as string[] };
 
     if (time !== -1 && fs.existsSync(filePath)) {
       stats = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 
       stats.time += time;
-      if (!stats.seen.includes(s)) stats.seen.push(s);
+      if (s && !stats.seen.includes(s)) stats.seen.push(s);
+      if (a && !stats.achievements.includes(a)) stats.achievements.push(a);
     }
     
     fs.writeFileSync(filePath, JSON.stringify(stats, null, 2), 'utf-8');
@@ -131,7 +132,7 @@ ipcMain.handle('get-stats', (e, i: string) => {
     return stats;
   }
 
-  return { time: 0, seen: [] as string[] };
+  return { time: 0, seen: [] as string[], achievements: [] as string[] };
 });
 
 ipcMain.handle('load-usersettings', () => {
