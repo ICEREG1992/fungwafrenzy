@@ -29,12 +29,13 @@ Impacts begin with an `impact.json` file. It is designed to be easy to be create
 4. music
 
 ## Info
-The info section holds basic information about what the impact is. It expects only 3 values, but there are more optional values which you can add.
+The info section holds basic information about what the impact is. It expects only 4 values, but there are more optional values which you can add. Make sure that "shortname" is named the same as the folder your impact is shipped in, or Stats will not be written correctly.
 ```json
 "info": {
     "game": "Game Name", // required
     "title": "Impact Title", // required
     "subtitle": "Impact Subtitle", // required
+    "shortname": "Folder Name", // required
     "description": "",
     "length": "",
     "author": "",
@@ -54,7 +55,15 @@ The meta section contains important information about how your impact should run
     "chapters": [],
     "datafault": "",
     "diskfault": "",
-    "color": ""
+    "color": "",
+    "achievements": [{
+        "title": "Achievement Name",
+        "desc": "Achievement Description",
+        "condition": {
+            "type": "SEEN",
+            "value": "0101"
+        }
+    }]
 }
 ```
 ### Flags
@@ -67,6 +76,8 @@ While Debug Mode is enabled, you have access to a Debug Pane which allows you to
 When something goes wrong, the datafault and diskfault videos are fallback videos which occur so the player knows something has gone wrong, and the program can fail safely. Specify the paths for those videos here.
 ### Color
 Determine the UI color for your impact here. Does not apply to the fullscreen theme. Available colors are "blue", "green", and "red".
+### Achievements
+Achievements is an array of achievements, which are displayed on the Stats page. Achievement conditions are checked after every video.
 
 ## Blocks
 The blocks section is the main data for your impact. It defines logical blocks of videos that the player will move between. This allows for video variants based on chance, or the player's flags for that playthrough.
