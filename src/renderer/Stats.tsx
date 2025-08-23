@@ -178,7 +178,7 @@ function Achievements(props: AchievementsProps) {
       const achieved = props.stats.achievements.includes(achievement.title);
       arr.push(
         <div
-          key={`achievement-${achievement.title}`}
+          key={achievement.title}
           className="NETline"
           style={{
             color: achieved ? 'lime' : 'gray',
