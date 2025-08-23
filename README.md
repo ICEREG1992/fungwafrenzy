@@ -38,6 +38,7 @@ The info section holds basic information about what the impact is. It expects on
     "shortname": "Folder Name", // required
     "description": "",
     "length": "",
+    "videos": 0,
     "author": "",
     "version": ""
 }
