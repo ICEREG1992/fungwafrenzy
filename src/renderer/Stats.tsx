@@ -193,5 +193,5 @@ function Achievements(props: AchievementsProps) {
   } else {
     return null;
   }
-  return arr;
+  return arr.sort((a, b) => a.key!.localeCompare(b.key!));
 }
