@@ -164,6 +164,7 @@ export default function App() {
         selected_song: '',
         play_mode: true,
         debug: false,
+        canonical: true,
         background: 'bali-dusk.gif',
       };
       try {

@@ -27,6 +27,8 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     skip_timer: 3,
     selected_song: '',
     play_mode: true,
+    canonical: true,
+    background: 'bali-dusk.gif',
     debug: false,
   },
   setSettings: (settings) => set({ settings }),

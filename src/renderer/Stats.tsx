@@ -73,6 +73,7 @@ interface ImpactStats {
 }
 
 function ImpactStatsView(props: ImpactStatsProps) {
+  const { settings, updateSettings } = useSettingsStore();
   const [stats, setStats] = useState<ImpactStats>({ time: 0, seen: [] });
 
   useEffect(() => {
@@ -105,7 +106,7 @@ function ImpactStatsView(props: ImpactStatsProps) {
         </div>
         <div className="NETline">
           &nbsp;&nbsp;&nbsp;&nbsp;
-          {getProgress(props.impact, stats.seen)
+          {getProgress(props.impact, stats.seen, settings.canonical)
             .toFixed(4)
             .replace(/\.?0+$/, '')}{' '}
           %
@@ -136,8 +137,12 @@ function secondsToText(seconds: number): string {
   }
 }
 
-function getProgress(impact: Impact, seen: String[]): number {
-  if (impact.info.videos) {
+function getProgress(
+  impact: Impact,
+  seen: String[],
+  canonical: boolean,
+): number {
+  if (impact.info.videos && canonical) {
     return (seen.length / impact.info.videos) * 100;
   } else {
     // calculate based on number of videos in each block that has a path

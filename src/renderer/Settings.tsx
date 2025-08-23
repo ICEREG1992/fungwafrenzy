@@ -167,6 +167,20 @@ export default function Settings() {
               </a>
             </div>
             <div className="NETline">
+              <b>use_canonical_stats:</b>{' '}
+              {settings.canonical ? 'ENABLED' : 'DISABLED'}{' '}
+              <a
+                onClick={() => {
+                  changeSetting('canonical', !settings.canonical);
+                }}
+              >
+                &lt;CHANGE&gt;
+              </a>
+            </div>
+          </div>
+          <div className="NETheader">GAME SETTINGS</div>
+          <div className="NETbody">
+            <div className="NETline">
               <b>username:</b> {settings.username ? settings.username : 'NONE'}{' '}
               <a
                 onClick={() =>

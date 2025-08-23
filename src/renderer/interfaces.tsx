@@ -18,6 +18,7 @@ export interface userSettings {
   volume_music: number;
   selected_song: string;
   play_mode: boolean;
+  canonical: boolean;
   debug: boolean;
 }
 
