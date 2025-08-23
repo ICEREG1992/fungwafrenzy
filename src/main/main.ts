@@ -126,13 +126,12 @@ ipcMain.handle('get-stats', (e, i: string) => {
   const statsDir = path.join(app.getPath('appData'), 'fungwafrenzy', 'stats');
   const filePath = path.join(statsDir, `${i}.json`);
 
-  try {
+  if (fs.existsSync(filePath)) {
     const stats = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     return stats;
-  } catch (err) {
-    console.error(`Failed to load stats for ${i}:`, err);
-    return { time: 0, seen: [] as string[] };
   }
+
+  return { time: 0, seen: [] as string[] };
 });
 
 ipcMain.handle('load-usersettings', () => {
@@ -417,7 +416,7 @@ app
               fileStream.on('error', (err) => reject(err));
             });
 
-            return new Response(fileChunk, {
+            return new Response(new Uint8Array(fileChunk), {
               status: 206,
               headers: {
                 'Content-Range': `bytes ${start}-${end}/${fileSize}`,
@@ -430,7 +429,7 @@ app
             // Serve the whole file
             const fileBuffer = fs.readFileSync(filePath);
 
-            return new Response(fileBuffer, {
+            return new Response(new Uint8Array(fileBuffer), {
               headers: {
                 'Content-Length': fileSize.toString(),
                 'Content-Type': contentType,
