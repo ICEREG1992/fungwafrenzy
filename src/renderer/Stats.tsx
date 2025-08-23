@@ -180,7 +180,10 @@ function Achievements(props: AchievementsProps) {
         <div
           key={`achievement-${achievement.title}`}
           className="NETline"
-          style={{ color: achieved ? 'lime' : 'gray' }}
+          style={{
+            color: achieved ? 'lime' : 'gray',
+            textShadow: achieved ? '0 0 5px lime' : 'none',
+          }}
           title={achievement.desc}
         >
           {achievement.title}
