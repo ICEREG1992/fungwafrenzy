@@ -364,7 +364,11 @@ input[type='range'] {
 }
 
 .NETprogress {
-  width: 180px;
+  width: 150px;
+}
+
+.NETprogress>.NETline {
+  width: max-content;
 }
 
 .NETachievements {
@@ -373,7 +377,7 @@ input[type='range'] {
   align-content: start;
   gap: 0px;
   width: 100%;
-  margin-left: 77px;
+  margin-left: 70px;
 }
 
 .NETachievements>div {
