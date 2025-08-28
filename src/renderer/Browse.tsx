@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import FrenzyNETHeader from './FrenzyNETHeader';
-import { userSettings } from './interfaces';
+import { Impact, ImpactPreview, userSettings } from './interfaces';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import MenuRoot from './MenuRoot';
-
-interface Impact {
-  key: string;
-  image: string;
-}
 
 export default function Browse() {
   const { settings, updateSettings } = useSettingsStore();
@@ -26,7 +22,10 @@ export default function Browse() {
     });
   };
 
-  const [impacts, setImpacts] = useState<Array<Impact>>([]);
+  const location = useLocation();
+  const prevPage = location.state?.prevPage;
+
+  const [impacts, setImpacts] = useState<Array<ImpactPreview>>([]);
   useEffect(() => {
     window.electron.ipcRenderer
       .invoke('get-impacts', settings.impact_folder_path)
@@ -41,7 +40,7 @@ export default function Browse() {
 
   return (
     <MenuRoot background={settings.background}>
-      <FrenzyNETHeader nav page="browse impacts" />
+      <FrenzyNETHeader nav page="browse impacts" prevPage={prevPage} />
       <div id="body">
         <div className="NETcontainer center">
           <Impacts impacts={impacts} selectImpact={selectImpact}></Impacts>
@@ -55,16 +54,19 @@ export default function Browse() {
 }
 
 interface ImpactsProps {
-  impacts: Array<Impact>;
+  impacts: Array<ImpactPreview>;
   selectImpact: (name: string) => void;
 }
 
 function Impacts(props: ImpactsProps) {
   const arr: Array<React.JSX.Element> = [];
   if (props.impacts.length) {
-    props.impacts.forEach((e: Impact) => {
+    props.impacts.forEach((e: ImpactPreview) => {
       arr.push(
-        <a onClick={(event) => selectImpact(event, e.key, props.selectImpact)}>
+        <a
+          key={e.key}
+          onClick={(event) => selectImpact(event, e.key, props.selectImpact)}
+        >
           <div className="NETimpact">
             {e.image ? (
               <img src={e.image}></img>

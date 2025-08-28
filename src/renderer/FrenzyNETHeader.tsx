@@ -9,6 +9,7 @@ function closeApp() {
 interface FrenzyNETHeaderProps {
   nav?: boolean;
   page: string;
+  prevPage?: string;
 }
 
 function shuffle(arr: Array<String>) {
@@ -85,21 +86,30 @@ export default function FrenzyNETHeader(props: FrenzyNETHeaderProps) {
       <Marquee speed={25}>
         <HeaderTicker text={tickerText}></HeaderTicker>
       </Marquee>
-      {props.nav ? <HeaderNavigation page={props.page} /> : null}
+      {props.nav ? (
+        <HeaderNavigation page={props.page} prevPage={props.prevPage} />
+      ) : null}
     </header>
   );
 }
 
 interface HeaderNavigationProps {
   page: string;
+  prevPage?: string;
 }
 function HeaderNavigation(props: HeaderNavigationProps) {
   return (
     <div id="navigation">
       <div id="navbox">
-        <Link to="/">
-          <button id="mainbutton">&lt; MAIN</button>
-        </Link>
+        {props.prevPage ? (
+          <Link to={`/${props.prevPage}`}>
+            <button id="mainbutton">&lt; {props.prevPage.toUpperCase()}</button>
+          </Link>
+        ) : (
+          <Link to="/">
+            <button id="mainbutton">&lt; MAIN</button>
+          </Link>
+        )}
         <div id="location">You are in {props.page.toUpperCase()}</div>
       </div>
     </div>

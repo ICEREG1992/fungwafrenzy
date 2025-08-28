@@ -76,7 +76,7 @@ export default function Settings() {
             <div className="NETline">
               <b>selected_impact:</b>{' '}
               {settings.selected_impact ? settings.selected_impact : 'NONE'}{' '}
-              <Link to="/browse" tabIndex={-1}>
+              <Link to="/browse" state={{ prevPage: 'settings' }} tabIndex={-1}>
                 <a>&lt;CHANGE&gt;</a>
               </Link>
             </div>
@@ -166,6 +166,20 @@ export default function Settings() {
                 &lt;CHANGE&gt;
               </a>
             </div>
+            <div className="NETline">
+              <b>use_canonical_stats:</b>{' '}
+              {settings.canonical ? 'ENABLED' : 'DISABLED'}{' '}
+              <a
+                onClick={() => {
+                  changeSetting('canonical', !settings.canonical);
+                }}
+              >
+                &lt;CHANGE&gt;
+              </a>
+            </div>
+          </div>
+          <div className="NETheader">USER SETTINGS</div>
+          <div className="NETbody">
             <div className="NETline">
               <b>username:</b> {settings.username ? settings.username : 'NONE'}{' '}
               <a

@@ -27,7 +27,7 @@ export default function LoadSave() {
     window.electron.ipcRenderer
       .invoke('get-saves', settings.save_folder_path)
       .then((res) => {
-        setSaves(res);
+        setSaves(res.reverse());
         return res;
       })
       .catch((err) => {

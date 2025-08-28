@@ -18,6 +18,7 @@ export interface userSettings {
   volume_music: number;
   selected_song: string;
   play_mode: boolean;
+  canonical: boolean;
   debug: boolean;
 }
 
@@ -28,12 +29,19 @@ export interface Impact {
   music: impactMusic;
 }
 
+export interface ImpactPreview {
+  key: string;
+  image: string;
+}
+
 interface impactInfo {
   game: string;
   title: string;
   subtitle: string;
+  shortname: string;
   description: string;
   length: string;
+  videos?: number;
   author: string;
 }
 
@@ -44,6 +52,13 @@ interface impactMeta {
   datafault?: string;
   diskfault?: string;
   color?: string;
+  achievements?: achievement[];
+}
+
+interface achievement {
+  title: string;
+  desc: string;
+  condition: blockCondition;
 }
 
 interface metaFlags {
@@ -144,4 +159,10 @@ export interface SaveGame {
   date: Date;
   impact: string;
   gameState: gameState;
+}
+
+export interface ImpactStats {
+  time: number;
+  seen: String[];
+  achievements: String[];
 }

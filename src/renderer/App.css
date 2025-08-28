@@ -38,6 +38,7 @@ body,
 
 body {
   min-height: 100%;
+  user-select: none;
 }
 
 .menuroot {
@@ -171,8 +172,10 @@ header #titlebar {
 #mainbutton {
   font-family: 'Source Code Pro', 'Courier New', 'Courier', monospace;
   font-size: 16px;
-  width: 96px;
+  width: max-content;
+  min-width: 96px;
   height: 50px;
+  cursor: pointer;
 }
 
 button,
@@ -224,6 +227,10 @@ a {
 
 .NETline a {
   cursor: pointer;
+}
+
+.NETline[title] {
+  cursor: help;
 }
 
 .NETimpact {
@@ -344,6 +351,37 @@ input[type='range'] {
   padding: 12px;
   transition: height 1s ease-in-out;
   min-height: 20px;
+}
+
+.NETstats {
+  display: flex;
+  flex-direction: row;
+  background-color: #222222ac;
+  border: 1px solid #aaaaaa88;
+  color: cyan;
+  padding: 40px 50px;
+  margin-bottom: 50px;
+}
+
+.NETprogress {
+  width: 150px;
+}
+
+.NETprogress>.NETline {
+  width: max-content;
+}
+
+.NETachievements {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-content: start;
+  gap: 0px;
+  width: 100%;
+  margin-left: 70px;
+}
+
+.NETachievements>div {
+  margin: 8px 0px 0px 0px;
 }
 
 a.purple {

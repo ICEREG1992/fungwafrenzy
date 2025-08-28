@@ -1,6 +1,8 @@
 # fungwafrenzy
 Modern Offline Client for Indie FMV Hit "Fung-Wa Frenzy"
 
+![main menu screenshot](image.png)
+
 # installation
 1. download the installer from the "Releases" tab on the right.
 2. for Windows, run the installer and the game will open automatically.
@@ -27,14 +29,16 @@ Impacts begin with an `impact.json` file. It is designed to be easy to be create
 4. music
 
 ## Info
-The info section holds basic information about what the impact is. It expects only 3 values, but there are more optional values which you can add.
+The info section holds basic information about what the impact is. It expects only 4 values, but there are more optional values which you can add. Make sure that "shortname" is named the same as the folder your impact is shipped in, or Stats will not be written correctly.
 ```json
 "info": {
     "game": "Game Name", // required
     "title": "Impact Title", // required
     "subtitle": "Impact Subtitle", // required
+    "shortname": "Folder Name", // required
     "description": "",
     "length": "",
+    "videos": 0,
     "author": "",
     "version": ""
 }
@@ -52,7 +56,15 @@ The meta section contains important information about how your impact should run
     "chapters": [],
     "datafault": "",
     "diskfault": "",
-    "color": ""
+    "color": "",
+    "achievements": [{
+        "title": "Achievement Name",
+        "desc": "Achievement Description",
+        "condition": {
+            "type": "SEEN",
+            "value": "0101"
+        }
+    }]
 }
 ```
 ### Flags
@@ -65,6 +77,8 @@ While Debug Mode is enabled, you have access to a Debug Pane which allows you to
 When something goes wrong, the datafault and diskfault videos are fallback videos which occur so the player knows something has gone wrong, and the program can fail safely. Specify the paths for those videos here.
 ### Color
 Determine the UI color for your impact here. Does not apply to the fullscreen theme. Available colors are "blue", "green", and "red".
+### Achievements
+Achievements is an array of achievements, which are displayed on the Stats page. Achievement conditions are checked after every video.
 
 ## Blocks
 The blocks section is the main data for your impact. It defines logical blocks of videos that the player will move between. This allows for video variants based on chance, or the player's flags for that playthrough.
@@ -130,7 +144,7 @@ The base condition block looks like this:
 ```
 `type` here can be many things. here is a list of supported conditions and what they do, as well as what to provide for their `value`:
 - `SEEN`: returns whether a user has seen a particular block (by key). you can check if a user has seen a particular video variant by also including the video's path after the block's key (i.e. "0201 0201.mp4")
-- `TIME`: returns whether a user loaded that video within a particular hour (UTC 24hour time). use integer comparison symbols (==, >=, <=, >, <).
+- `TIME`: returns whether a user loaded that video within a particular hour (UTC 24hour time). use integer comparison symbols (==, >=, <=, >, <) followed by an integer number 0-23.
 - `STATE`: returns whether a user is in a certain U.S. state, as determined by their location setting for the game. use two-character state abbreviations.
 - `[flag name]`: allows you to compare a flag to an integer, or to another flag. use integer comparison symbols, or if the flag is a boolean, use "true" and "false".
 - `AND`: returns whether multiple conditions are true at once. expects an array of conditions as its value.

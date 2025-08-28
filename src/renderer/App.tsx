@@ -13,6 +13,7 @@ import Browse from './Browse';
 import Game from './Game';
 import LoadSave from './LoadSave';
 import Radio from './Radio';
+import Stats from './Stats';
 import './App.css';
 import Credits from './components/Credits';
 import { useSettingsStore } from '../hooks/useSettingsStore';
@@ -94,9 +95,9 @@ function Title() {
           <Link to="/browse" tabIndex={-1}>
             <button type="button">Browse Impacts</button>
           </Link>
-          <button type="button" disabled>
-            ???
-          </button>
+          <Link to="/stats" tabIndex={-1}>
+            <button type="button">Stats</button>
+          </Link>
           <Link to="/radio" tabIndex={-1}>
             <button type="button">Radio</button>
           </Link>
@@ -163,6 +164,7 @@ export default function App() {
         selected_song: '',
         play_mode: true,
         debug: false,
+        canonical: true,
         background: 'bali-dusk.gif',
       };
       try {
@@ -230,6 +232,7 @@ export default function App() {
         <Route path="/continue" element={<Game continue />} />
         <Route path="/tools" element={<Tools />} />
         <Route path="/radio" element={<Radio />} />
+        <Route path="/stats" element={<Stats />} />
       </Routes>
     </Router>
   );

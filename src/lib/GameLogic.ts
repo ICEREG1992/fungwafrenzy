@@ -6,6 +6,7 @@ import {
   gameState,
   Impact,
   impactBlock,
+  ImpactStats,
   userSettings,
 } from '../renderer/interfaces';
 import { useSettingsStore } from '../hooks/useSettingsStore';
@@ -366,4 +367,24 @@ function splitCondition(c: string) {
   const match = /^(==|<=|>=|<|>)?(.*)/.exec(c);
   // eslint-disable-next-line spaced-comment
   return (match as RegExpExecArray).slice(1); //assert this has a result
+}
+
+export function handleAchievements(
+  gameState: gameState,
+  impact: Impact,
+  stats: ImpactStats,
+) {
+  const settings = useSettingsStore.getState().settings;
+  if (impact.meta.achievements) {
+
+    impact.meta.achievements.forEach((achievement) => {
+      console.log(`testing achievement: ${achievement.title}`);
+      if (
+        !stats.achievements.includes(achievement.title) && // not already achieved
+        checkCondition(achievement.condition, gameState, settings) // condition is met
+      ) {
+        window.electron.ipcRenderer.invoke("post-stats", impact.info.shortname, 0, "", achievement.title);
+      }
+    });
+  }
 }

@@ -101,21 +101,54 @@ ipcMain.handle('save-savedata', (e, s: SaveGame, p: string) => {
   }
 });
 
+ipcMain.handle('post-stats', (e, i: string, time: number, s?: string, a?: string) => {
+  const statsDir = path.join(app.getPath('appData'), 'fungwafrenzy', 'stats');
+  const filePath = path.join(statsDir, `${i}.json`);
+
+  try {
+    let stats = { time: 0, seen: [] as string[], achievements: [] as string[] };
+
+    if (time !== -1 && fs.existsSync(filePath)) {
+      stats = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+      stats.time += time;
+      if (s && !stats.seen.includes(s)) stats.seen.push(s);
+      if (a && !stats.achievements.includes(a)) stats.achievements.push(a);
+    }
+    
+    fs.writeFileSync(filePath, JSON.stringify(stats, null, 2), 'utf-8');
+    console.log(`Stats saved for ${i}`);
+  } catch (err) {
+    console.error(`Failed to save stats for ${i}:`, err);
+  }
+});
+
+ipcMain.handle('get-stats', (e, i: string) => {
+  const statsDir = path.join(app.getPath('appData'), 'fungwafrenzy', 'stats');
+  const filePath = path.join(statsDir, `${i}.json`);
+
+  if (fs.existsSync(filePath)) {
+    const stats = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    return stats;
+  }
+
+  return { time: 0, seen: [] as string[], achievements: [] as string[] };
+});
+
 ipcMain.handle('load-usersettings', () => {
-  const settingsFile = fs
-    .readdirSync(path.join(app.getPath('appData'), 'fungwafrenzy'))
-    .filter((file) => /^settings\.json/.test(file));
-  if (settingsFile.length) {
-    const userSettings = fs.readFileSync(
-      path.join(app.getPath('appData'), 'fungwafrenzy', 'settings.json'),
-      'utf-8',
-    );
-    const json = JSON.parse(userSettings);
-    return json;
-  } else {
+  const filePath = path.join(app.getPath('appData'), 'fungwafrenzy', 'settings.json');
+
+  if (!fs.existsSync(filePath)) return null;
+
+  try {
+    const data = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.error('Failed to load user settings:', err);
     return null;
   }
 });
+
 
 ipcMain.handle('get-impacts', (e, p: string) => {
   const impactFolders = fs.readdirSync(p);
@@ -209,12 +242,18 @@ const ensureAppDataDir = () => {
     'fungwafrenzy',
     'impacts',
   );
-  const savesPath = path.join(app.getPath('appData'), 'fungwafrenzy', 'saves');
   if (!fs.existsSync(appDataPath)) {
     fs.mkdirSync(appDataPath, { recursive: true });
   }
+
+  const savesPath = path.join(app.getPath('appData'), 'fungwafrenzy', 'saves');
   if (!fs.existsSync(savesPath)) {
     fs.mkdirSync(savesPath, { recursive: true });
+  }
+
+  const statsPath = path.join(app.getPath('appData'), 'fungwafrenzy', 'stats');
+  if (!fs.existsSync(statsPath)) {
+    fs.mkdirSync(statsPath, { recursive: true });
   }
 };
 
@@ -378,7 +417,7 @@ app
               fileStream.on('error', (err) => reject(err));
             });
 
-            return new Response(fileChunk, {
+            return new Response(new Uint8Array(fileChunk), {
               status: 206,
               headers: {
                 'Content-Range': `bytes ${start}-${end}/${fileSize}`,
@@ -391,7 +430,7 @@ app
             // Serve the whole file
             const fileBuffer = fs.readFileSync(filePath);
 
-            return new Response(fileBuffer, {
+            return new Response(new Uint8Array(fileBuffer), {
               headers: {
                 'Content-Length': fileSize.toString(),
                 'Content-Type': contentType,
